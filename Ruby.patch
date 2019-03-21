@@ -97,7 +97,7 @@ index fd2f168..ba63d9b 100644
  
  
 -if %w'z libz zlib1 zlib zdll zlibwapi'.find {|z| have_library(z, 'deflateReset')} and
-+if %w'z zlibstatic zlibstaticd'.find {|z| have_library(z, 'deflateReset', 'zlib.h')} and
++if %w'z zlibstatic zlibstaticd zlib zlibd'.find {|z| have_library(z, 'deflateReset', 'zlib.h')} and
      have_header('zlib.h') then
    have_zlib = true
  else
