@@ -14,26 +14,20 @@ class OpenstudiorubyConan(ConanFile):
     default_options = "shared=False"
     generators = "cmake"
 
-    def source(self):
-        self.run("git clone https://github.com/memsharded/hello.git")
-        self.run("cd hello && git checkout static_shared")
-        # This small hack might be useful to guarantee proper /MT /MD linkage
-        # in MSVC if the packaged project doesn't have variables to set it
-        # properly
-        tools.replace_in_file("hello/CMakeLists.txt", "PROJECT(MyHello)",
-                              '''PROJECT(MyHello)
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()''')
+
+    def configure(self):
+        self.requires("OpenSSL/1.1.0g@conan/stable")
+        self.requires("ruby_installer/2.5.1@bincrafters/stable")
+        self.requires("zlib/1.2.11@conan/stable")
+
+
 
     def build(self):
         cmake = CMake(self)
-        cmake.configure(source_folder="hello")
+        cmake.definitions["INTEGRATED_CONAN"] = False
+        cmake.configure()
         cmake.build()
 
-        # Explicit way:
-        # self.run('cmake %s/hello %s'
-        #          % (self.source_folder, cmake.command_line))
-        # self.run("cmake --build . %s" % cmake.build_config)
 
     def package(self):
         self.copy("*.h", dst="include", src="hello")

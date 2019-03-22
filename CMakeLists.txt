@@ -1,46 +1,45 @@
 cmake_minimum_required(VERSION 3.10.2)
 cmake_policy(SET CMP0048 NEW)
 
-project(OpenStudio-Ruby VERSION 2.5.5)
+project(openstudio-ruby)
+
 
 include(ExternalProject)
 
+option(INTEGRATED_CONAN "Use conan integrated into this CMake." ON)
 
-###############################################################################
-# Conan
+if (INTEGRATED_CONAN)
+  ###############################################################################
+  # Conan
 
-# Download automatically, you can also just copy the conan.cmake file
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-  message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-  file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.13/conan.cmake"
-    "${CMAKE_BINARY_DIR}/conan.cmake")
+  # Download automatically, you can also just copy the conan.cmake file
+  if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+    message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.13/conan.cmake"
+      "${CMAKE_BINARY_DIR}/conan.cmake")
+  endif()
+
+  include(${CMAKE_BINARY_DIR}/conan.cmake)
+  message("RUNNING CONAN")
+
+  conan_check(VERSION 1.0.0 REQUIRED)
+
+  conan_add_remote(NAME bincrafters
+    URL https://api.bintray.com/conan/bincrafters/public-conan)
+
+  conan_cmake_run(REQUIRES 
+    OpenSSL/1.1.0g@conan/stable
+    ruby_installer/2.5.1@bincrafters/stable 
+    zlib/1.2.11@conan/stable
+  
+    BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
+    GENERATORS cmake_find_package
+    BUILD missing
+  )
+else()
+  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 endif()
 
-include(${CMAKE_BINARY_DIR}/conan.cmake)
-
-message("RUNNING CONAN")
-
-conan_check(VERSION 1.0.0 REQUIRED)
-
-conan_add_remote(NAME bincrafters
-  URL https://api.bintray.com/conan/bincrafters/public-conan)
- 
-
-conan_cmake_run(REQUIRES 
-  OpenSSL/1.1.0g@conan/stable
-  ruby_installer/2.5.1@bincrafters/stable 
-  zlib/1.2.11@conan/stable
-  
-  BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
-  GENERATORS cmake_find_package
-  BUILD missing
-)
-
-set(CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}")
-
-find_package(OpenSSL)
-find_package(zlib)
-find_package(libffi)
 
 
 find_package(Git)
