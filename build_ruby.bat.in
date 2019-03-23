@@ -2,14 +2,14 @@ REM Whitespace is critically important with system variables on Windows
 
 
 set CL=/MP
-set CFLAGS=${CURRENT_C_FLAGS} -wd4996 -we4028 -we4142 -Zm600 
-set BASE_RUBY=${CURRENT_RUBY_BIN_DIR}/ruby.exe
-set OPENSSL_DIR=${CURRENT_OPENSSL_DIR}
-set OPENSSL_LIBS=${CURRENT_OPENSSL_LIB_DIR}/libcrypto.lib ${CURRENT_OPENSSL_LIB_DIR}/libssl.lib
-set ZLIB_DIR=${CURRENT_ZLIB_DIR}
-set ZLIB_LIBS=${CURRENT_ZLIB_LIB_DIR}/zlib.lib
-set LIBFFI_DIR=${CURRENT_LIBFFI_DIR}
-set LIBFFI_LIBS=${CURRENT_LIBFFI_LIB_DIR}/libffi.lib
+set CFLAGS=${CURRENT_CMAKE_C_FLAGS} -wd4996 -we4028 -we4142 -Zm600 -Zi
+set BASE_RUBY=${CURRENT_CONAN_BIN_DIRS_RUBY_INSTALLER}/ruby.exe
+set OPENSSL_DIR=${CURRENT_CONAN_OPENSSL_ROOT}
+set OPENSSL_LIBS=${CURRENT_CONAN_LIB_DIRS_OPENSSL}/libcrypto.lib ${CURRENT_CONAN_LIB_DIRS_OPENSSL}/libssl.lib
+set ZLIB_DIR=${CURRENT_CONAN_ZLIB_ROOT}
+set ZLIB_LIBS=${CURRENT_CONAN_LIB_DIRS_ZLIB}/zlib.lib
+set LIBFFI_DIR=${CURRENT_CONAN_LIBFFI_ROOT}
+set LIBFFI_LIBS=${CURRENT_CONAN_LIB_DIRS_LIBFFI}/libffi.lib
 
 set PATH=${CMAKE_BINARY_DIR}/tools/bin;%PATH%
 
@@ -19,22 +19,24 @@ set EXTLIBS=%LIBFFI_LIBS% %OPENSSL_LIBS% %ZLIB_LIBS%
 
 echo "EXTLIBS='%EXTLIBS%'
 
-call .\win32\configure.bat --with-static-linked-ext --with-zlib-dir="%ZLIB_DIR%" --with-openssl-dir="%OPENSSL_DIR%" --with-libffi-dir="%LIBFFI_DIR%" --without-win32ole --disable-install-doc --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/$<CONFIG>" --target=x64-mswin64 --with-baseruby="%BASE_RUBY%"
+call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --with-static-linked-ext --with-zlib-dir="%ZLIB_DIR%" --with-openssl-dir="%OPENSSL_DIR%" --with-libffi-dir="%LIBFFI_DIR%" --without-win32ole --disable-install-doc --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --target=x64-mswin64 --with-baseruby="%BASE_RUBY%" 
 
-nmake /K libenc
-nmake /K libencs
-nmake /K libtrans
-nmake /K 
-nmake install
+REM --without-ext=+,dbm,gdbm,readline
 
-REM "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/$<CONFIG>/bin"
-REM "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/$<CONFIG>/bin"
-"${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby/enc/encinit.c" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/$<CONFIG>/include/"
-"${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/$<CONFIG>/lib/ext/"
+
+nmake /k
+nmake /k install-nodoc
+
+REM "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin"
+REM "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin"
+"${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/include/"
+"${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-build/enc/encinit.c" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/include/"
+"${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext/"
 for /R "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby/ext/" %%f in (*.lib) do (
-  "${CMAKE_COMMAND}" -E copy_if_different %%f "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/$<CONFIG>/lib/ext/"
+  "${CMAKE_COMMAND}" -E copy_if_different %%f "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext/"
 )
-"${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/$<CONFIG>/lib/enc/"
+"${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc/"
 for /R "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby/enc/" %%f in (*.lib) do (
-  "${CMAKE_COMMAND}" -E copy_if_different %%f "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/$<CONFIG>/lib/enc/"
+  "${CMAKE_COMMAND}" -E copy_if_different %%f "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc/"
 )
+

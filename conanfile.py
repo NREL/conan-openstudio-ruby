@@ -12,6 +12,7 @@ class OpenstudiorubyConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
     default_options = "shared=False"
+    exports_sources = "*"
     generators = "cmake"
 
 
@@ -26,16 +27,17 @@ class OpenstudiorubyConan(ConanFile):
         cmake = CMake(self)
         cmake.definitions["INTEGRATED_CONAN"] = False
         cmake.configure()
-        cmake.build()
+
+        try:
+            cmake.build()
+        except:
+            # total hack to allow second attempt at building
+            self.should_build = True             
+            cmake.build()
 
 
     def package(self):
-        self.copy("*.h", dst="include", src="hello")
-        self.copy("*hello.lib", dst="lib", keep_path=False)
-        self.copy("*.dll", dst="bin", keep_path=False)
-        self.copy("*.so", dst="lib", keep_path=False)
-        self.copy("*.dylib", dst="lib", keep_path=False)
-        self.copy("*.a", dst="lib", keep_path=False)
+        self.copy("*", src="Ruby-prefix/src/Ruby-install", keep_path=True)
 
     def package_info(self):
         self.cpp_info.libs = ["hello"]
