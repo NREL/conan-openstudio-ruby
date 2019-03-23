@@ -28,6 +28,9 @@ class OpenstudiorubyConan(ConanFile):
         cmake.definitions["INTEGRATED_CONAN"] = False
         cmake.configure()
 
+        # On Windows the build never succeeds on the first try. Much effort
+        # was spent trying to figure out why. This is the compromise:
+        # we just build twice.
         try:
             cmake.build()
         except:
@@ -39,6 +42,4 @@ class OpenstudiorubyConan(ConanFile):
     def package(self):
         self.copy("*", src="Ruby-prefix/src/Ruby-install", keep_path=True)
 
-    def package_info(self):
-        self.cpp_info.libs = ["hello"]
 
