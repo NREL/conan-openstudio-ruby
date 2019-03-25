@@ -10,8 +10,6 @@ class OpenstudiorubyConan(ConanFile):
     description = "<Description of Openstudioruby here>"
     topics = ("<Put some tag here>", "<here>", "<and here>")
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
-    default_options = "shared=False"
     exports_sources = "*"
     generators = "cmake"
 
@@ -42,4 +40,9 @@ class OpenstudiorubyConan(ConanFile):
     def package(self):
         self.copy("*", src="Ruby-prefix/src/Ruby-install", keep_path=True)
 
+    def package_info(self):
+        self.cpp_info.libs = ['libruby-static.a', "pathname.a", "objspace.a", "readline.a", "zlib.a", "sizeof.a", "strscan.a", "parser.a", "fiber.a", "cparse.a", "wait.a", "fcntl.a", "coverage.a", "stringio.a", "generator.a", "nonblock.a", "psych.a", "socket.a", "pty.a", "etc.a", "dbm.a", "fiddle.a", 'sha2.a', "syslog.a", "sdbm.a", "digest.a", "bigdecimal.a", "console.a", "bubblebabble.a", "ripper.a", 'date_core.a', "nkf.a", "gdbm.a", 'rmd160.a', "continuation.a", "openssl.a", 'sha1.a', 'md5.a', "escape.a", "libtrans.a", "libenc.a"]
+        
+        self.cpp_info.libdirs = ['lib', 'lib/ext', 'lib/enc']
+        self.cpp_info.includedirs = ['include', 'include/ruby-2.5.0', 'include/ruby-2.5.0/x86_64-linux']
 
