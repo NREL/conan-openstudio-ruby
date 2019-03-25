@@ -31,11 +31,11 @@ REM "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/OpenSSL-Win64/b
 "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/include/"
 "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-build/enc/encinit.c" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/include/"
 "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext/"
-for /R "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby/ext/" %%f in (*.lib) do (
+for /R "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-build/ext/" %%f in (*.lib) do (
   "${CMAKE_COMMAND}" -E copy_if_different %%f "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext/"
 )
 "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc/"
-for /R "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby/enc/" %%f in (*.lib) do (
+for /R "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-build/enc/" %%f in (*.lib) do (
   "${CMAKE_COMMAND}" -E copy_if_different %%f "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc/"
 )
 
