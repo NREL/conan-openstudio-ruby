@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10.2)
 cmake_policy(SET CMP0048 NEW)
 
-project(openstudio-ruby)
+project(openstudio_ruby)
 
 
 include(ExternalProject)

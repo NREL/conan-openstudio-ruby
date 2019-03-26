@@ -2,7 +2,7 @@ from conans import ConanFile, CMake, tools
 
 
 class OpenstudiorubyConan(ConanFile):
-    name = "openstudio-ruby"
+    name = "openstudio_ruby"
     version = "2.5.5"
     license = "<Put the package license here>"
     author = "<Put your name here> <And your email here>"

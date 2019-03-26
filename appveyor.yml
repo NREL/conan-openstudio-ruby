@@ -3,7 +3,7 @@ build: false
 environment:
     PYTHON: "C:\\Python37"
 
-    CONAN_REFERENCE: "openstudio-ruby/2.5.5"
+    CONAN_REFERENCE: "openstudio_ruby/2.5.5"
     CONAN_USERNAME: "lefticus"
     CONAN_LOGIN_USERNAME: "lefticus"
     CONAN_CHANNEL: "testing"
