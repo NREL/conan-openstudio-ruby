@@ -13,13 +13,10 @@ class OpenstudiorubyConan(ConanFile):
     exports_sources = "*"
     generators = "cmake"
 
-
     def configure(self):
         self.requires("OpenSSL/1.1.0g@conan/stable")
         self.requires("ruby_installer/2.5.1@bincrafters/stable")
         self.requires("zlib/1.2.11@conan/stable")
-
-
 
     def build(self):
         cmake = CMake(self)
@@ -36,7 +33,6 @@ class OpenstudiorubyConan(ConanFile):
             self.should_build = True
             cmake.build()
 
-
     def package(self):
         self.copy("*", src="Ruby-prefix/src/Ruby-install", keep_path=True)
 
@@ -46,8 +42,6 @@ class OpenstudiorubyConan(ConanFile):
         if self.settings.os == "Windows":
             self.cpp_info.libs = ['x64-vcruntime140-ruby250-static.lib', "at_exit-x64-mswin64_140.lib", "bigdecimal.lib", "bignum-x64-mswin64_140.lib", "bubblebabble.lib", "bug_3571-x64-mswin64_140.lib", "bug_5832-x64-mswin64_140.lib", "bug_reporter-x64-mswin64_140.lib", "call_without_gvl-x64-mswin64_140.lib", "class-x64-mswin64_140.lib", "compat-x64-mswin64_140.lib", "console.lib", "console-x64-mswin64_140.lib", "continuation.lib", "coverage.lib", "cparse.lib", "date_core.lib", "debug-x64-mswin64_140.lib", "digest.lib", "dlntest.lib", "dln-x64-mswin64_140.lib", "dot.dot-x64-mswin64_140.lib", "empty-x64-mswin64_140.lib", "escape.lib", "etc.lib", "exception-x64-mswin64_140.lib", "fcntl.lib", "fd_setsize-x64-mswin64_140.lib", "fiber.lib", "fiddle.lib", "file-x64-mswin64_140.lib", "float-x64-mswin64_140.lib", "foreach-x64-mswin64_140.lib", "funcall-x64-mswin64_140.lib", "generator.lib", "hash-x64-mswin64_140.lib", "integer-x64-mswin64_140.lib", "internal_ivar-x64-mswin64_140.lib", "iseq_load-x64-mswin64_140.lib", "iter-x64-mswin64_140.lib", "md5.lib", "memory_status-x64-mswin64_140.lib", "method-x64-mswin64_140.lib", "nkf.lib", "nonblock.lib", "notimplement-x64-mswin64_140.lib", "num2int-x64-mswin64_140.lib", "numhash-x64-mswin64_140.lib", "objspace.lib", "openssl.lib", "parser.lib", "path_to_class-x64-mswin64_140.lib", "pathname.lib", "postponed_job-x64-mswin64_140.lib", "printf-x64-mswin64_140.lib", "proc-x64-mswin64_140.lib", "protect-x64-mswin64_140.lib", "psych.lib", "rational-x64-mswin64_140.lib", "rb_fatal-x64-mswin64_140.lib", "recursion-x64-mswin64_140.lib", "regexp-x64-mswin64_140.lib", "resize-x64-mswin64_140.lib", "resolv.lib", "ripper.lib", "rmd160.lib", "scan_args-x64-mswin64_140.lib", "sdbm.lib", "sha1.lib", "sha2.lib", "sizeof.lib", "socket.lib", "stringio.lib", "string-x64-mswin64_140.lib", "strscan.lib", "struct-x64-mswin64_140.lib", "symbol-x64-mswin64_140.lib", "thread_fd_close-x64-mswin64_140.lib", "time-x64-mswin64_140.lib", "tracepoint-x64-mswin64_140.lib", "typeddata-x64-mswin64_140.lib", "update-x64-mswin64_140.lib", "usr-x64-mswin64_140.lib", "wait.lib", "wait_for_single_fd-x64-mswin64_140.lib", "zlib.lib", "libtrans.lib", "libenc.lib"]
 
-
-
             self.cpp_info.libdirs = ['lib', 'lib/ext', 'lib/enc']
             self.cpp_info.includedirs = ['include', 'include/ruby-2.5.0', 'include/ruby-2.5.0/x64-mswin64_140']
         else:
@@ -55,4 +49,3 @@ class OpenstudiorubyConan(ConanFile):
 
             self.cpp_info.libdirs = ['lib', 'lib/ext', 'lib/enc']
             self.cpp_info.includedirs = ['include', 'include/ruby-2.5.0', 'include/ruby-2.5.0/x86_64-linux']
-
