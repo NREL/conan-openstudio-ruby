@@ -29,4 +29,4 @@ Full instructions available at: https://docs.conan.io/en/latest/uploading_packag
 * Upload them to your remote:
 
     $ conan create . openstudio_ruby/2.5.5@jmarrec/testing -r jmarrec
-    $ conan upload openstudio_ruby/2.5.5@jmarrec/testing -r testing
+    $ conan upload openstudio_ruby/2.5.5@jmarrec/testing -r jmarrec
