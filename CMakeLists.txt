@@ -94,6 +94,12 @@ if( UNIX )
   #  set(RUBY_EXT_CONFIG "--with-openssl-dir=/usr --with-readline-dir=/usr --with-zlib-dir=/usr")
   #endif()
 
+
+  if (APPLE)
+    find_library(GDBM libgdbm.a PATHS /usr/local/Cellar/gdbm /usr/local/opt/gdbm/lib)
+    set(GDBM_opt "--with-gdbm-dir=${GDBM}")
+  endif()
+
   # KSB: For Mac, you may need to install some things...
   # brew install homebrew/dupes/zlib
   # brew link --overwrite --force homebrew/dupes/zlib
@@ -107,7 +113,7 @@ if( UNIX )
     # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)
     PATCH_COMMAND pwd && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/Ruby.patch # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/Ruby.nodynamic.patch
     BUILD_IN_SOURCE 1
-    CONFIGURE_COMMAND pwd && sh -c "pwd && ./configure --with-static-linked-ext ${RUBY_EXT_CONFIG} --disable-install-doc --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install --with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} --with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT}"
+    CONFIGURE_COMMAND pwd && sh -c "pwd && ./configure --with-static-linked-ext ${RUBY_EXT_CONFIG} ${GDBM_opt} --disable-install-doc --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install --with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} --with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT}"
     #    BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} Use default BUILD_COMMAND for now
     INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install && sh -c "cp ./rbconfig.rb ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/." && sh -c "rm -rf ./ext/-test-" && sh -c "mkdir ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext" && sh -c "mkdir ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc" && sh -c "find ./ext -name '*.a' | xargs -I {} cp {} ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext/" && sh -c "find ./enc -name '*.a' | xargs -I {} cp {} ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc"
   )
