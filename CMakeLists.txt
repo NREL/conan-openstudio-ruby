@@ -29,6 +29,12 @@ if (INTEGRATED_CONAN)
   conan_add_remote(NAME bincrafters
     URL https://api.bintray.com/conan/bincrafters/public-conan)
 
+
+  set(CONAN_BUILD "missing")
+  if (APPLE)
+    list(APPEND CONAN_BUILD "zlib")
+  endif()
+
   conan_cmake_run(REQUIRES
     OpenSSL/${OPENSSL_VERSION}@conan/stable
     ruby_installer/2.5.1@bincrafters/stable
@@ -36,7 +42,7 @@ if (INTEGRATED_CONAN)
 
     BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
     GENERATORS cmake_find_package
-    BUILD missing
+    BUILD ${CONAN_BUILD}
   )
 else()
   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -100,7 +106,7 @@ if( UNIX )
     set(GDBM_opt "--with-gdbm-dir=${GDBM}")
   endif()
 
-  # KSB: For Mac, you may need to install some things...
+    # KSB: For Mac, you may need to install some things...
   # brew install homebrew/dupes/zlib
   # brew link --overwrite --force homebrew/dupes/zlib
   # brew install autoconf automake libtool
