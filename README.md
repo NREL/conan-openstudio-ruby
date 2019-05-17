@@ -23,7 +23,7 @@ $ conan remote add jmarrec https://api.bintray.com/conan/jmarrec/testing
 ```
 $ conan user -p <APIKEY> -r <REMOTE> <USERNAME>
 # eg:
-$ conan user -p <API_KEY> -r testing jmarrec
+$ conan user -p <API_KEY> -r jmarrec jmarrec
 ```
 
 * Add a new package on bintray, eg 'openstudio_ruby'
