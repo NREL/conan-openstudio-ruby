@@ -42,7 +42,13 @@ class OpenstudiorubyConan(ConanFile):
         """
         Locate the ruby/config.h which will be in different folders depending
         on the platform
+
+        eg:
+            include/ruby-2.5.0/x64-mswin64_140
+            include/ruby-2.5.0/x86_64-linux
+            include/ruby-2.5.0/x86_64-darwin17
         """
+
         found = gb.glob("**/ruby/config.h", recursive=True)
         if len(found) != 1:
             raise "Didn't find one and one only ruby/config.h"
@@ -55,12 +61,10 @@ class OpenstudiorubyConan(ConanFile):
         return relpath
 
     def package_info(self):
-        # TODO: This can certainly be done better with file globbing
-        # or something
 
+        # We'll glob for this extension
         if self.settings.os == "Windows":
             libext = "lib"
-
         else:
             libext = "a"
 
@@ -74,7 +78,7 @@ class OpenstudiorubyConan(ConanFile):
         libs = gb.glob(glob_pattern, recursive=True)
         if not libs:
             # Add debug info
-            self.output.info("cwd={}".format(os.path.abspath(".")))
+            self.output.info("cwd: {}".format(os.path.abspath(".")))
             self.output.info("Package folder: {}".format(self.package_folder))
             self.output.error("Globbing: {}".format(glob_pattern))
             raise "Didn't find the libraries!"
@@ -96,11 +100,9 @@ class OpenstudiorubyConan(ConanFile):
         libdirs.sort(key=lambda p: len(os.path.normpath(p).split(os.sep)))
         self.cpp_info.libdirs = libdirs
 
-        self.output.info("cpp_info.libs = {}".format(self.cpp_info.libs))
-
-        # include/ruby-2.5.0/x64-mswin64_140'
-        # 'include/ruby-2.5.0/x86_64-linux',
-        # 'include/ruby-2.5.0/x86_64-darwin17'
-
         self.cpp_info.includedirs = ['include', 'include/ruby-2.5.0']
         self.cpp_info.includedirs.append(self.find_config_header())
+
+        self.output.info("cpp_info.libs = {}".format(self.cpp_info.libs))
+        self.output.info("cpp_info.includedirs = "
+                         "{}".format(self.cpp_info.includedirs))
