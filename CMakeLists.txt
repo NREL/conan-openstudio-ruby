@@ -102,7 +102,7 @@ if( UNIX )
 
 
   if (APPLE)
-    find_library(GDBM libgdbm.a PATHS /usr/local/Cellar/gdbm /usr/local/opt/gdbm/lib)
+    find_library(GDBM libgdbm.a PATHS /usr/local/Cellar/gdbm/lib /usr/local/opt/gdbm/lib)
     set(GDBM_opt "--with-gdbm-dir=${GDBM}")
   endif()
 
