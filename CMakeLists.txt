@@ -102,8 +102,17 @@ if( UNIX )
 
 
   if (APPLE)
-    find_library(GDBM libgdbm.a PATHS /usr/local/Cellar/gdbm/lib /usr/local/opt/gdbm/lib)
-    set(GDBM_opt "--with-gdbm-dir=${GDBM}")
+    # Brew installs in there
+    # Another option is to find_package(brew brew) then execute_process brew --prefix gdbm
+    # Without NO_DEFAULT_PATH it finds my system one at /usr/local/lib/
+    find_library(GDBM libgdbm.a PATHS /usr/local/opt/gdbm/lib NO_DEFAULT_PATH)
+    if(NOT GDBM)
+      message(FATAL_ERROR "Please use Homebrew to install GDBM: `brew install gdbm`")
+    endif()
+    message(STATUS "Found libgdbm at ${GDBM}")
+    get_filename_component(GDBM_DIR "${GDBM}/../.." ABSOLUTE)
+    set(GDBM_opt "--with-gdbm-dir=${GDBM_DIR}")
+    message(STATUS "Configuring Ruby with '${GDBM_opt}")
   endif()
 
     # KSB: For Mac, you may need to install some things...
@@ -198,6 +207,9 @@ else()
   )
 endif()
 
+# TODO: This is triggered before ExternalProject_Add finishes... so useless
+# Move to Conan's side? Or try to use TEST_COMMAND i ExternalProject_Add
+message("${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin/ruby -r openssl -e print OpenSSL::OPENSSL_VERSION[/\\d+\\.\\d+\\.\\d+[a-z]/]")
 execute_process(COMMAND "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin/ruby" -r openssl -e "print OpenSSL::OPENSSL_VERSION[/\\d+\\.\\d+\\.\\d+[a-z]/]"
   OUTPUT_VARIABLE RUBY_OPENSSL_VERSION
   OUTPUT_STRIP_TRAILING_WHITESPACE
