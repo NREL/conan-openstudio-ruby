@@ -14,16 +14,16 @@ Steps:
 * Get your API key by clicking on "View Profile"
 * Add remote to conan client
 ```
-$ conan remote add <REMOTE> <YOUR_BINTRAY_REPO_URL>
+conan remote add <REMOTE> <YOUR_BINTRAY_REPO_URL>
 # eg:
-$ conan remote add jmarrec https://api.bintray.com/conan/jmarrec/testing
+conan remote add jmarrec https://api.bintray.com/conan/jmarrec/testing
 ```
 
 * Add your API key:
 ```
-$ conan user -p <APIKEY> -r <REMOTE> <USERNAME>
+conan user -p <APIKEY> -r <REMOTE> <USERNAME>
 # eg:
-$ conan user -p <API_KEY> -r jmarrec jmarrec
+conan user -p <API_KEY> -r jmarrec jmarrec
 ```
 
 * Add a new package on bintray, eg 'openstudio_ruby'
@@ -31,6 +31,6 @@ $ conan user -p <API_KEY> -r jmarrec jmarrec
 
 * Build your binaries locally and Upload them to your remote:
 ```
-$ conan create . openstudio_ruby/2.5.5@jmarrec/testing -r jmarrec
-$ conan upload openstudio_ruby/2.5.5@jmarrec/testing -r jmarrec
+conan create . openstudio_ruby/2.5.5@jmarrec/testing -r jmarrec
+conan upload openstudio_ruby/2.5.5@jmarrec/testing -r jmarrec
 ```
