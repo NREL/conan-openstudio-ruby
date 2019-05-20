@@ -131,6 +131,8 @@ if( UNIX )
     CONFIGURE_COMMAND pwd && sh -c "pwd && ./configure --with-static-linked-ext ${RUBY_EXT_CONFIG} ${GDBM_opt} --disable-install-doc --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install --with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} --with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT}"
     #    BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} Use default BUILD_COMMAND for now
     INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install && sh -c "cp ./rbconfig.rb ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/." && sh -c "rm -rf ./ext/-test-" && sh -c "mkdir ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext" && sh -c "mkdir ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc" && sh -c "find ./ext -name '*.a' | xargs -I {} cp {} ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext/" && sh -c "find ./enc -name '*.a' | xargs -I {} cp {} ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc"
+    # Run a ruby script to ensure we linked against the right OpenSSL
+    TEST_COMMAND sh -c "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin/ruby ${CMAKE_SOURCE_DIR}/test_openssl_version.rb ${OPENSSL_VERSION}"
   )
   find_file( RUBY_CONFIG_INCLUDE_DIR config.h PATHS "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/include/" )
 
@@ -178,6 +180,8 @@ else()
       COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/lib
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI/win32/vc14_x64/x64/$<CONFIG>/libffi.lib ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/lib/libffi.lib
       #COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI/win32/vc14_x64/x64/$<CONFIG>/libffi.pdb ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/lib/libffi.pdb
+    # Run a ruby script to ensure we linked against the right OpenSSL
+    TEST_COMMAND cmd /C "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin/ruby ${CMAKE_SOURCE_DIR}/test_openssl_version.rb ${OPENSSL_VERSION}"
   )
 
   set(CURRENT_CONAN_LIBFFI_ROOT ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/)
@@ -206,21 +210,3 @@ else()
     INSTALL_COMMAND ""
   )
 endif()
-
-# TODO: This is triggered before ExternalProject_Add finishes... so useless
-# Move to Conan's side? Or try to use TEST_COMMAND i ExternalProject_Add
-message("${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin/ruby -r openssl -e print OpenSSL::OPENSSL_VERSION[/\\d+\\.\\d+\\.\\d+[a-z]/]")
-execute_process(COMMAND "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin/ruby" -r openssl -e "print OpenSSL::OPENSSL_VERSION[/\\d+\\.\\d+\\.\\d+[a-z]/]"
-  OUTPUT_VARIABLE RUBY_OPENSSL_VERSION
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-# Only keep the version: not needed; we do it in ruby above
-#STRING(REGEX REPLACE "^OpenSSL +([0-9]+\\.[0-9]+\\.[0-9]+[a-z]) +.*" "\\1" RUBY_OPENSSL_VERSION "${RUBY_OPENSSL_VERSION}")
-
-if(RUBY_OPENSSL_VERSION VERSION_EQUAL OPENSSL_VERSION)
-  message(STATUS "Checking Ruby OpenSSL version: OK, ruby is built against the right OpenSSL version '${RUBY_OPENSSL_VERSION}' (expected == '${OPENSSL_VERSION}')")
-else()
-  message(WARNING "Ruby doesn't appear to be built against the right OpenSSL version, built against '${RUBY_OPENSSL_VERSION}' while we expected == '${OPENSSL_VERSION}'")
-endif()
-
