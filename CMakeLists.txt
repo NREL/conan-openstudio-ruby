@@ -17,7 +17,7 @@ if (INTEGRATED_CONAN)
   # Download automatically, you can also just copy the conan.cmake file
   if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
     message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.13/conan.cmake"
+    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.14/conan.cmake"
       "${CMAKE_BINARY_DIR}/conan.cmake")
   endif()
 
@@ -29,6 +29,12 @@ if (INTEGRATED_CONAN)
   conan_add_remote(NAME bincrafters
     URL https://api.bintray.com/conan/bincrafters/public-conan)
 
+
+  set(CONAN_BUILD "missing")
+  if (APPLE)
+    list(APPEND CONAN_BUILD "zlib")
+  endif()
+
   conan_cmake_run(REQUIRES
     OpenSSL/${OPENSSL_VERSION}@conan/stable
     ruby_installer/2.5.1@bincrafters/stable
@@ -36,7 +42,7 @@ if (INTEGRATED_CONAN)
 
     BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
     GENERATORS cmake_find_package
-    BUILD missing
+    BUILD ${CONAN_BUILD}
   )
 else()
   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -94,7 +100,22 @@ if( UNIX )
   #  set(RUBY_EXT_CONFIG "--with-openssl-dir=/usr --with-readline-dir=/usr --with-zlib-dir=/usr")
   #endif()
 
-  # KSB: For Mac, you may need to install some things...
+
+  if (APPLE)
+    # Brew installs in there
+    # Another option is to find_package(brew brew) then execute_process brew --prefix gdbm
+    # Without NO_DEFAULT_PATH it finds my system one at /usr/local/lib/
+    find_library(GDBM libgdbm.a PATHS /usr/local/opt/gdbm/lib NO_DEFAULT_PATH)
+    if(NOT GDBM)
+      message(FATAL_ERROR "Please use Homebrew to install GDBM: `brew install gdbm`")
+    endif()
+    message(STATUS "Found libgdbm at ${GDBM}")
+    get_filename_component(GDBM_DIR "${GDBM}/../.." ABSOLUTE)
+    set(GDBM_opt "--with-gdbm-dir=${GDBM_DIR}")
+    message(STATUS "Configuring Ruby with '${GDBM_opt}")
+  endif()
+
+    # KSB: For Mac, you may need to install some things...
   # brew install homebrew/dupes/zlib
   # brew link --overwrite --force homebrew/dupes/zlib
   # brew install autoconf automake libtool
@@ -107,9 +128,11 @@ if( UNIX )
     # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)
     PATCH_COMMAND pwd && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/Ruby.patch # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/Ruby.nodynamic.patch
     BUILD_IN_SOURCE 1
-    CONFIGURE_COMMAND pwd && sh -c "pwd && ./configure --with-static-linked-ext ${RUBY_EXT_CONFIG} --disable-install-doc --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install --with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} --with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT}"
+    CONFIGURE_COMMAND pwd && sh -c "pwd && ./configure --with-static-linked-ext ${RUBY_EXT_CONFIG} ${GDBM_opt} --disable-install-doc --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install --with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} --with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT}"
     #    BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} Use default BUILD_COMMAND for now
     INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install && sh -c "cp ./rbconfig.rb ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/." && sh -c "rm -rf ./ext/-test-" && sh -c "mkdir ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext" && sh -c "mkdir ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc" && sh -c "find ./ext -name '*.a' | xargs -I {} cp {} ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext/" && sh -c "find ./enc -name '*.a' | xargs -I {} cp {} ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc"
+    # Run a ruby script to ensure we linked against the right OpenSSL
+    TEST_COMMAND sh -c "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin/ruby ${CMAKE_SOURCE_DIR}/test_openssl_version.rb ${OPENSSL_VERSION}"
   )
   find_file( RUBY_CONFIG_INCLUDE_DIR config.h PATHS "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/include/" )
 
@@ -157,6 +180,8 @@ else()
       COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/lib
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI/win32/vc14_x64/x64/$<CONFIG>/libffi.lib ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/lib/libffi.lib
       #COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI/win32/vc14_x64/x64/$<CONFIG>/libffi.pdb ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/lib/libffi.pdb
+    # Run a ruby script to ensure we linked against the right OpenSSL
+    TEST_COMMAND cmd /C "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin/ruby ${CMAKE_SOURCE_DIR}/test_openssl_version.rb ${OPENSSL_VERSION}"
   )
 
   set(CURRENT_CONAN_LIBFFI_ROOT ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/)
@@ -185,18 +210,3 @@ else()
     INSTALL_COMMAND ""
   )
 endif()
-
-execute_process(COMMAND "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin/ruby" -r openssl -e "print OpenSSL::OPENSSL_VERSION[/\\d+\\.\\d+\\.\\d+[a-z]/]"
-  OUTPUT_VARIABLE RUBY_OPENSSL_VERSION
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-# Only keep the version: not needed; we do it in ruby above
-#STRING(REGEX REPLACE "^OpenSSL +([0-9]+\\.[0-9]+\\.[0-9]+[a-z]) +.*" "\\1" RUBY_OPENSSL_VERSION "${RUBY_OPENSSL_VERSION}")
-
-if(RUBY_OPENSSL_VERSION VERSION_EQUAL OPENSSL_VERSION)
-  message(STATUS "Checking Ruby OpenSSL version: OK, ruby is built against the right OpenSSL version '${RUBY_OPENSSL_VERSION}' (expected == '${OPENSSL_VERSION}')")
-else()
-  message(WARNING "Ruby doesn't appear to be built against the right OpenSSL version, built against '${RUBY_OPENSSL_VERSION}' while we expected == '${OPENSSL_VERSION}'")
-endif()
-
