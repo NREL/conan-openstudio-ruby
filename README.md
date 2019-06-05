@@ -6,7 +6,7 @@ A [conan](https://conan.io/) package to build ruby for [OpenStudio](https://gith
 
 | Bintray | Windows | Linux & macOS |
 |:--------:|:---------:|:-----------------:|
-|[![Download](https://api.bintray.com/packages/jmarrec/testing/openstudio_ruby%3Ajmarrec/images/download.svg)](https://bintray.com/jmarrec/testing/openstudio_ruby%3Ajmarrec/_latestVersion)|[![Build status](https://ci.appveyor.com/api/projects/status/github/jmarrec/openstudio_ruby?svg=true)](https://ci.appveyor.com/project/jmarrec/conan-openstudio-ruby)|[![Build Status](https://travis-ci.com/jmarrec/conan-openstudio-ruby.svg)](https://travis-ci.com/jmarrec/conan-openstudio-ruby)|
+|[![Download](https://api.bintray.com/packages/jmarrec/testing/openstudio_ruby%3Ajmarrec/images/download.svg)](https://bintray.com/jmarrec/testing/openstudio_ruby%3Ajmarrec/_latestVersion)|[![Build status](https://ci.appveyor.com/api/projects/status/github/jmarrec/openstudio_ruby?svg=true)](https://ci.appveyor.com/project/jmarrec/conan-openstudio-ruby)|[![Build Status](https://travis-ci.com/jmarrec/conan-openstudio-ruby.svg?branch=master)](https://travis-ci.org/jmarrec/conan-openstudio-ruby)|
 
 ## Uploading to bintray (unecessary due to CI)
 
