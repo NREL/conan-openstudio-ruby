@@ -15,12 +15,27 @@ class OpenstudiorubyConan(ConanFile):
     exports_sources = "*"
     generators = "cmake"
 
-    def configure(self):
+    def requirements(self):
+        """
+        Declare required dependencies
+        """
         self.requires("OpenSSL/1.1.0g@conan/stable")
-        self.requires("ruby_installer/2.5.1@bincrafters/stable")
         self.requires("zlib/1.2.11@conan/stable")
 
+    def build_requirements(self):
+        """
+        Build requirements are requirements that are only installed and used
+        when the package is built from sources. If there is an existing
+        pre-compiled binary, then the build requirements for this package will
+        not be retrieved.
+        """
+        self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
+
     def build(self):
+        """
+        This method is used to build the source code of the recipe using the
+        CMakeLists.txt
+        """
         cmake = CMake(self)
         cmake.definitions["INTEGRATED_CONAN"] = False
         cmake.configure()
@@ -28,17 +43,24 @@ class OpenstudiorubyConan(ConanFile):
         # On Windows the build never succeeds on the first try. Much effort
         # was spent trying to figure out why. This is the compromise:
         # we just build twice.
-        try:
-            cmake.build()
-        except:
-            # total hack to allow second attempt at building
-            self.should_build = True
+        if self.settings.os == "Windows":
+            try:
+                cmake.build()
+            except:
+                # total hack to allow second attempt at building
+                self.should_build = True
+                cmake.build()
+        else:
             cmake.build()
 
     def package(self):
+        """
+        The actual creation of the package, once that it is built, is done
+        here by copying artifacts from the build folder to the package folder
+        """
         self.copy("*", src="Ruby-prefix/src/Ruby-install", keep_path=True)
 
-    def find_config_header(self):
+    def _find_config_header(self):
         """
         Locate the ruby/config.h which will be in different folders depending
         on the platform
@@ -61,7 +83,11 @@ class OpenstudiorubyConan(ConanFile):
         return relpath
 
     def package_info(self):
-
+        """
+        Specify certain build information for consumers of the package
+        Mostly we properly define libs to link against, libdirs and includedirs
+        so that it can work with OpenStudio
+        """
         # We'll glob for this extension
         if self.settings.os == "Windows":
             libext = "lib"
@@ -101,7 +127,7 @@ class OpenstudiorubyConan(ConanFile):
         self.cpp_info.libdirs = libdirs
 
         self.cpp_info.includedirs = ['include', 'include/ruby-2.5.0']
-        self.cpp_info.includedirs.append(self.find_config_header())
+        self.cpp_info.includedirs.append(self._find_config_header())
 
         self.output.info("cpp_info.libs = {}".format(self.cpp_info.libs))
         self.output.info("cpp_info.includedirs = "
