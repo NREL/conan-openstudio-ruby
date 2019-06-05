@@ -3,61 +3,65 @@ build: false
 environment:
     PYTHON_HOME: "C:\\Python37"
 
-    CONAN_REFERENCE: "openstudio_ruby/2.5.5"
-    CONAN_USERNAME: "jmarrec"
-    CONAN_LOGIN_USERNAME: "lefticus"
-    CONAN_CHANNEL: "testing"
-
     matrix:
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-          CONAN_VISUAL_VERSIONS: 14
-          CONAN_ARCHS: x86
-          CONAN_BUILD_TYPES: Release
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-          CONAN_VISUAL_VERSIONS: 14
-          CONAN_ARCHS: x86
-          CONAN_BUILD_TYPES: Debug
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-          CONAN_VISUAL_VERSIONS: 14
-          CONAN_ARCHS: x86_64
-          CONAN_BUILD_TYPES: Release
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-          CONAN_VISUAL_VERSIONS: 14
-          CONAN_ARCHS: x86_64
-          CONAN_BUILD_TYPES: Debug
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-          CONAN_VISUAL_VERSIONS: 15
-          CONAN_ARCHS: x86
-          CONAN_BUILD_TYPES: Release
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-          CONAN_VISUAL_VERSIONS: 15
-          CONAN_ARCHS: x86
-          CONAN_BUILD_TYPES: Debug
+
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
           CONAN_VISUAL_VERSIONS: 15
           CONAN_ARCHS: x86_64
           CONAN_BUILD_TYPES: Release
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-          CONAN_VISUAL_VERSIONS: 15
-          CONAN_ARCHS: x86_64
-          CONAN_BUILD_TYPES: Debug
 
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
           CONAN_VISUAL_VERSIONS: 16
-          CONAN_ARCHS: x86
-          CONAN_BUILD_TYPES: Release
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-          CONAN_VISUAL_VERSIONS: 16
-          CONAN_ARCHS: x86
-          CONAN_BUILD_TYPES: Debug
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-          CONAN_VISUAL_VERSIONS: 16
           CONAN_ARCHS: x86_64
           CONAN_BUILD_TYPES: Release
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-          CONAN_VISUAL_VERSIONS: 16
-          CONAN_ARCHS: x86_64
-          CONAN_BUILD_TYPES: Debug
+
+#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+#          CONAN_VISUAL_VERSIONS: 15
+#          CONAN_ARCHS: x86_64
+#          CONAN_BUILD_TYPES: Debug
+#
+#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+#          CONAN_VISUAL_VERSIONS: 16
+#          CONAN_ARCHS: x86_64
+#          CONAN_BUILD_TYPES: Debug
+#
+#
+#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+#          CONAN_VISUAL_VERSIONS: 14
+#          CONAN_ARCHS: x86_64
+#          CONAN_BUILD_TYPES: Release
+#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+#          CONAN_VISUAL_VERSIONS: 14
+#          CONAN_ARCHS: x86_64
+#          CONAN_BUILD_TYPES: Debug
+#
+#
+#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+#          CONAN_VISUAL_VERSIONS: 14
+#          CONAN_ARCHS: x86
+#          CONAN_BUILD_TYPES: Release
+#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+#          CONAN_VISUAL_VERSIONS: 14
+#          CONAN_ARCHS: x86
+#          CONAN_BUILD_TYPES: Debug
+#
+#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+#          CONAN_VISUAL_VERSIONS: 15
+#          CONAN_ARCHS: x86
+#          CONAN_BUILD_TYPES: Release
+#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+#          CONAN_VISUAL_VERSIONS: 15
+#          CONAN_ARCHS: x86
+#          CONAN_BUILD_TYPES: Debug
+#
+#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+#          CONAN_VISUAL_VERSIONS: 16
+#          CONAN_ARCHS: x86
+#          CONAN_BUILD_TYPES: Debug
+#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+#          CONAN_VISUAL_VERSIONS: 16
+#          CONAN_ARCHS: x86
+#          CONAN_BUILD_TYPES: Release
 
 install:
   - set PATH=%PYTHON_HOME%;%PYTHON_HOME%/Scripts/;%PATH%
