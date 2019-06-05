@@ -1,14 +1,14 @@
+# Conan OpenStudio Ruby
+
+A [conan](https://conan.io/) package to build ruby for [OpenStudio](https://github.com/NREL/OpenStudio).
+
 ## Package Status
 
 | Bintray | Windows | Linux & macOS |
 |:--------:|:---------:|:-----------------:|
 |[![Download](https://api.bintray.com/packages/jmarrec/testing/openstudio_ruby%3Ajmarrec/images/download.svg)](https://bintray.com/jmarrec/testing/openstudio_ruby%3Ajmarrec/_latestVersion)|[![Build status](https://ci.appveyor.com/api/projects/status/github/jmarrec/openstudio_ruby?svg=true)](https://ci.appveyor.com/project/jmarrec/conan-openstudio-ruby)|[![Build Status](https://travis-ci.com/jmarrec/conan-openstudio-ruby.svg)](https://travis-ci.com/jmarrec/conan-openstudio-ruby)|
 
-# Conan OpenStudio Ruby
-
-A [conan](https://conan.io/) package to build ruby for [OpenStudio](https://github.com/NREL/OpenStudio).
-
-# Uploading to bintray
+## Uploading to bintray (unecessary due to CI)
 
 **TODO: Once the NREL bintray is up and running, only include the information needed to upload (remove the setup portion) and with the right links**
 
