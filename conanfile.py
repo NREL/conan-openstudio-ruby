@@ -1,7 +1,7 @@
 import os
 import glob as gb
 from conans import ConanFile, CMake
-
+from conans.errors import ConanException
 
 class OpenstudiorubyConan(ConanFile):
     name = "openstudio_ruby"
@@ -73,7 +73,7 @@ class OpenstudiorubyConan(ConanFile):
 
         found = gb.glob("**/ruby/config.h", recursive=True)
         if len(found) != 1:
-            raise "Didn't find one and one only ruby/config.h"
+            raise ConanException("Didn't find one and one only ruby/config.h")
 
         p = found[0]
         abspath = os.path.abspath(os.path.join(p, os.pardir, os.pardir))
@@ -107,7 +107,7 @@ class OpenstudiorubyConan(ConanFile):
             self.output.info("cwd: {}".format(os.path.abspath(".")))
             self.output.info("Package folder: {}".format(self.package_folder))
             self.output.error("Globbing: {}".format(glob_pattern))
-            raise "Didn't find the libraries!"
+            raise ConanException("Didn't find the libraries!")
 
         self.output.success("Found {} libs".format(len(libs)))
 
