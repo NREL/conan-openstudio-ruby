@@ -1,7 +1,9 @@
+import sys
 import os
 import glob as gb
 from conans import ConanFile, CMake
 from conans.errors import ConanException
+
 
 class OpenstudiorubyConan(ConanFile):
     name = "openstudio_ruby"
@@ -70,6 +72,17 @@ class OpenstudiorubyConan(ConanFile):
             include/ruby-2.5.0/x86_64-linux
             include/ruby-2.5.0/x86_64-darwin17
         """
+        found = []
+
+        # Glob recursive Works in python3.4 and above only...
+        if sys.version_info > (3, 4):
+            found = gb.glob("**/ruby/config.h", recursive=True)
+        else:
+            import fnmatch
+            for root, dirnames, filenames in os.walk('.'):
+                for filename in fnmatch.filter(filenames, 'config.h'):
+                    if root.endswith('ruby'):
+                        found.append(os.path.join(root, filename))
 
         found = gb.glob("**/ruby/config.h", recursive=True)
         if len(found) != 1:
