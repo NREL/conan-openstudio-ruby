@@ -8,6 +8,8 @@ A [conan](https://conan.io/) package to build ruby for [OpenStudio](https://gith
 |:--------:|:---------:|:-----------------:|
 |[![Download](https://api.bintray.com/packages/jmarrec/testing/openstudio_ruby%3Ajmarrec/images/download.svg)](https://bintray.com/jmarrec/testing/openstudio_ruby%3Ajmarrec/_latestVersion)|[![Build status](https://ci.appveyor.com/api/projects/status/github/jmarrec/conan-openstudio-ruby?svg=true)](https://ci.appveyor.com/project/jmarrec/conan-openstudio-ruby)|[![Build Status](https://travis-ci.org/jmarrec/conan-openstudio-ruby.svg?branch=master)](https://travis-ci.org/jmarrec/conan-openstudio-ruby)|
 
+CI is done by Travis for Linux&Mac, and AppVeyor for Windows. To ignore specific commits, please add tags in your commit message such as `[skip ci]` (skip all), `[skip travis]` or `[skip appveyor]`.
+
 ## Uploading to bintray (unecessary due to CI)
 
 **TODO: Once the NREL bintray is up and running, only include the information needed to upload (remove the setup portion) and with the right links**
