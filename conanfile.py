@@ -84,7 +84,6 @@ class OpenstudiorubyConan(ConanFile):
                     if root.endswith('ruby'):
                         found.append(os.path.join(root, filename))
 
-        found = gb.glob("**/ruby/config.h", recursive=True)
         if len(found) != 1:
             raise ConanException("Didn't find one and one only ruby/config.h")
 
@@ -114,7 +113,17 @@ class OpenstudiorubyConan(ConanFile):
         glob_pattern = "**/*.{}".format(libext)
         # glob_pattern = os.path.join(self.package_folder, glob_pattern)
 
-        libs = gb.glob(glob_pattern, recursive=True)
+        # Glob recursive Works in python3.4 and above only...
+        libs = []
+        if sys.version_info > (3, 4):
+            libs = gb.glob(glob_pattern, recursive=True)
+        else:
+            import fnmatch
+            for root, dirnames, filenames in os.walk('.'):
+                for filename in fnmatch.filter(filenames,
+                                               '*.{}'.format(libext)):
+                    libs.append(os.path.join(root, filename))
+
         if not libs:
             # Add debug info
             self.output.info("cwd: {}".format(os.path.abspath(".")))
