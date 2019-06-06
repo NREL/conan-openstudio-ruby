@@ -10,12 +10,11 @@ if __name__ == "__main__":
 
     if "ARCH" in os.environ:
         arch = os.environ["ARCH"]
-        builder = build_template_installer.get_builder()
-        builder.add({"os": build_shared.get_os(),
-                     "arch_build": arch,
-                     "arch": arch},
-                    {}, {}, {})
+        builder = build_template_installer.get_builder(build_policy="outdated")
+        builder.add(settings={"os": build_shared.get_os(),
+                              "arch_build": arch,
+                              "arch": arch})
     else:
-        builder = build_template_default.get_builder(pure_c=False)
+        builder = build_template_default.get_builder(build_policy="outdated")
 
 builder.run()
