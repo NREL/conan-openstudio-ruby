@@ -1,6 +1,7 @@
 import sys
 import os
 import glob as gb
+import re
 from conans import ConanFile, CMake
 from conans.errors import ConanException
 
@@ -131,14 +132,29 @@ class OpenstudiorubyConan(ConanFile):
             self.output.error("Globbing: {}".format(glob_pattern))
             raise ConanException("Didn't find the libraries!")
 
-        self.output.success("Found {} libs".format(len(libs)))
+        # Remove the non-static VS libs
+        if self.settings.os == "Windows":
+            non_stat_re = re.compile(r'x64-vcruntime[0-9]+-ruby[0-9]+\.lib')
+            exclude_libs = [x for x in libs
+                            if non_stat_re.search(x)]
+            if not exclude_libs:
+                self.output.error("Did not find any static lib to exclude, "
+                                  "expected at least one on Windows")
+            else:
+                print("Excluding {} non-static libs: "
+                      "{}".format(len(exclude_libs), exclude_libs))
+
+                # Now we actually exclude it
+                libs = list(set(libs) - set(exclude_libs))
 
         # Relative to package folder: no need unless explicitly setting glob
         # to package_folder above
         # libs = [os.path.relpath(p, start=self.package_folder) for p in libs]
 
-        # Keep only the names
+        # Keep only the names:
         self.cpp_info.libs = [os.path.basename(x) for x in libs]
+
+        self.output.success("Found {} libs".format(len(libs)))
 
         # self.cpp_info.libdirs = ['lib', 'lib/ext', 'lib/enc']
         # Equivalent automatic detection
