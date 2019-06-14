@@ -16,6 +16,9 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
     pyenv virtualenv 3.7.1 conan
     pyenv rehash
     pyenv activate conan
+
+    # Install deps
+    brew install gdbm libyaml readline libffi
 fi
 
 pip install conan --upgrade
