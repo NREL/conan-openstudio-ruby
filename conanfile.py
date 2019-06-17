@@ -44,23 +44,23 @@ class OpenstudiorubyConan(ConanFile):
         if self.options.with_libyaml:
             self.requires("libyaml/0.2.2@bincrafters/stable")
             self.options["libyaml"].shared = False
-            self.options["libyaml"].fPIC = True
+            # self.options["libyaml"].fPIC = True
 
         if self.options.with_libffi:
             self.requires("libffi/3.2.1@bincrafters/stable")
             self.options["libffi"].shared = False
-            self.options["libffi"].fPIC = True
+            # self.options["libffi"].fPIC = True
 
         if self.options.with_gdbm:
             self.requires("gdbm/1.18.1@jmarrec/testing")
             self.options["gdbm"].shared = False
-            self.options["gdbm"].fPIC = True
+            # self.options["gdbm"].fPIC = True
             self.options["gdbm"].libgdbm_compat = True
 
         if self.options.with_readline:
             self.requires("readline/7.0@bincrafters/stable")
             self.options["readline"].shared = False
-            self.options["readline"].fPIC = True
+            # self.options["readline"].fPIC = True
 
     def build_requirements(self):
         """
