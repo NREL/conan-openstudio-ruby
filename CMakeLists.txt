@@ -176,8 +176,8 @@ else()
   #file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
   #file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/bison/2.4.1/bison-2.4.1-bin.zip ${CMAKE_BINARY_DIR}/tools/bison-2.4.1-bin.zip)
   #file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/bison/2.4.1/bison-2.4.1-dep.zip ${CMAKE_BINARY_DIR}/tools/bison-2.4.1-dep.zip)
-  #file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-dep.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-dep.zip)
-  #file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-bin.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-bin.zip)
+  file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-dep.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-dep.zip)
+  file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-bin.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-bin.zip)
 
   #add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/tools/bin/bison.exe ${CMAKE_BINARY_DIR}/tools/bin/sed.exe
       #COMMAND ${CMAKE_COMMAND} -E tar xvf bison-2.4.1-bin.zip
@@ -187,6 +187,14 @@ else()
       #WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
   #add_custom_target(GetTools
       #DEPENDS ${CMAKE_BINARY_DIR}/tools/bin/bison.exe)
+
+  add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/tools/bin/sed.exe
+      COMMAND ${CMAKE_COMMAND} -E tar xvf sed-4.2.1-bin.zip
+      COMMAND ${CMAKE_COMMAND} -E tar xvf sed-4.2.1-dep.zip
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
+  add_custom_target(GetTools
+      DEPENDS ${CMAKE_BINARY_DIR}/tools/bin/sed.exe)
+
 
 
   ## The libFFI provided by Conan gives us something we cannot link to for some reason (TBD)
@@ -222,6 +230,7 @@ else()
   # TODO: consider moving to the official ruby distribution and avoid needing the above
   # tool dependencies
   ExternalProject_Add(Ruby
+    DEPENDS GetTools
     #    URL https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.5.tar.gz
     #    URL_HASH SHA256=28a945fdf340e6ba04fc890b98648342e3cccfd6d223a48f3810572f11b2514c
     URL https://codeload.github.com/ruby/ruby/tar.gz/v2_5_5
