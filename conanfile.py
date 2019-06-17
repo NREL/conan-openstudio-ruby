@@ -18,12 +18,49 @@ class OpenstudiorubyConan(ConanFile):
     exports_sources = "*"
     generators = "cmake"
 
+    options = {
+        'with_libyaml': [True, False],
+        'with_libffi': [True, False],
+        # GDBM depends on readline
+        'with_gdbm': [True, False],
+        # Readline doesn't work for MSVC currently
+        'with_readline': [True, False],
+    }
+    default_options = {x: True for x in options}
+
+    def configure(self):
+        if (self.settings.os == "Windows" and self.settings.compiler == "Visual Studio"):
+            # raise ConanInvalidConfiguration("readline is not supported for Visual Studio")
+            self.output.warn("Readline (and therefore GDBM) will not work on "
+                             "MSVC right now")
+
     def requirements(self):
         """
         Declare required dependencies
         """
         self.requires("OpenSSL/1.1.0g@conan/stable")
         self.requires("zlib/1.2.11@conan/stable")
+
+        if self.options.with_libyaml:
+            self.requires("libyaml/0.2.2@bincrafters/stable")
+            self.options["libyaml"].shared = False
+            self.options["libyaml"].fPIC = True
+
+        if self.options.with_libffi:
+            self.requires("libffi/3.2.1@bincrafters/stable")
+            self.options["libffi"].shared = False
+            self.options["libffi"].fPIC = True
+
+        if self.options.with_gdbm:
+            self.requires("gdbm/1.18.1@jmarrec/testing")
+            self.options["gdbm"].shared = False
+            self.options["gdbm"].fPIC = True
+            self.options["gdbm"].libgdbm_compat = True
+
+        if self.options.with_readline:
+            self.requires("readline/7.0@bincrafters/stable")
+            self.options["readline"].shared = False
+            self.options["readline"].fPIC = True
 
     def build_requirements(self):
         """
@@ -33,6 +70,7 @@ class OpenstudiorubyConan(ConanFile):
         not be retrieved.
         """
         self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
+        self.build_requires("bison_installer/3.3.2@bincrafters/stable")
 
     def build(self):
         """

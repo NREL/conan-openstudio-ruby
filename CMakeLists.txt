@@ -34,11 +34,24 @@ if (INTEGRATED_CONAN)
   if (APPLE)
     list(APPEND CONAN_BUILD "zlib")
   endif()
+  list(APPEND CONAN_OPTIONS "libyaml:fPIC=True")
+  list(APPEND CONAN_OPTIONS "libyaml:shared=False")
+  list(APPEND CONAN_OPTIONS "gdbm:fPIC=True")
+  list(APPEND CONAN_OPTIONS "gdbm:shared=False")
+  list(APPEND CONAN_OPTIONS "gdbm:libgdbm_compat=True")
+  list(APPEND CONAN_OPTIONS "readline:fPIC=True")
+  list(APPEND CONAN_OPTIONS "readline:shared=False")
+  list(APPEND CONAN_OPTIONS "fPIC=True")
+  list(APPEND CONAN_OPTIONS "libffi:shared=False")
 
   conan_cmake_run(REQUIRES
     OpenSSL/${OPENSSL_VERSION}@conan/stable
     ruby_installer/2.5.1@bincrafters/stable
     zlib/1.2.11@conan/stable
+    libyaml/0.2.2@bincrafters/stable
+    gdbm/1.18.1@jmarrec/testing  # No official recipes yet
+    libffi/3.2.1@bincrafters/stable
+    readline/7.0@bincrafters/stable
 
     BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
     GENERATORS cmake_find_package
@@ -81,17 +94,29 @@ macro(FindValue ValueName)
 endmacro()
 
 FindValue(CMAKE_C_FLAGS)
+
 FindValue(CONAN_OPENSSL_ROOT)
 FindValue(CONAN_LIB_DIRS_OPENSSL)
+
 FindValue(CONAN_ZLIB_ROOT)
 FindValue(CONAN_LIB_DIRS_ZLIB)
+
 FindValue(CONAN_LIBFFI_ROOT)
 FindValue(CONAN_LIB_DIRS_LIBFFI)
+
 FindValue(CONAN_BIN_DIRS_RUBY_INSTALLER)
 
+FindValue(CONAN_LIBYAML_ROOT)
+FindValue(CONAN_LIB_DIRS_LIBYAML)
+
+FindValue(CONAN_GDBM_ROOT)
+FindValue(CONAN_LIB_DIRS_GDBM)
+
+FindValue(CONAN_READLINE_ROOT)
+FindValue(CONAN_LIB_DIRS_READLINE)
 
 if( UNIX )
-  set(RUBY_EXT_CONFIG "")
+  # set(RUBY_EXT_CONFIG "")
   #if (NOT APPLE)
   #  # DLM: still missing: curses, dbm, gdbm
   #  # gbdm: libgbdm3 for Up to 16.04, libgbdm5 for 18.04
@@ -101,10 +126,10 @@ if( UNIX )
   #endif()
 
 
-  if (APPLE)
+  #if (APPLE)
     # Find some homebrew stuff
-    include(FindHomeBrewPackage.cmake)
-  endif()
+    # include(FindHomeBrewPackage.cmake)
+  # endif()
 
     # KSB: For Mac, you may need to install some things...
   # brew install homebrew/dupes/zlib
@@ -119,7 +144,14 @@ if( UNIX )
     # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)
     PATCH_COMMAND pwd && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/Ruby.patch # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/Ruby.nodynamic.patch
     BUILD_IN_SOURCE 1
-    CONFIGURE_COMMAND pwd && sh -c "pwd && ./configure --with-static-linked-ext ${RUBY_EXT_CONFIG} ${MAC_opts} --disable-install-doc --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install --with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} --with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT}"
+    CONFIGURE_COMMAND pwd && sh -c "pwd && ./configure --with-static-linked-ext ${MAC_opts} --disable-install-doc \
+      --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install \
+      --with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} \
+      --with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT} \
+      --with-libyaml-dir=${CURRENT_CONAN_LIBYAML_ROOT} \
+      --with-gdbm-dir=${CURRENT_CONAN_GDBM_ROOT} \
+      --with-libffi-dir=${CURRENT_CONAN_LIBFFI_ROOT} \
+      --with-readline-dir=${CURRENT_CONAN_READLINE_ROOT}"
     #    BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} Use default BUILD_COMMAND for now
     INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install && sh -c "cp ./rbconfig.rb ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/." && sh -c "rm -rf ./ext/-test-" && sh -c "mkdir ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext" && sh -c "mkdir ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc" && sh -c "find ./ext -name '*.a' | xargs -I {} cp {} ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext/" && sh -c "find ./enc -name '*.a' | xargs -I {} cp {} ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc"
     # Run a ruby script to ensure we linked against the right OpenSSL
@@ -137,6 +169,8 @@ else()
   # patch config.h to allow for multiple _MSC_VER values:
   #   #if !(_MSC_VER == 1915 || _MSC_VER == 1916 || _MSC_VER == 1917 || _MSC_VER == 1918 || _MSC_VER == 1919)
   # tar -zcvf ruby_2_5_1_msvc2017_static.tar.gz Ruby-install
+
+  # TODO: replace with conanfile.py: self.build_requires("bison_installer/3.3.2@bincrafters/stable")
 
   # get bison and sed tools
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
