@@ -10,16 +10,19 @@ set ZLIB_DIR=${CURRENT_CONAN_ZLIB_ROOT}
 set ZLIB_LIBS=${CURRENT_CONAN_LIB_DIRS_ZLIB}/zlib.lib
 set LIBFFI_DIR=${CURRENT_CONAN_LIBFFI_ROOT}
 set LIBFFI_LIBS=${CURRENT_CONAN_LIB_DIRS_LIBFFI}/libffi.lib
+set LIBYAML_DIR=${CURRENT_CONAN_LIBYAML_ROOT}
+set LIBYAML_LIBS=${CURRENT_CONAN_LIB_DIRS_LIBYAML}/libffi.lib
+
 
 set PATH=${CMAKE_BINARY_DIR}/tools/bin;%PATH%
 
 echo "New Flags %CFLAGS%"
 
-set EXTLIBS=%LIBFFI_LIBS% %OPENSSL_LIBS% %ZLIB_LIBS% 
+set EXTLIBS=%LIBFFI_LIBS% %OPENSSL_LIBS% %ZLIB_LIBS% %LIBYAML_LIBS%
 
 echo "EXTLIBS='%EXTLIBS%'
 
-call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --with-static-linked-ext --with-zlib-dir="%ZLIB_DIR%" --with-openssl-dir="%OPENSSL_DIR%" --with-libffi-dir="%LIBFFI_DIR%" --without-win32ole --disable-install-doc --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --target=x64-mswin64 --with-baseruby="%BASE_RUBY%" 
+call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --with-static-linked-ext --with-zlib-dir="%ZLIB_DIR%" --with-openssl-dir="%OPENSSL_DIR%" --with-libffi-dir="%LIBFFI_DIR%" --with-libyaml-dir="%LIBYAML_DIR%" --without-win32ole --disable-install-doc --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --target=x64-mswin64 --with-baseruby="%BASE_RUBY%" 
 
 
 

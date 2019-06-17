@@ -33,6 +33,8 @@ class OpenstudiorubyConan(ConanFile):
             # raise ConanInvalidConfiguration("readline is not supported for Visual Studio")
             self.output.warn("Readline (and therefore GDBM) will not work on "
                              "MSVC right now")
+            del self.options.with_gdbm
+            del self.options.with_readline
 
     def requirements(self):
         """
