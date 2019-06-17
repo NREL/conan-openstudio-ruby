@@ -2,13 +2,20 @@ import sys
 import os
 import glob as gb
 import re
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, tools
 from conans.errors import ConanException
 
+def get_version():
+    git = tools.Git()
+    ruby_version = "2.5.5"
+    try:
+        return "%s-%s" % (ruby_version, git.get_revision()[:10])
+    except:
+        return None
 
 class OpenstudiorubyConan(ConanFile):
     name = "openstudio_ruby"
-    version = "2.5.5"
+    version = get_version()
     license = "<Put the package license here>"
     author = "<Put your name here> <And your email here>"
     url = "<Package recipe repository url here, for issues about the package>"

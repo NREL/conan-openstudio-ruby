@@ -45,3 +45,11 @@ install:
 script:
   - chmod +x .ci/run.sh
   - ./.ci/run.sh
+
+script:
+  - chmod +x .ci/nrel_build.sh
+  - ./.ci/nrel_build.sh
+
+env:
+  global:
+    secure: JCc6Gr5eL3A4nFLQfDmEBzx2QENRsZmoqLdZ1vvfJwiV1fUxXUt2UlPXaBe/P6+N9XdSHP5iGyopYachENdeuSJAhLXmBbXItoXClOblhEesZdKl3sMigCVScEX6oLoIoriuQtkNQwFLTBG+6JOq/bnGUn8eMuXOr9noO75mvWP5NcVb+xI/k+U8T046q4tFmLM8aGsXR9V3dEXl9Q9yHCvVF6WSr30ld/9h1JzmDZaMo0/Nin9y5lY8mxVYke3AwbqXSLXq0342YzylG0Bp4eVVrCVrsXlaVDRGMtN00zNHjgc+QkvbIaGaNYxrBNe+FuVk7JSAerlDSIoqoJuNkDKiIVDb9JLAnwc1DFuoGwhJxSwLQ4wJgX1PPS438BLLYynid54pjVKHYI0EzAiBuX5hXMqbgseZaqh/0VZBpE/X9IS9rEJ7CPLo9NQ9VW1274nbGrciueBYwNfrsUE0Wu2iUuJulfdw6I9s3VVKOSmsOJxU6T/UgkUlLP/fGOEGwki5Ybs+DGh2pcW9SDUE2BuDe9LrQ6JtZl73WKE61wPUC1qfVFoL1fh/Rp1UZGNyMbrS460uMyoDHR3vNRWCgzMOcJfdLH6CMhf3rqYAYoOJ2Mmn0hM7A7/0IMt4HMHKbY5faWZV2S+TR5ykDKyR5lOTgrWCkuPEaxJ0f2D3Nl4=
