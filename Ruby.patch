@@ -15,7 +15,7 @@ diff --git a/lib/mkmf.rb b/lib/mkmf.rb
 index 7f53bb4..20ac890 100644
 --- a/lib/mkmf.rb
 +++ b/lib/mkmf.rb
-@@ -2708,7 +2708,21 @@ def MAIN_DOES_NOTHING(*refs)
+@@ -2709,7 +2709,21 @@ def MAIN_DOES_NOTHING(*refs)
    ##
    # A C main function which does no work
  
@@ -42,7 +42,7 @@ diff --git a/lib/rubygems.rb b/lib/rubygems.rb
 index 2762bfc..2280a9e 100644
 --- a/lib/rubygems.rb
 +++ b/lib/rubygems.rb
-@@ -1354,24 +1354,24 @@ def clear_default_specs
+@@ -1349,24 +1349,24 @@ def clear_default_specs
  
    MARSHAL_SPEC_DIR = "quick/Marshal.#{Gem.marshal_version}/"
  
