@@ -65,6 +65,9 @@ environment:
 #          CONAN_ARCHS: x86
 #          CONAN_BUILD_TYPES: Release
 
+clone_folder: C:\projects\conan-openstudio-ruby
+
+
 install:
   - set PATH=%PYTHON_HOME%;%PYTHON_HOME%/Scripts/;%PATH%
   - pip.exe install conan --upgrade
@@ -72,4 +75,4 @@ install:
   - conan user # It creates the conan data directory
 
 test_script:
-- cmd: run.cmd
+- cmd: C:\projects\conan-openstudio-ruby\.ci\run.cmd
