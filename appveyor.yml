@@ -2,6 +2,8 @@ build: false
 
 environment:
     PYTHON_HOME: "C:\\Python37"
+    BINTRAY_API:
+      secure: P8Jq7K6ajoUO4iTsl/IntNm88Rnb1jnn1MJYRbdkMZ7YHwSs9n4HiY28Wf8v1i99
 
     matrix:
 
@@ -70,4 +72,4 @@ install:
   - conan user # It creates the conan data directory
 
 test_script:
-- python build.py
+- cmd: run.cmd
