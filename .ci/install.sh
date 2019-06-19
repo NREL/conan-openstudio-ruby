@@ -7,8 +7,6 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
     brew outdated pyenv || brew upgrade pyenv
     brew install pyenv-virtualenv
     brew install cmake || true
-    # Install deps
-    brew install gdbm libyaml readline libffi || true
 
     if which pyenv > /dev/null; then
         eval "$(pyenv init -)"
