@@ -3,6 +3,7 @@ REM Whitespace is critically important with system variables on Windows
 
 set CL=/MP
 set CFLAGS=${CURRENT_CMAKE_C_FLAGS} -wd4996 -we4028 -we4142 -Zm600 -Zi
+
 set BASE_RUBY=${CURRENT_CONAN_BIN_DIRS_RUBY_INSTALLER}/ruby.exe
 set OPENSSL_DIR=${CURRENT_CONAN_OPENSSL_ROOT}
 set OPENSSL_LIBS=${CURRENT_CONAN_LIB_DIRS_OPENSSL}/libcrypto.lib ${CURRENT_CONAN_LIB_DIRS_OPENSSL}/libssl.lib
@@ -13,18 +14,46 @@ set LIBFFI_LIBS=${CURRENT_CONAN_LIB_DIRS_LIBFFI}/libffi.lib
 set LIBYAML_DIR=${CURRENT_CONAN_LIBYAML_ROOT}
 set LIBYAML_LIBS=${CURRENT_CONAN_LIB_DIRS_LIBYAML}/yaml.lib
 
-
 set PATH=${CMAKE_BINARY_DIR}/tools/bin;%PATH%
 
+set EXTLIBS=
+set CONF_ARGS=
+
+IF "%OPENSSL_DIR%" == "" (
+    ECHO "OpenSSL not defined"
+) ELSE (
+    set EXTLIBS=%EXTLIBS%%OPENSSL_LIBS% 
+    set CONF_ARGS=%CONF_ARGS% --with-openssl-dir="%OPENSSL_DIR%"
+    ECHO "OpenSSL defined: %OPENSSL_DIR%"
+)
+IF "%ZLIB_DIR%" == "" (
+    ECHO "ZLib not defined"
+) ELSE (
+    set EXTLIBS=%EXTLIBS%%ZLIB_LIBS% 
+    set CONF_ARGS=%CONF_ARGS% --with-zlib-dir="%ZLIB_DIR%"
+    ECHO "ZLib defined: %ZLIB_DIR%"
+)
+IF "%LIBFFI_DIR%" == "" (
+    ECHO "LIBFFI not defined"
+) ELSE (
+    set EXTLIBS=%EXTLIBS%%LIBFFI_LIBS% 
+    set CONF_ARGS=%CONF_ARGS% --with-libffi-dir=\"%LIBFFI_DIR%\"
+    ECHO "LIBFFI defined: %LIBFFI_DIR%"
+)
+IF "%LIBYAML_DIR%" == "" (
+    ECHO "LibYAML not defined"
+) ELSE (
+    set EXTLIBS=%EXTLIBS%%LIBYAML_LIBS% 
+    set CONF_ARGS=%CONF_ARGS% --with-libyaml-dir=\"%LIBYAML_DIR%\"
+    ECHO "LibYAML defined: %LIBYAML_DIR%"
+)
+
 echo "New Flags %CFLAGS%"
-
-set EXTLIBS=%LIBFFI_LIBS% %OPENSSL_LIBS% %ZLIB_LIBS% %LIBYAML_LIBS% 
-
-echo "EXTLIBS='%EXTLIBS%'
-
-call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --with-static-linked-ext --with-zlib-dir="%ZLIB_DIR%" --with-openssl-dir="%OPENSSL_DIR%" --with-libffi-dir="%LIBFFI_DIR%" --with-libyaml-dir="%LIBYAML_DIR%" --without-win32ole --disable-install-doc --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --target=x64-mswin64 --with-baseruby="%BASE_RUBY%" 
+echo "EXTLIBS='%EXTLIBS%'"
+echo "CONF_ARGS='%CONF_ARGS%'"
 
 
+call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --with-static-linked-ext %CONF_ARGS% --without-win32ole --disable-install-doc --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --target=x64-mswin64 --with-baseruby="%BASE_RUBY%" 
 
 nmake /k
 nmake /k install-nodoc
