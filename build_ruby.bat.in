@@ -37,14 +37,14 @@ IF "%LIBFFI_DIR%" == "" (
     ECHO "LIBFFI not defined"
 ) ELSE (
     set EXTLIBS=%EXTLIBS%%LIBFFI_LIBS% 
-    set CONF_ARGS=%CONF_ARGS% --with-libffi-dir=\"%LIBFFI_DIR%\"
+    set CONF_ARGS=%CONF_ARGS% --with-libffi-dir="%LIBFFI_DIR%"
     ECHO "LIBFFI defined: %LIBFFI_DIR%"
 )
 IF "%LIBYAML_DIR%" == "" (
     ECHO "LibYAML not defined"
 ) ELSE (
     set EXTLIBS=%EXTLIBS%%LIBYAML_LIBS% 
-    set CONF_ARGS=%CONF_ARGS% --with-libyaml-dir=\"%LIBYAML_DIR%\"
+    set CONF_ARGS=%CONF_ARGS% --with-libyaml-dir="%LIBYAML_DIR%"
     ECHO "LibYAML defined: %LIBYAML_DIR%"
 )
 
