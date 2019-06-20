@@ -34,7 +34,7 @@ if (INTEGRATED_CONAN)
   if (APPLE)
     list(APPEND CONAN_BUILD "zlib")
   endif()
-  #list(APPEND CONAN_OPTIONS "zlib:minizip=True")
+  list(APPEND CONAN_OPTIONS "zlib:minizip=True")
 
   # Passing shared=False is fine (but also already the default)
   # Passing fPIC=True is already the default on Unix, and doesn't exist on Windows (options is deleted in most recipes)
@@ -48,14 +48,23 @@ if (INTEGRATED_CONAN)
   #list(APPEND CONAN_OPTIONS "fPIC=True")
   #list(APPEND CONAN_OPTIONS "libffi:shared=False")
 
+  if(NOT MSVC)
+    set(CONAN_FFI "libffi/3.2.1@bincrafters/stable")
+    set(CONAN_LIBYAML "libyaml/0.2.2@bincrafters/stable")
+    set(CONAN_READLINE "readline/7.0@bincrafters/stable")
+    set(CONAN_GDBM "gdbm/1.18.1@jmarrec/testing")  # No official recipes yet
+    set(CONAN_GMP "gmp/6.1.2@bincrafters/stable")
+  endif()
+
   conan_cmake_run(REQUIRES
     OpenSSL/${OPENSSL_VERSION}@conan/stable
     ruby_installer/2.5.1@bincrafters/stable
     zlib/1.2.11@conan/stable
-    libyaml/0.2.2@bincrafters/stable
-    gdbm/1.18.1@jmarrec/testing  # No official recipes yet
-    libffi/3.2.1@bincrafters/stable
-    readline/7.0@bincrafters/stable
+    ${CONAN_FFI}
+    ${CONAN_LIBYAML}
+    ${CONAN_READLINE}
+    ${CONAN_GDBM}
+    ${CONAN_GMP}
 
     BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
     GENERATORS cmake_find_package
@@ -119,6 +128,9 @@ FindValue(CONAN_LIB_DIRS_GDBM)
 FindValue(CONAN_READLINE_ROOT)
 FindValue(CONAN_LIB_DIRS_READLINE)
 
+FindValue(CONAN_GMP_ROOT)
+FindValue(CONAN_LIB_DIRS_GMP)
+
 # TODO: there might be side effects supplying "with-xxx-dir=''" if not defined. Problem is that generator expressions are evaluated as build time... So need to wrap into another
 set(CONF_ARGS
 "$<IF:$<BOOL:${CURRENT_CONAN_ZLIB_ROOT}>,--with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} ,>\
@@ -126,7 +138,8 @@ $<IF:$<BOOL:${CURRENT_CONAN_OPENSSL_ROOT}>,--with-openssl-dir=${CURRENT_CONAN_OP
 $<IF:$<BOOL:${CURRENT_CONAN_LIBFFI_ROOT}>,--with-libffi-dir=${CURRENT_CONAN_LIBFFI_ROOT} ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIBYAML_ROOT}>,--with-libyaml-dir=${CURRENT_CONAN_LIBYAML_ROOT} ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-gdbm-dir=${CURRENT_CONAN_GDBM_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_READLINE_ROOT}>,--with-readline-dir=${CURRENT_CONAN_READLINE_ROOT} ,>"
+$<IF:$<BOOL:${CURRENT_CONAN_READLINE_ROOT}>,--with-readline-dir=${CURRENT_CONAN_READLINE_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_GMP_ROOT}>,--with-gmp-dir=${CURRENT_CONAN_GMP_ROOT} ,>"
 )
 
 set(EXTLIBS
@@ -135,7 +148,8 @@ $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_OPENSSL}>,${CURRENT_CONAN_LIB_DIRS_OPENSSL}
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_LIBFFI}>,${CURRENT_CONAN_LIB_DIRS_LIBFFI}/libffi.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_LIBYAML}>,${CURRENT_CONAN_LIB_DIRS_LIBYAML}/yaml.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_GDBM}>,${CURRENT_CONAN_LIB_DIRS_GDBM}/gdbm.lib ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_READLINE}>,${CURRENT_CONAN_LIB_DIRS_READLINE}/readline.lib ,> "
+$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_READLINE}>,${CURRENT_CONAN_LIB_DIRS_READLINE}/readline.lib ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_GMP}>,${CURRENT_CONAN_LIB_DIRS_GMP}/libgmp.lib ,> "
 )
 
 if( UNIX )

@@ -25,14 +25,15 @@ class OpenstudiorubyConan(ConanFile):
         'with_gdbm': [True, False],
         # Readline doesn't work for MSVC currently
         'with_readline': [True, False],
+        'with_gmp': [True, False],
     }
     default_options = {x: True for x in options}
 
     def configure(self):
         if (self.settings.os == "Windows" and self.settings.compiler == "Visual Studio"):
             # raise ConanInvalidConfiguration("readline is not supported for Visual Studio")
-            self.output.warn("Readline (and therefore GDBM) will not work on "
-                             "MSVC right now")
+            self.output.warn(
+                "Readline (hence GDBM) will not work on MSVC right now")
             self.options.with_gdbm = False
             self.options.with_readline = False
             self.output.warn(
@@ -43,6 +44,10 @@ class OpenstudiorubyConan(ConanFile):
                 "Conan LibYAML will not link properly right now with MSVC, "
                 "so temporarilly disable it")
             self.options.with_libyaml = False
+            self.output.warn(
+                "Conan GMP isn't supported on MSVC")
+            self.options.with_gmp = False
+
 
     def requirements(self):
         """
@@ -76,6 +81,9 @@ class OpenstudiorubyConan(ConanFile):
             # Shared Not available on Mac
             # self.options["readline"].shared = False
             # self.options["readline"].fPIC = True
+
+        if self.options.with_gmp:
+            self.requires("gmp/6.1.2@bincrafters/stable")
 
     def build_requirements(self):
         """
