@@ -35,6 +35,10 @@ class OpenstudiorubyConan(ConanFile):
                              "MSVC right now")
             self.options.with_gdbm = False
             self.options.with_readline = False
+            self.output.warn(
+                "Conan LIBFFI will not allow linking right now with MSVC, "
+                "so temporarilly built it from CMakeLists instead")
+            self.options.with_libffi = False
 
     def requirements(self):
         """
