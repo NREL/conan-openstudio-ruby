@@ -65,7 +65,8 @@ class OpenstudiorubyConan(ConanFile):
 
         if self.options.with_readline:
             self.requires("readline/7.0@bincrafters/stable")
-            self.options["readline"].shared = False
+            # Shared Not available on Mac
+            # self.options["readline"].shared = False
             # self.options["readline"].fPIC = True
 
     def build_requirements(self):
