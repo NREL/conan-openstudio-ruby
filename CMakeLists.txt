@@ -34,11 +34,37 @@ if (INTEGRATED_CONAN)
   if (APPLE)
     list(APPEND CONAN_BUILD "zlib")
   endif()
+  list(APPEND CONAN_OPTIONS "zlib:minizip=True")
+
+  # Passing shared=False is fine (but also already the default)
+  # Passing fPIC=True is already the default on Unix, and doesn't exist on Windows (options is deleted in most recipes)
+  #list(APPEND CONAN_OPTIONS "libyaml:fPIC=True")
+  #list(APPEND CONAN_OPTIONS "libyaml:shared=False")
+  #list(APPEND CONAN_OPTIONS "gdbm:fPIC=True")
+  #list(APPEND CONAN_OPTIONS "gdbm:shared=False")
+  #list(APPEND CONAN_OPTIONS "gdbm:libgdbm_compat=True")
+  #list(APPEND CONAN_OPTIONS "readline:fPIC=True")
+  #list(APPEND CONAN_OPTIONS "readline:shared=False")
+  #list(APPEND CONAN_OPTIONS "fPIC=True")
+  #list(APPEND CONAN_OPTIONS "libffi:shared=False")
+
+  if(NOT MSVC)
+    set(CONAN_FFI "libffi/3.2.1@bincrafters/stable")
+    set(CONAN_LIBYAML "libyaml/0.2.2@bincrafters/stable")
+    set(CONAN_READLINE "readline/7.0@bincrafters/stable")
+    set(CONAN_GDBM "gdbm/1.18.1@jmarrec/testing")  # No official recipes yet
+    set(CONAN_GMP "gmp/6.1.2@bincrafters/stable")
+  endif()
 
   conan_cmake_run(REQUIRES
     OpenSSL/${OPENSSL_VERSION}@conan/stable
     ruby_installer/2.5.1@bincrafters/stable
     zlib/1.2.11@conan/stable
+    ${CONAN_FFI}
+    ${CONAN_LIBYAML}
+    ${CONAN_READLINE}
+    ${CONAN_GDBM}
+    ${CONAN_GMP}
 
     BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
     GENERATORS cmake_find_package
@@ -77,21 +103,59 @@ macro(FindValue ValueName)
 #  list(JOIN LocalVar "" LocalVar)
   string(STRIP ${LocalVar} LocalVar)
   set(CURRENT_${ValueName} $<IF:$<BOOL:${LocalVar}>,${LocalVar},${${ValueName}}>)
-  message("Found '${ValueName}' as '${CURRENT_${ValueName}}'")
+  # For debug purposes
+  # message(STATUS "Found '${ValueName}' as '${CURRENT_${ValueName}}'")
 endmacro()
 
 FindValue(CMAKE_C_FLAGS)
+
 FindValue(CONAN_OPENSSL_ROOT)
 FindValue(CONAN_LIB_DIRS_OPENSSL)
+
 FindValue(CONAN_ZLIB_ROOT)
 FindValue(CONAN_LIB_DIRS_ZLIB)
+
 FindValue(CONAN_LIBFFI_ROOT)
 FindValue(CONAN_LIB_DIRS_LIBFFI)
+
 FindValue(CONAN_BIN_DIRS_RUBY_INSTALLER)
 
+FindValue(CONAN_LIBYAML_ROOT)
+FindValue(CONAN_LIB_DIRS_LIBYAML)
+
+FindValue(CONAN_GDBM_ROOT)
+FindValue(CONAN_LIB_DIRS_GDBM)
+
+FindValue(CONAN_READLINE_ROOT)
+FindValue(CONAN_LIB_DIRS_READLINE)
+
+FindValue(CONAN_GMP_ROOT)
+FindValue(CONAN_LIB_DIRS_GMP)
+
+# TODO: there might be side effects supplying "with-xxx-dir=''" if not defined. Problem is that generator expressions are evaluated as build time... So need to wrap into another
+# Note JM 2019-06-20: Please mind the space after the true_string arg.
+set(CONF_ARGS
+"$<IF:$<BOOL:${CURRENT_CONAN_ZLIB_ROOT}>,--with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_OPENSSL_ROOT}>,--with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIBFFI_ROOT}>,--with-libffi-dir=${CURRENT_CONAN_LIBFFI_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIBYAML_ROOT}>,--with-libyaml-dir=${CURRENT_CONAN_LIBYAML_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-gdbm-dir=${CURRENT_CONAN_GDBM_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_READLINE_ROOT}>,--with-readline-dir=${CURRENT_CONAN_READLINE_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_GMP_ROOT}>,--with-gmp-dir=${CURRENT_CONAN_GMP_ROOT} ,>"
+)
+
+set(EXTLIBS
+"$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_ZLIB}>,${CURRENT_CONAN_LIB_DIRS_ZLIB}/zlib.lib ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_OPENSSL}>,${CURRENT_CONAN_LIB_DIRS_OPENSSL}/libcrypto.lib ${CURRENT_CONAN_LIB_DIRS_OPENSSL}/libssl.lib ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_LIBFFI}>,${CURRENT_CONAN_LIB_DIRS_LIBFFI}/libffi.lib ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_LIBYAML}>,${CURRENT_CONAN_LIB_DIRS_LIBYAML}/yaml.lib ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_GDBM}>,${CURRENT_CONAN_LIB_DIRS_GDBM}/gdbm.lib ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_READLINE}>,${CURRENT_CONAN_LIB_DIRS_READLINE}/readline.lib ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_GMP}>,${CURRENT_CONAN_LIB_DIRS_GMP}/libgmp.lib ,> "
+)
 
 if( UNIX )
-  set(RUBY_EXT_CONFIG "")
+  # set(RUBY_EXT_CONFIG "")
   #if (NOT APPLE)
   #  # DLM: still missing: curses, dbm, gdbm
   #  # gbdm: libgbdm3 for Up to 16.04, libgbdm5 for 18.04
@@ -101,25 +165,18 @@ if( UNIX )
   #endif()
 
 
-  if (APPLE)
-    # Brew installs in there
-    # Another option is to find_package(brew brew) then execute_process brew --prefix gdbm
-    # Without NO_DEFAULT_PATH it finds my system one at /usr/local/lib/
-    find_library(GDBM libgdbm.a PATHS /usr/local/opt/gdbm/lib NO_DEFAULT_PATH)
-    if(NOT GDBM)
-      message(FATAL_ERROR "Please use Homebrew to install GDBM: `brew install gdbm`")
-    endif()
-    message(STATUS "Found libgdbm at ${GDBM}")
-    get_filename_component(GDBM_DIR "${GDBM}/../.." ABSOLUTE)
-    set(GDBM_opt "--with-gdbm-dir=${GDBM_DIR}")
-    message(STATUS "Configuring Ruby with '${GDBM_opt}")
-  endif()
+  #if (APPLE)
+    # Find some homebrew stuff
+    # include(FindHomeBrewPackage.cmake)
+  # endif()
 
     # KSB: For Mac, you may need to install some things...
   # brew install homebrew/dupes/zlib
   # brew link --overwrite --force homebrew/dupes/zlib
   # brew install autoconf automake libtool
   # brew link autoconf automake libtool
+
+  set(configure_cmd "./configure --with-static-linked-ext ${MAC_opts} --disable-install-doc --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install ${CONF_ARGS}")
   ExternalProject_Add(Ruby
     # Use official ruby source package to reduce dependencies on autoconf and friends
     URL https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.5.tar.gz
@@ -128,7 +185,7 @@ if( UNIX )
     # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)
     PATCH_COMMAND pwd && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/Ruby.patch # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/Ruby.nodynamic.patch
     BUILD_IN_SOURCE 1
-    CONFIGURE_COMMAND pwd && sh -c "pwd && ./configure --with-static-linked-ext ${RUBY_EXT_CONFIG} ${GDBM_opt} --disable-install-doc --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install --with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} --with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT}"
+    CONFIGURE_COMMAND pwd && sh -c "pwd && echo '===============  CONFIGURE ============' && echo 'Calling: ${configure_cmd}' && ${configure_cmd}"
     #    BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} Use default BUILD_COMMAND for now
     INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install && sh -c "cp ./rbconfig.rb ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/." && sh -c "rm -rf ./ext/-test-" && sh -c "mkdir ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext" && sh -c "mkdir ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc" && sh -c "find ./ext -name '*.a' | xargs -I {} cp {} ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ext/" && sh -c "find ./enc -name '*.a' | xargs -I {} cp {} ${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc"
     # Run a ruby script to ensure we linked against the right OpenSSL
@@ -147,25 +204,42 @@ else()
   #   #if !(_MSC_VER == 1915 || _MSC_VER == 1916 || _MSC_VER == 1917 || _MSC_VER == 1918 || _MSC_VER == 1919)
   # tar -zcvf ruby_2_5_1_msvc2017_static.tar.gz Ruby-install
 
-  # get bison and sed tools
-  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
-  file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/bison/2.4.1/bison-2.4.1-bin.zip ${CMAKE_BINARY_DIR}/tools/bison-2.4.1-bin.zip)
-  file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/bison/2.4.1/bison-2.4.1-dep.zip ${CMAKE_BINARY_DIR}/tools/bison-2.4.1-dep.zip)
-  file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-dep.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-dep.zip)
-  file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-bin.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-bin.zip)
+  # TODO: replace with conanfile.py: self.build_requires("bison_installer/3.3.2@bincrafters/stable")
 
-  add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/tools/bin/bison.exe ${CMAKE_BINARY_DIR}/tools/bin/sed.exe
-      COMMAND ${CMAKE_COMMAND} -E tar xvf bison-2.4.1-bin.zip
-      COMMAND ${CMAKE_COMMAND} -E tar xvf bison-2.4.1-dep.zip
+  # get bison and sed tools
+  # at least check if already there before redownloading (conanfile calls CMake.build twice right now!)
+  if(NOT EXISTS ${CMAKE_BINARY_DIR}/tools)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
+  endif()
+  #file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/bison/2.4.1/bison-2.4.1-bin.zip ${CMAKE_BINARY_DIR}/tools/bison-2.4.1-bin.zip)
+  #file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/bison/2.4.1/bison-2.4.1-dep.zip ${CMAKE_BINARY_DIR}/tools/bison-2.4.1-dep.zip)
+  if(NOT EXISTS ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-dep.zip)
+    file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-dep.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-dep.zip)
+  endif()
+  if(NOT EXISTS ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-bin.zip)
+    file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-bin.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-bin.zip)
+  endif()
+
+  #add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/tools/bin/bison.exe ${CMAKE_BINARY_DIR}/tools/bin/sed.exe
+      #COMMAND ${CMAKE_COMMAND} -E tar xvf bison-2.4.1-bin.zip
+      #COMMAND ${CMAKE_COMMAND} -E tar xvf bison-2.4.1-dep.zip
+      #COMMAND ${CMAKE_COMMAND} -E tar xvf sed-4.2.1-bin.zip
+      #COMMAND ${CMAKE_COMMAND} -E tar xvf sed-4.2.1-dep.zip
+      #WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
+  #add_custom_target(GetTools
+      #DEPENDS ${CMAKE_BINARY_DIR}/tools/bin/bison.exe)
+
+  add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/tools/bin/sed.exe
       COMMAND ${CMAKE_COMMAND} -E tar xvf sed-4.2.1-bin.zip
       COMMAND ${CMAKE_COMMAND} -E tar xvf sed-4.2.1-dep.zip
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
   add_custom_target(GetTools
-      DEPENDS ${CMAKE_BINARY_DIR}/tools/bin/bison.exe)
+      DEPENDS ${CMAKE_BINARY_DIR}/tools/bin/sed.exe)
 
 
-  # The libFFI provided by Conan gives us something we cannot link to for some reason (TBD)
-  # It's possible we can move to the in-built deps provided by ruby
+
+  ## The libFFI provided by Conan gives us something we cannot link to for some reason (TBD)
+  ## It's possible we can move to the in-built deps provided by ruby
   ExternalProject_Add(FFI
     URL_HASH SHA256=bf6813045c0d470aedc3c69f9ec11fe351c2d7360c7d5396dc9a6ddc4830033c
     URL https://github.com/winlibs/libffi/archive/libffi-3.2.1.zip

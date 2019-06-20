@@ -18,12 +18,72 @@ class OpenstudiorubyConan(ConanFile):
     exports_sources = "*"
     generators = "cmake"
 
+    options = {
+        'with_libyaml': [True, False],
+        'with_libffi': [True, False],
+        # GDBM depends on readline
+        'with_gdbm': [True, False],
+        # Readline doesn't work for MSVC currently
+        'with_readline': [True, False],
+        'with_gmp': [True, False],
+    }
+    default_options = {x: True for x in options}
+
+    def configure(self):
+        if (self.settings.os == "Windows" and self.settings.compiler == "Visual Studio"):
+            # raise ConanInvalidConfiguration("readline is not supported for Visual Studio")
+            self.output.warn(
+                "Readline (hence GDBM) will not work on MSVC right now")
+            self.options.with_gdbm = False
+            self.options.with_readline = False
+            self.output.warn(
+                "Conan LIBFFI will not allow linking right now with MSVC, "
+                "so temporarilly built it from CMakeLists instead")
+            self.options.with_libffi = False
+            self.output.warn(
+                "Conan LibYAML will not link properly right now with MSVC, "
+                "so temporarilly disable it")
+            self.options.with_libyaml = False
+            self.output.warn(
+                "Conan GMP isn't supported on MSVC")
+            self.options.with_gmp = False
+
+
     def requirements(self):
         """
         Declare required dependencies
         """
         self.requires("OpenSSL/1.1.0g@conan/stable")
         self.requires("zlib/1.2.11@conan/stable")
+
+        if self.options.with_libyaml:
+            self.requires("libyaml/0.2.2@bincrafters/stable")
+            self.options["libyaml"].shared = False
+            # self.options["libyaml"].fPIC = True
+
+        if self.options.with_libffi:
+            self.requires("libffi/3.2.1@bincrafters/stable")
+            self.options["libffi"].shared = False
+            # self.options["libffi"].fPIC = True
+
+        if self.options.with_gdbm:
+            self.requires("gdbm/1.18.1@jmarrec/testing")
+            self.options["gdbm"].shared = False
+            # self.options["gdbm"].fPIC = True
+            self.options["gdbm"].libgdbm_compat = True
+
+        if self.options.with_readline:
+            # TODO: On mac you MUST build this one from source because it's shared
+            # if not, it'll fail because it's downloading a travis package and
+            # can't resolve a path when trying to build gdbm
+            # > dyld: Library not loaded: /Users/travis/.conan/data/readline/7.0/bincrafters/stable/package/988863d075519fe477ab5c0452ee71c84a94de8a/lib/libhistory.7.dylib
+            self.requires("readline/7.0@bincrafters/stable")
+            # Shared Not available on Mac
+            # self.options["readline"].shared = False
+            # self.options["readline"].fPIC = True
+
+        if self.options.with_gmp:
+            self.requires("gmp/6.1.2@bincrafters/stable")
 
     def build_requirements(self):
         """
@@ -33,6 +93,7 @@ class OpenstudiorubyConan(ConanFile):
         not be retrieved.
         """
         self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
+        self.build_requires("bison_installer/3.3.2@bincrafters/stable")
 
     def build(self):
         """
