@@ -66,7 +66,7 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["libffi"].fPIC = True
 
         if self.options.with_gdbm:
-            self.requires("gdbm/1.18.1@jmarrec/testing")
+            self.requires("gdbm/1.18.1@bincrafters/stable")
             self.options["gdbm"].shared = False
             # self.options["gdbm"].fPIC = True
             self.options["gdbm"].libgdbm_compat = True
