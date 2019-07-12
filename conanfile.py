@@ -9,11 +9,11 @@ from conans.errors import ConanException
 class OpenstudiorubyConan(ConanFile):
     name = "openstudio_ruby"
     version = "2.5.5"
-    license = "<Put the package license here>"
-    author = "<Put your name here> <And your email here>"
-    url = "<Package recipe repository url here, for issues about the package>"
-    description = "<Description of Openstudioruby here>"
-    topics = ("<Put some tag here>", "<here>", "<and here>")
+    license = "<Put the package license here>" # TODO
+    author = "NREL <openstudio@nrel.gov>"
+    url = "https://github.com/NREL/conan-openstudio-ruby"
+    description = "Static ruby for use in OpenStudio's Command Line Interface"
+    topics = ("ruby", "openstudio")
     settings = "os", "compiler", "build_type", "arch"
     exports_sources = "*"
     generators = "cmake"
@@ -47,7 +47,6 @@ class OpenstudiorubyConan(ConanFile):
             self.output.warn(
                 "Conan GMP isn't supported on MSVC")
             self.options.with_gmp = False
-
 
     def requirements(self):
         """
