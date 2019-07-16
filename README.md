@@ -6,7 +6,7 @@ A [conan](https://conan.io/) package to build ruby for [OpenStudio](https://gith
 
 | Bintray | Windows | Linux & macOS |
 |:--------:|:---------:|:-----------------:|
-|[![Download](https://api.bintray.com/packages/commercialbuilding/nrel/openstudio_ruby%3Anrel/images/download.svg)](https://bintray.com/commercialbuilding/nrel/openstudio_ruby%3Anrel/_latestVersion)|[![Build status](https://ci.appveyor.com/api/projects/status/github/ci-commercialbuildings/conan-openstudio-ruby?svg=true)](https://ci.appveyor.com/project/ci-commercialbuildings/conan-openstudio-ruby)|[![Build Status](https://travis-ci.org/nrel/conan-openstudio-ruby.svg?branch=master)](https://travis-ci.org/nrel/conan-openstudio-ruby)|
+|[![Download](https://api.bintray.com/packages/commercialbuilding/nrel/openstudio_ruby%3Anrel/images/download.svg)](https://bintray.com/commercialbuilding/nrel/openstudio_ruby%3Anrel/_latestVersion)|[![Build status](https://ci.appveyor.com/api/projects/status/github/nrel/conan-openstudio-ruby?branch=master&svg=true)](https://ci.appveyor.com/project/ci-commercialbuildings/conan-openstudio-ruby/branch/master)|[![Build Status](https://travis-ci.org/nrel/conan-openstudio-ruby.svg?branch=master)](https://travis-ci.org/nrel/conan-openstudio-ruby)|
 
 CI is done by Travis for Linux&Mac, and AppVeyor for Windows. To ignore specific commits, please add tags in your commit message such as `[skip ci]` (skip all), `[skip travis]` or `[skip appveyor]`.
 
