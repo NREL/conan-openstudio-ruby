@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from cpt.ci_manager import CIManager
+from cpt.ci_manager import GenericManager
 from bincrafters import build_template_default
 
 if __name__ == "__main__":
@@ -10,7 +10,7 @@ if __name__ == "__main__":
     # * branch `master` to upload to `stable`
     # * All other to `testing`
     # Here we also check the branch, and if not master or develop, don't upload
-    branch = CIManager(None).get_branch()
+    branch = GenericManager(None).get_branch()
     if branch in ['master', 'develop']:
         upload_only_when_stable = False
     else:
