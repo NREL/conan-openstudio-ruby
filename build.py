@@ -1,9 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from cpt.ci_manager import CIManager
 from bincrafters import build_template_default
 
 if __name__ == "__main__":
+
+    # CONAN_STABLE_PATTERN env variable is used to set:
+    # * branch `master` to upload to `stable`
+    # * All other to `testing`
+    # Here we also check the branch, and if not master or develop, don't upload
+    branch = CIManager(None).get_branch()
+    if branch in ['master', 'develop']:
+        upload_only_when_stable = False
+    else:
+        upload_only_when_stable = True
 
     # This will add common builds.
     # We are customizing what these are by using environment variables.
@@ -14,5 +25,7 @@ if __name__ == "__main__":
     # * CONAN_BUILD_TYPES, it will limit itself to the ones we asked
     # cf: https://github.com/conan-io/conan-package-tools
     # Specifically in ./cpt/builds_generator.py
-    builder = build_template_default.get_builder(build_policy="outdated")
+
+    builder = build_template_default.get_builder(build_policy="outdated",
+                                                 upload_only_when_stable=upload_only_when_stable)
     builder.run()
