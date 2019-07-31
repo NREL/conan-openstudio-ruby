@@ -2,19 +2,19 @@ build: false
 
 environment:
     PYTHON_HOME: "C:\\Python37"
+    CONAN_VISUAL_RUNTIMES: MD,MDd   # Ignoring MT and MTd
+    CONAN_ARCHS: x86_64   # Don't want to build for x86
 
     matrix:
 
         # 2017 is the target MSVC for now, so build Release and Debug, x64 only
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
           CONAN_VISUAL_VERSIONS: 15
-          CONAN_ARCHS: x86_64   # or: x86_64,x86
           CONAN_BUILD_TYPES: Release,Debug
 
         # To check if it works with MSVC 2019, we also produce a Release build on 2019, x64 only
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
           CONAN_VISUAL_VERSIONS: 16
-          CONAN_ARCHS: x86_64
           CONAN_BUILD_TYPES: Release
 
 install:
