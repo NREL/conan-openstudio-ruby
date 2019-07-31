@@ -14,6 +14,7 @@ if __name__ == "__main__":
     if branch in ['master', 'develop']:
         upload_only_when_stable = False
     else:
+        # It can't be stable since that means it'd be 'master' => never upload
         upload_only_when_stable = True
 
     # This will add common builds.
