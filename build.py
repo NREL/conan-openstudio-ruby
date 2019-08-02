@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-from cpt.ci_manager import GenericManager
+from cpt.printer import Printer
+from cpt.ci_manager import CIManager
 from bincrafters import build_template_default
 
 if __name__ == "__main__":
@@ -11,7 +12,10 @@ if __name__ == "__main__":
     # * branch `master` to upload to `stable`
     # * All other to `testing`
     # Here we also check the branch, and if not master or develop, don't upload
-    branch = GenericManager(None).get_branch()
+    printer = Printer()
+    branch = CIManager(printer).get_branch()
+    printer.print_message("Detected branch {}".format(branch))
+
     if branch in ['master', 'develop']:
         upload_only_when_stable = False
     else:
