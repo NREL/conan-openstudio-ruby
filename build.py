@@ -33,6 +33,19 @@ if __name__ == "__main__":
     # cf: https://github.com/conan-io/conan-package-tools
     # Specifically in ./cpt/builds_generator.py
 
+    # When pure_c is called, it  will create, for GCC >=5, one build for
+    # compiler.libcxx=libstdc++ and one for compiler.libcxx=libstc++11.
+    # Then we could filter the old ABI ones out (since that will never happen in OpenStudio...)
+    # cf: https://docs.conan.io/en/latest/howtos/manage_gcc_abi.html#how-to-manage-the-gcc-5-abi
+    # builder.remove_build_if(lambda build: build.settings["compiler"] == "gcc"
+    #                   and build.settings["compiler.libcxx"] != "libstdc++11")
+
+    # Actually, instead, we hard specify CONAN_ENV_COMPILER_LIBCXX=libstdc++11
+    # and pass pure_c=True, which will use that value
+    pure_c = True
+
     builder = build_template_default.get_builder(build_policy="outdated",
                                                  # upload_only_when_stable=upload_only_when_stable,
+                                                 pure_c=pure_c)
+
     builder.run()
