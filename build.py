@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # Pending https://github.com/bincrafters/bincrafters-package-tools/pull/25
     # We can't use this upload_only_when_stable param so instead we set it as
     # an env var
-    os.environ["CONAN_UPLOAD_ONLY_WHEN_STABLE"] = upload_only_when_stable
+    os.environ["CONAN_UPLOAD_ONLY_WHEN_STABLE"] = str(int(upload_only_when_stable))
 
     # This will add common builds.
     # We are customizing what these are by using environment variables.
