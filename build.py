@@ -44,8 +44,8 @@ if __name__ == "__main__":
                                                  # upload_only_when_stable=upload_only_when_stable,
                                                  pure_c=pure_c)
     builder.remove_build_if(
-        lambda build: (build.settings.compiler == "gcc") and
-                      (build.settings.compiler.libcxx != "libstdc++11")
+        lambda build: (build["settings.compiler"] == "gcc") and
+                      (build["settings.compiler.libcxx"] != "libstdc++11")
     )
 
     builder.run()
