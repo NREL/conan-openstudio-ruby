@@ -14,7 +14,6 @@ if __name__ == "__main__":
     # Here we also check the branch, and if not master or develop, don't upload
     printer = Printer()
     branch = CIManager(printer).get_branch()
-    printer.print_message("Detected branch {}".format(branch))
 
     if branch in ['master', 'develop']:
         upload_only_when_stable = False
