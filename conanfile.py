@@ -3,17 +3,19 @@ import os
 import glob as gb
 import re
 from conans import ConanFile, CMake
-from conans.errors import ConanException
+from conans.errors import ConanException, ConanInvalidConfiguration
 
 
 class OpenstudiorubyConan(ConanFile):
     name = "openstudio_ruby"
     version = "2.5.5"
-    license = "<Put the package license here>" # TODO
+    license = "<Put the package license here>"  # TODO
     author = "NREL <openstudio@nrel.gov>"
     url = "https://github.com/NREL/conan-openstudio-ruby"
     description = "Static ruby for use in OpenStudio's Command Line Interface"
     topics = ("ruby", "openstudio")
+    # THIS is what creates the package_id (sha) that will determine whether
+    # we pull binaries or build them
     settings = "os", "compiler", "build_type", "arch"
     exports_sources = "*"
     generators = "cmake"
@@ -30,8 +32,8 @@ class OpenstudiorubyConan(ConanFile):
     default_options = {x: True for x in options}
 
     def configure(self):
-        if (self.settings.os == "Windows" and self.settings.compiler == "Visual Studio"):
-            # raise ConanInvalidConfiguration("readline is not supported for Visual Studio")
+        if ((self.settings.os == "Windows") and
+           (self.settings.compiler == "Visual Studio")):
             self.output.warn(
                 "Readline (hence GDBM) will not work on MSVC right now")
             self.options.with_gdbm = False
@@ -47,6 +49,24 @@ class OpenstudiorubyConan(ConanFile):
             self.output.warn(
                 "Conan GMP isn't supported on MSVC")
             self.options.with_gmp = False
+
+        # I could let it slide, and hope for the best, but I'm afraid of other
+        # incompatibilities, so just raise (which shouldn't happen when trying
+        # to install from OpenStudio's cmake)
+        if (self.settings.compiler == 'gcc'):
+            if (self.settings.compiler.libcxx != "libstdc++11"):
+                msg = ("This isn't meant to be compiled with an old "
+                       " GCC ABI (though complation will work), "
+                       "please use settings.compiler.libcxx=libstdc++11")
+                raise ConanInvalidConfiguration(msg)
+
+        # I delete the libcxx setting now, so that the package_id isn't
+        # calculated taking this into account.
+        # Note: on Mac we may want to ensure we get libc++/libstdc++ for
+        # performance reasons
+        # (not sure which will be default on OpenStudio's CMake),
+        # but at least that doesn't have actual incompatibility
+        del self.settings.compiler.libcxx
 
     def requirements(self):
         """
@@ -72,7 +92,8 @@ class OpenstudiorubyConan(ConanFile):
             self.options["gdbm"].libgdbm_compat = True
 
         if self.options.with_readline:
-            # TODO: On mac you MUST build this one from source because it's shared
+            # TODO: On mac you MUST build this one from source
+            # because it's shared
             # if not, it'll fail because it's downloading a travis package and
             # can't resolve a path when trying to build gdbm
             # > dyld: Library not loaded: /Users/travis/.conan/data/readline/7.0/bincrafters/stable/package/988863d075519fe477ab5c0452ee71c84a94de8a/lib/libhistory.7.dylib

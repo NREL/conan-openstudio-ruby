@@ -10,6 +10,7 @@ osx: &osx
    language: generic
 matrix:
    include:
+       # Note: Passing CONAN_ENV_COMPILER_LIBCXX=libstdc++ (on mac) or CONAN_ENV_COMPILER_LIBCXX=libstdc++11 doesn't work because Conan package tools will override that.
 
       # 64-bit builds on GCC 7/8/9. GCC 7 is the one listed on the wiki, so build Debug and Release for this one. Only release for GCC 8 and GCC 9
       - <<: *linux
