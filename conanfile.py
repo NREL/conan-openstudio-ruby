@@ -49,12 +49,24 @@ class OpenstudiorubyConan(ConanFile):
             self.output.warn(
                 "Conan GMP isn't supported on MSVC")
             self.options.with_gmp = False
-        if ((self.settings.compiler == 'gcc')
-           and (self.settings.compiler.libcxx != "libstdc++11")):
-            msg = ("This library isn't mean to be compiled with an old GCC ABI"
-                   " (though it will work), so use settings "
-                   "compiler.libcxx=libstdc++11")
-            raise ConanInvalidConfiguration(msg)
+
+        # I could let it slide, and hope for the best, but I'm afraid of other
+        # incompatibilities, so just raise (which shouldn't happen when trying
+        # to install from OpenStudio's cmake)
+        if (self.settings.compiler == 'gcc'):
+            if (self.settings.compiler.libcxx != "libstdc++11"):
+                msg = ("This isn't meant to be compiled with an old "
+                       " GCC ABI (though complation will work), "
+                       "please use settings.compiler.libcxx=libstdc++11")
+                raise ConanInvalidConfiguration(msg)
+
+        # I delete the libcxx setting now, so that the package_id isn't
+        # calculated taking this into account.
+        # Note: on Mac we may want to ensure we get libc++/libstdc++ for
+        # performance reasons
+        # (not sure which will be default on OpenStudio's CMake),
+        # but at least that doesn't have actual incompatibility
+        del self.settings.compiler.libcxx
 
     def requirements(self):
         """

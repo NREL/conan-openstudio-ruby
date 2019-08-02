@@ -9,8 +9,4 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
     pyenv activate conan
 fi
 
-# The CONAN_ENV_COMPILER_LIBCXX is being ignored, so we reset it
-echo "Setting the settigns.compiler.libcxx=$CONAN_ENV_COMPILER_LIBCXX"
-conan profile update settings.compiler.libcxx=$CONAN_ENV_COMPILER_LIBCXX default
-
 python build.py
