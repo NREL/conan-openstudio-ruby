@@ -52,7 +52,7 @@ if (INTEGRATED_CONAN)
     set(CONAN_FFI "libffi/3.2.1@bincrafters/stable")
     set(CONAN_LIBYAML "libyaml/0.2.2@bincrafters/stable")
     set(CONAN_READLINE "readline/7.0@bincrafters/stable")
-    set(CONAN_GDBM "gdbm/1.18.1@jmarrec/testing")  # No official recipes yet
+    set(CONAN_GDBM "gdbm/1.18.1@bincrafters/stable")
     set(CONAN_GMP "gmp/6.1.2@bincrafters/stable")
   endif()
 
