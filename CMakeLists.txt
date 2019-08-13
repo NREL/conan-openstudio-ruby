@@ -134,22 +134,26 @@ FindValue(CONAN_LIB_DIRS_GMP)
 
 # TODO: there might be side effects supplying "with-xxx-dir=''" if not defined. Problem is that generator expressions are evaluated as build time... So need to wrap into another
 # Note JM 2019-06-20: Please mind the space after the true_string arg.
+# Notice that we pass --with-dbm-dir poiting to conan gdbm: that's because we build with gdbm_compat which should provide dbm too
 set(CONF_ARGS
 "$<IF:$<BOOL:${CURRENT_CONAN_ZLIB_ROOT}>,--with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_OPENSSL_ROOT}>,--with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT} ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIBFFI_ROOT}>,--with-libffi-dir=${CURRENT_CONAN_LIBFFI_ROOT} ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIBYAML_ROOT}>,--with-libyaml-dir=${CURRENT_CONAN_LIBYAML_ROOT} ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-gdbm-dir=${CURRENT_CONAN_GDBM_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-dbm-dir=${CURRENT_CONAN_GDBM_ROOT} ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_READLINE_ROOT}>,--with-readline-dir=${CURRENT_CONAN_READLINE_ROOT} ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_GMP_ROOT}>,--with-gmp-dir=${CURRENT_CONAN_GMP_ROOT} ,>"
 )
 
+# TODO: once/if gdbm works on MSVC, check the gdbm_compat.lib name and others
 set(EXTLIBS
 "$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_ZLIB}>,${CURRENT_CONAN_LIB_DIRS_ZLIB}/zlib.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_OPENSSL}>,${CURRENT_CONAN_LIB_DIRS_OPENSSL}/libcrypto.lib ${CURRENT_CONAN_LIB_DIRS_OPENSSL}/libssl.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_LIBFFI}>,${CURRENT_CONAN_LIB_DIRS_LIBFFI}/libffi.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_LIBYAML}>,${CURRENT_CONAN_LIB_DIRS_LIBYAML}/yaml.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_GDBM}>,${CURRENT_CONAN_LIB_DIRS_GDBM}/gdbm.lib ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_GDBM}>,${CURRENT_CONAN_LIB_DIRS_GDBM}/gdbm_compat.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_READLINE}>,${CURRENT_CONAN_LIB_DIRS_READLINE}/readline.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_GMP}>,${CURRENT_CONAN_LIB_DIRS_GMP}/libgmp.lib ,> "
 )
