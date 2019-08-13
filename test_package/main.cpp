@@ -42,7 +42,7 @@
 #endif
 
 extern "C" {
-  INIT_DECLARATIONS;
+  // INIT_DECLARATIONS;
 
   void Init_encdb();
 
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
     swig::GC_VALUE::lshift_id = rb_intern("<<");
     swig::GC_VALUE::rshift_id = rb_intern(">>");
 
-    INIT_CALLS;
+    // INIT_CALLS;
 
     //// encodings
     Init_encdb();
@@ -543,4 +543,17 @@ int main(int argc, char *argv[])
   rubyInterpreter.evalString(R"(STDOUT.flush)");
   std::cout << std::flush;
   return ruby_cleanup(0);
+}
+
+// Our ruby is patched to include this, so I can't delete these
+extern "C" {
+  int rb_hasFile(const char *t_filename) {
+    return false;
+  }
+
+  int rb_require_embedded(const char *t_filename) {
+    std::string require_script = R"(require ')" + std::string(t_filename) + R"(')";
+    rubyInterpreter.evalString(require_script);
+    return 0;
+  }
 }

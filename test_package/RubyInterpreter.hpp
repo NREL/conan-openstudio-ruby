@@ -685,7 +685,7 @@
 
 
 
-#include <cli/SWIGRubyRuntime.hxx>
+// #include <cli/SWIGRubyRuntime.hxx>
 
 
 
@@ -847,71 +847,6 @@ class RubyInterpreter
         makeProtectedCall(t_functionName, params);
       }
 
-    /// Execute a function by name with 0 parameters and a return value
-    template<typename ReturnType>
-      ReturnType execWithReturn(const std::string &t_functionName)
-      {
-        std::vector<VALUE> params;
-
-        VALUE retval = makeProtectedCall(t_functionName, params);
-        return asType<ReturnType>(retval);
-      }
-
-    /// Execute a function by name with 1 parameter and a return value
-    template<typename ReturnType, typename Param1>
-      ReturnType execWithReturn(
-          const std::string &t_functionName,
-          Param1 t_param1)
-      {
-        std::vector<VALUE> params;
-        params.push_back(newPointerObj(&t_param1));
-
-        VALUE retval = makeProtectedCall(t_functionName, params);
-        return asType<ReturnType>(retval);
-      }
-
-    /// Execute a function by name with 2 parameters and a return value
-    template<typename ReturnType, typename Param1, typename Param2>
-      ReturnType execWithReturn(
-          const std::string &t_functionName,
-          Param1 t_param1,
-          Param2 t_param2)
-      {
-        std::vector<VALUE> params;
-        params.push_back(newPointerObj(&t_param1));
-        params.push_back(newPointerObj(&t_param2));
-
-        VALUE retval = makeProtectedCall(t_functionName, params);
-        return asType<ReturnType>(retval);
-      }
-
-    /// Execute a function by name with 3 parameters and a return value
-    template<typename ReturnType, typename Param1, typename Param2, typename Param3>
-      ReturnType execWithReturn(
-          const std::string &t_functionName,
-          Param1 t_param1,
-          Param2 t_param2,
-          Param3 t_param3)
-      {
-        std::vector<VALUE> params;
-        params.push_back(newPointerObj(&t_param1));
-        params.push_back(newPointerObj(&t_param2));
-        params.push_back(newPointerObj(&t_param3));
-
-        VALUE retval = makeProtectedCall(t_functionName, params);
-        return asType<ReturnType>(retval);
-      }
-
-
-    /// Add a named global object to the ruby runtime
-    template<typename ObjectType>
-      void addObject(const std::string &t_objectName, ObjectType *t_obj)
-      {
-        VALUE r_obj = SWIG_NewPointerObj(t_obj, getTypeInfo<ObjectType *>(), 0);
-        rb_define_variable(t_objectName.c_str(), &r_obj);
-      }
-
-
   private:
     RubyInterpreter &operator=(const RubyInterpreter &) = delete;
     RubyInterpreter(const RubyInterpreter &) = delete;
@@ -924,28 +859,6 @@ class RubyInterpreter
       return rb_eval_string(StringValuePtr(arg));
     }
 
-    // Returns the swig_type_info for the templated type if it's been registered previously
-    // with registerType
-    template<typename Type>
-      swig_type_info *getTypeInfo() const
-      {
-        auto itr = m_types.find(typeid(Type).name());
-
-        if (itr == m_types.end())
-        {
-          throw std::runtime_error(std::string("Type has not been registered: ") + typeid(Type).name());
-        }
-
-        std::string t_typeName = itr->second;
-
-        swig_type_info *sti = SWIG_TypeQuery(t_typeName.c_str());
-
-        if (sti == nullptr) {
-          throw std::runtime_error("Unable to lookup type info for type: " + t_typeName);
-        }
-
-        return sti;
-      }
 
     VALUE makeProtectedCall(const std::string &t_functionName, std::vector<VALUE> &t_params)
     {
@@ -974,12 +887,6 @@ class RubyInterpreter
       return retval;
     }
 
-    template<typename Param>
-      VALUE newPointerObj(Param t_param)
-      {
-        swig_type_info *ti = getTypeInfo<Param>();
-        return SWIG_NewPointerObj(t_param, ti, 0);
-      }
 
     VALUE newPointerObj(double *d)
     {
@@ -1005,32 +912,6 @@ class RubyInterpreter
     {
       return rb_str_new2(s->c_str());
     }
-
-
-    template<typename Type>
-      Type asType(VALUE v)
-      {
-        Type *ptr = nullptr;
-
-        int res = SWIG_ConvertPtr(v, reinterpret_cast<void **>(&ptr), getTypeInfo<Type *>(), 0);
-        if (SWIG_IsOK(res))
-        {
-          if (!ptr)
-          {
-            throw std::runtime_error(std::string("Result is null, trying to get type: ") + typeid(Type).name());
-          }
-
-          if (SWIG_IsNewObj(res)) {
-            Type obj = *ptr;
-            delete ptr;
-            return obj;
-          } else {
-            return *ptr;
-          }
-        } else {
-          throw std::runtime_error(std::string("Unable to convert object to type: ") + typeid(Type).name());
-        }
-      }
 
 };
 
