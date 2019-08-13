@@ -29,8 +29,6 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ########################################################################################################################
 
-require 'openstudio'
-
 #File.open('E:\test\test.log', 'w') do |f|
 #  ENV.each_key {|k| f.puts "#{k} = #{ENV[k]}" }
 #end
@@ -42,18 +40,12 @@ require 'optparse'
 require 'stringio'
 require 'rbconfig'
 
-#include OpenStudio::Workflow::Util::IO
-
 $argv = ARGV.dup
 
 $logger = Logger.new(STDOUT)
 #$logger.level = Logger::ERROR
 $logger.level = Logger::WARN
 #$logger.level = Logger::DEBUG
-
-#OpenStudio::Logger.instance.standardOutLogger.disable
-#OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Warn)
-OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Error)
 
 # debug Gem::Resolver, must go before resolver is required
 #ENV['DEBUG_RESOLVER'] = "1"
@@ -413,8 +405,8 @@ def parse_main_args(main_args)
     $logger.info "Setting BUNDLE_PATH to ':/ruby/2.5.0/'"
     ENV['BUNDLE_PATH'] = ':/ruby/2.5.0/'
 
-  end  
-  
+  end
+
   if main_args.include? '--bundle_without'
     option_index = main_args.index '--bundle_without'
     path_index = option_index + 1
@@ -424,15 +416,15 @@ def parse_main_args(main_args)
 
     $logger.info "Setting BUNDLE_WITHOUT to #{bundle_without}"
     ENV['BUNDLE_WITHOUT'] = bundle_without
-  
+
   elsif ENV['BUNDLE_WITHOUT']
     # no argument but env var is set
     $logger.info "ENV['BUNDLE_WITHOUT'] set to '#{ENV['BUNDLE_WITHOUT']}'"
-  
+
   elsif use_bundler
     # bundle was requested but bundle_path was not provided
     $logger.warn "Bundle activated but ENV['BUNDLE_WITHOUT'] is not set"
-    
+
     # match configuration in build_openstudio_gems
     $logger.info "Setting BUNDLE_WITHOUT to 'test'"
     ENV['BUNDLE_WITHOUT'] = 'test'
@@ -447,42 +439,6 @@ def parse_main_args(main_args)
 
   Gem.paths.path << ':/ruby/2.5.0/gems/'
   Gem.paths.path << ':/ruby/2.5.0/bundler/gems/'
-
-  # find all the embedded gems
-  original_embedded_gems = {}
-  begin
-    EmbeddedScripting::allFileNamesAsString().split(';').each do |f|
-      if md = /specifications\/.*\.gemspec$/.match(f) ||
-         md = /bundler\/.*\.gemspec$/.match(f)
-        begin
-          spec = EmbeddedScripting::getFileAsString(f)
-          s = eval(spec)
-          s.loaded_from = f
-          original_embedded_gems[s.name] = s
-
-          init_count = 0
-          Gem::Specification.each {|x| init_count += 1}
-
-          # if already have an equivalent spec this will be a no-op
-          Gem::Specification.add_spec(s)
-
-          post_count = 0
-          Gem::Specification.each {|x| post_count += 1}
-
-          if post_count == init_count
-            $logger.debug "Found system gem #{s.name} #{s.version}, overrides embedded gem"
-          end
-
-        rescue LoadError => e
-          safe_puts e.message
-        rescue => e
-          safe_puts e.message
-        end
-      end
-    end
-  rescue NameError => e
-    # EmbeddedScripting not available
-  end
 
   # activate or remove bundler
   Gem::Specification.each do |spec|
@@ -501,7 +457,7 @@ def parse_main_args(main_args)
   if use_bundler
 
     current_dir = Dir.pwd
-    
+
     original_arch = nil
     if RbConfig::CONFIG['arch'] =~ /x64-mswin64/
       # assume that system ruby of 'x64-mingw32' architecture was used to create bundle
@@ -509,9 +465,9 @@ def parse_main_args(main_args)
       $logger.info "Temporarily replacing arch '#{original_arch}' with 'x64-mingw32' for Bundle"
       RbConfig::CONFIG['arch'] = 'x64-mingw32'
     end
-  
-   
-   
+
+
+
     # require bundler
     # have to do some forward declaration and pre-require to get around autoload cycles
     require 'bundler/errors'
@@ -530,19 +486,19 @@ def parse_main_args(main_args)
     require 'bundler/dsl'
     require 'bundler/uri_credentials_filter'
     require 'bundler'
-    
+
     begin
       # activate bundled gems
       # bundler will look in:
       # 1) ENV["BUNDLE_GEMFILE"]
       # 2) find_file("Gemfile", "gems.rb")
       #require 'bundler/setup'
-      
+
       groups = Bundler.definition.groups
       keep_groups = []
       without_groups = ENV['BUNDLE_WITHOUT']
       $logger.info "without_groups = #{without_groups}"
-      groups.each do |g| 
+      groups.each do |g|
         $logger.info "g = #{g}"
         if without_groups.include?(g.to_s)
           $logger.info "Bundling without group '#{g}'"
@@ -550,17 +506,17 @@ def parse_main_args(main_args)
           keep_groups << g
       end
       end
-      
+
       $logger.info "Bundling with groups [#{keep_groups.join(',')}]"
-      
+
       remaining_specs = []
       Bundler.definition.specs_for(keep_groups).each {|s| remaining_specs << s.name}
-      
+
       $logger.info "Specs to be included [#{remaining_specs.join(',')}]"
-        
-      Bundler.setup(*keep_groups) 
+
+      Bundler.setup(*keep_groups)
       #Bundler.require(*keep_groups)
-      
+
     #rescue Bundler::BundlerError => e
 
       #$logger.info e.backtrace.join("\n")
@@ -573,7 +529,7 @@ def parse_main_args(main_args)
         $logger.info "Restoring arch '#{original_arch}'"
         RbConfig::CONFIG['arch'] = original_arch
       end
-    
+
       Dir.chdir(current_dir)
     end
 
@@ -583,19 +539,9 @@ def parse_main_args(main_args)
     current_dir = Dir.pwd
 
     begin
-      # DLM: test code, useful for testing from command line using system ruby
-      #Gem::Specification.each do |spec|
-      #  if /openstudio/.match(spec.name) 
-      #    original_embedded_gems[spec.name] = spec
-      #  end
-      #end
-
       # get a list of all the embedded gems
       dependencies = []
-      original_embedded_gems.each_value do |spec|
-        $logger.debug "Adding dependency on #{spec.name} '~> #{spec.version}'"
-        dependencies << Gem::Dependency.new(spec.name, "~> #{spec.version}")
-      end
+
       #dependencies.each {|d| $logger.debug "Added dependency #{d}"}
 
       # resolve dependencies
@@ -607,20 +553,6 @@ def parse_main_args(main_args)
       activation_requests.each do |request|
         do_activate = true
         spec = request.spec
-
-        # check if this is one of our embedded gems
-        if original_embedded_gems[spec.name]
-
-          # check if gem can be loaded from RUBYLIB, this supports developer use case
-          original_load_path.each do |lp|
-            if File.exists?(File.join(lp, spec.name)) || File.exists?(File.join(lp, spec.name + '.rb')) || File.exists?(File.join(lp, spec.name + '.so'))
-              $logger.debug "Found #{spec.name} in '#{lp}', overrides gem #{spec.spec_file}"
-              Gem::Specification.remove_spec(spec)
-              do_activate = false
-              break
-            end
-          end
-        end
 
         if do_activate
           $logger.debug "Activating gem #{spec.spec_file}"
@@ -638,10 +570,10 @@ def parse_main_args(main_args)
         return false
       end
 
-    ensure 
+    ensure
       Dir.chdir(current_dir)
     end
-    
+
   end # use_bundler
 
   # Handle -e commands
@@ -682,15 +614,10 @@ class CLI
   def command_list
     {
         run: [ Proc.new { ::Run }, {primary: true, working: true}],
-        #apply_measure: [ Proc.new { ::ApplyMeasure }, {primary: true, working: false}], # DLM: remove, can do this with run
         gem_list: [ Proc.new { ::GemList }, {primary: false, working: true}],
-        #gem_install: [ Proc.new { ::InstallGem }, {primary: false, working: false}], # DLM: needs Ruby built with FFI
-        measure: [ Proc.new { ::Measure }, {primary: true, working: false}],
-        update: [ Proc.new { ::Update }, {primary: true, working: false}],
+        gem_install: [ Proc.new { ::InstallGem }, {primary: false, working: false}], # DLM: needs Ruby built with FFI
         execute_ruby_script: [ Proc.new { ::ExecuteRubyScript }, {primary: false, working: true}],
-        #interactive_ruby: [ Proc.new { ::InteractiveRubyShell }, {primary: false, working: false}], # DLM: not working
-        openstudio_version: [ Proc.new { ::OpenStudioVersion }, {primary: true, working: true}],
-        energyplus_version: [ Proc.new { ::EnergyPlusVersion }, {primary: true, working: true}],
+        interactive_ruby: [ Proc.new { ::InteractiveRubyShell }, {primary: false, working: false}], # DLM: not working
         ruby_version: [ Proc.new { ::RubyVersion }, {primary: false, working: true}],
         list_commands: [ Proc.new { ::ListCommands }, {primary: true, working: true}]
     }
@@ -706,7 +633,6 @@ class CLI
 
     if $main_args.include? '--verbose'
       $logger.level = Logger::DEBUG
-      OpenStudio::Logger.instance.standardOutLogger.setLogLevel(OpenStudio::Debug)
     end
 
     $logger.info("CLI Parsed Inputs: #{$main_args.inspect} #{$sub_command.inspect} #{$sub_args.inspect}")
@@ -840,183 +766,6 @@ class CLI
 
       safe_puts opts.help
     end
-  end
-end
-
-# Class to execute part or all of an OSW workflow
-class Run
-
-  # Provides text for the main help functionality
-  def self.synopsis
-    'Executes an OpenStudio Workflow file'
-  end
-
-  # Executes the standard, or one of two custom, workflows using the workflow-gem
-  #
-  # @param [Array] sub_argv Options passed to the run command from the user input
-  # @return [Fixnum] Return status
-  #
-  def execute(sub_argv)
-
-    $logger.info "Run, sub_argv = #{sub_argv}"
-
-    # options are local to this method, run_methods are what get passed to workflow gem
-    run_options = {}
-
-    # Hidden option shhhhh
-    run_options[:fast] = false
-    if sub_argv.delete '--fast'
-      run_options[:fast] = true
-    end
-
-    options = {}
-    options[:debug] = false
-    options[:no_simulation] = false
-    options[:osw_path] = './workflow.osw'
-    options[:post_process] = false
-
-    opts = OptionParser.new do |o|
-      o.banner = 'Usage: openstudio run [options]'
-      o.separator ''
-      o.separator 'Options:'
-      o.separator ''
-
-      o.on('-w', '--workflow [FILE]', 'Specify the FILE path to the workflow to run') do |osw_path|
-        options[:osw_path] = osw_path
-      end
-      o.on('-m', '--measures_only', 'Only run the OpenStudio and EnergyPlus measures') do
-        options[:no_simulation] = true
-      end
-      o.on('-p', '--postprocess_only', 'Only run the reporting measures') do
-        options[:post_process] = true
-      end
-      o.on('-s', '--socket PORT', 'Pipe status messages to a socket on localhost PORT') do |port|
-        options[:socket] = port
-      end
-      o.on('--debug', 'Includes additional outputs for debugging failing workflows and does not clean up the run directory') do |f|
-        options[:debug] = f
-      end
-    end
-
-    # Parse the options
-    argv = parse_options(opts, sub_argv)
-    return 0 if argv == nil
-
-    $logger.debug("Run command: #{argv.inspect} #{options.inspect}")
-
-    unless argv == []
-      $logger.error 'Extra arguments passed to the run command. Please refer to the help documentation.'
-      return 1
-    end
-
-    if options[:post_process] && options[:no_simulation]
-      $logger.error 'Both the -m and -p flags were set, which is an invalid combination.'
-      return 1
-    end
-
-    require 'openstudio-workflow'
-
-    osw_path = options[:osw_path]
-    osw_path = File.absolute_path(File.join(Dir.pwd, osw_path)) unless Pathname.new(osw_path).absolute?
-    $logger.debug "Path for the OSW: #{osw_path}"
-
-    if options[:debug]
-      run_options[:debug] = true
-      run_options[:cleanup] = false
-    end
-
-    if options[:socket]
-      require 'openstudio/workflow/adapters/input/local'
-      require 'openstudio/workflow/adapters/output/socket'
-      input_adapter = OpenStudio::Workflow::InputAdapter::Local.new(osw_path)
-      output_adapter = OpenStudio::Workflow::OutputAdapter::Socket.new({output_directory: input_adapter.run_dir, port: options[:socket]})
-      run_options[:output_adapter] = output_adapter
-    end
-
-    if options[:no_simulation]
-      run_options[:jobs] = [
-        { state: :queued, next_state: :initialization, options: { initial: true } },
-        { state: :initialization, next_state: :os_measures, job: :RunInitialization,
-          file: 'openstudio/workflow/jobs/run_initialization.rb', options: {} },
-        { state: :os_measures, next_state: :translator, job: :RunOpenStudioMeasures,
-          file: 'openstudio/workflow/jobs/run_os_measures.rb', options: {} },
-        { state: :translator, next_state: :ep_measures, job: :RunTranslation,
-          file: 'openstudio/workflow/jobs/run_translation.rb', options: {} },
-        { state: :ep_measures, next_state: :preprocess, job: :RunEnergyPlusMeasures,
-          file: 'openstudio/workflow/jobs/run_ep_measures.rb', options: {} },
-        { state: :preprocess, next_state: :postprocess, job: :RunPreprocess,
-          file: 'openstudio/workflow/jobs/run_preprocess.rb', options: {} },
-        { state: :postprocess, next_state: :finished, job: :RunPostprocess,
-          file: 'openstudio/workflow/jobs/run_postprocess.rb', options: {} },
-        { state: :finished },
-        { state: :errored }
-      ]
-    elsif options[:post_process]
-      run_options[:jobs] = [
-        { state: :queued, next_state: :initialization, options: { initial: true } },
-        { state: :initialization, next_state: :reporting_measures, job: :RunInitialization,
-          file: 'openstudio/workflow/jobs/run_initialization.rb', options: {} },
-        { state: :reporting_measures, next_state: :postprocess, job: :RunReportingMeasures,
-          file: 'openstudio/workflow/jobs/run_reporting_measures.rb', options: {} },
-        { state: :postprocess, next_state: :finished, job: :RunPostprocess,
-          file: 'openstudio/workflow/jobs/run_postprocess.rb', options: {} },
-        { state: :finished },
-        { state: :errored }
-      ]
-      run_options[:preserve_run_dir] = true
-    end
-
-    $logger.debug "Initializing run method"
-    k = OpenStudio::Workflow::Run.new osw_path, run_options
-
-    $logger.debug "Beginning run"
-    k.run
-
-    0
-  end
-end
-
-# Class to apply an OpenStudio, EnergyPlus, or Reporting measure
-# @abstract
-class ApplyMeasure
-
-  # Provides text for the main help functionality
-  def self.synopsis
-    'Applies an OpenStudio, EnergyPlus, or Reporting measure'
-  end
-
-  # Executes a single measure using an undefined interface
-  #
-  # @param [Array] sub_argv Options passed to the apply_measures command from the user input
-  # @return [Fixnum] Return status
-  # @abstract
-  #
-  def execute(sub_argv)
-
-    $logger.info "ApplyMeasure, sub_argv = #{sub_argv}"
-
-    options = {}
-    #options[:debug] = false
-
-    # opts = OptionParser.new do |o|
-    #   o.banner = 'Usage: openstudio apply_measure'
-    #   o.separator ''
-    #   o.separator 'Options:'
-    #   o.separator ''
-    # end
-
-    $logger.error 'This interface has yet to be defined.'
-
-    # Parse the options
-    argv = parse_options(opts, sub_argv)
-    return 0 if argv == nil
-
-    $logger.debug("ApplyMeasure command: #{argv.inspect} #{options.inspect}")
-
-    return 1 unless argv
-    require 'openstudio-workflow'
-
-    1
   end
 end
 
@@ -1155,304 +904,6 @@ class InstallGem
   end
 end
 
-# Class to update measures and compute arguments
-class Measure
-
-  # Provides text for the main help functionality
-  def self.synopsis
-    'Updates measures and compute arguments'
-  end
-
-  # Executes code to update and compute arguments for measures
-  #
-  # @param [Array] sub_argv Options passed to the e command from the user input
-  # @return [Fixnum] Return status
-  #
-  def execute(sub_argv)
-
-    $logger.info "Measure, sub_argv = #{sub_argv}"
-
-    require_relative 'measure_manager'
-
-    options = {}
-    options[:update] = false
-    options[:compute_arguments] = nil
-
-    # save some arguments to pass to minitest
-    saved_subargv = []
-    if sub_argv[0] == '-r' || sub_argv[0] == '--run_tests'
-      saved_subargv = sub_argv[2..-1]
-      sub_argv = sub_argv[0...2]
-    end
-
-    # find the directory
-    directory = nil
-    if sub_argv.size > 1
-      unless (sub_argv[0] == '-s' || sub_argv[0] == '--start_server')
-        directory = sub_argv.pop
-        $logger.debug("Directory to examine is #{directory}")
-        $logger.debug("Remaining args are #{sub_argv}")
-      end
-    end
-
-    opts = OptionParser.new do |o|
-      o.banner = 'Usage: openstudio measure [options] DIRECTORY'
-      o.separator ''
-      o.separator 'Options:'
-      o.separator ''
-
-      o.on('-t', '--update_all', 'Update all measures in a directory') do
-        options[:update_all] = true
-      end
-      o.on('-u', '--update', 'Update the measure.xml') do
-        options[:update] = true
-      end
-      o.on('-a', '--compute_arguments [MODEL]', 'Compute arguments for the given OSM or IDF') do |model_file|
-        options[:compute_arguments] = true
-        options[:compute_arguments_model] = model_file
-      end
-      o.on('-r', '--run_tests', 'Run all tests recursively found in a directory, additional arguments are passed to minitest') do
-        options[:run_tests] = true
-      end
-      o.on('-s', '--start_server [PORT]', 'Start a measure manager server') do |port|
-        options[:start_server] = true
-        options[:start_server_port] = port
-      end
-      # TODO: run unit tests
-    end
-
-    # Parse the options
-    argv = parse_options(opts, sub_argv)
-    return 0 if argv == nil
-
-    $logger.debug("Measure command: #{argv.inspect} #{options.inspect}")
-
-    if !options[:start_server]
-      if directory.nil?
-        $logger.error 'No directory provided'
-        return 1
-      end
-      directory = File.expand_path(directory)
-    end
-
-    $logger.debug("Directory to examine is #{directory}")
-
-    if options[:update_all]
-      measure_manager = MeasureManager.new($logger)
-
-      # loop over all directories
-      result = []
-      Dir.glob("#{directory}/*/").each do |measure_dir|
-        if File.directory?(measure_dir) && File.exists?(File.join(measure_dir, "measure.xml"))
-          measure = measure_manager.get_measure(measure_dir, true)
-          if measure.nil?
-            $logger.debug("Directory #{measure_dir} is not a measure")
-          else
-            result << measure_manager.measure_hash(measure_dir, measure)
-          end
-        end
-      end
-
-      safe_puts JSON.generate(result)
-
-    elsif options[:update]
-      measure_manager = MeasureManager.new($logger)
-      measure = measure_manager.get_measure(directory, true)
-      if measure.nil?
-        $logger.error("Cannot load measure from '#{directory}'")
-        return 1
-      end
-
-      hash = measure_manager.measure_hash(directory, measure)
-      safe_puts JSON.generate(hash)
-
-    elsif options[:compute_arguments]
-      measure_manager = MeasureManager.new($logger)
-      measure = measure_manager.get_measure(directory, true)
-      if measure.nil?
-        $logger.error("Cannot load measure from '#{directory}'")
-        return 1
-      end
-
-      model_path = options[:compute_arguments_model]
-
-      model = OpenStudio::Model::OptionalModel.new()
-      workspace = OpenStudio::OptionalWorkspace.new()
-      if model_path
-        measure_type = measure.measureType.valueName
-        if measure_type == 'ModelMeasure'
-
-          value = measure_manager.get_model(model_path, true)
-          if value.nil?
-            $logger.error("Cannot load model from '#{model_path}'")
-            return 1
-          else
-            model = value[0].clone(true).to_Model
-            workspace = value[1].clone(true)
-          end
-
-        elsif measure_type == 'EnergyPlusMeasure'
-          value = measure_manager.get_idf(model_path, true)
-
-          if value.nil?
-            $logger.error("Cannot load workspace from '#{model_path}'")
-            return 1
-          else
-            workspace = value.clone(true)
-          end
-
-        else
-          $logger.error("Measure type '#{measure_type}' does not take a model path")
-          return 1
-        end
-
-      else
-        model_path = ""
-      end
-
-      measure_info = measure_manager.get_measure_info(directory, measure, model_path, model, workspace)
-
-      hash = measure_manager.measure_hash(directory, measure, measure_info)
-      safe_puts JSON.generate(hash)
-
-    elsif options[:run_tests]
-
-      # restore saved arguments for minitest
-      ARGV.clear
-      saved_subargv.each do |arg|
-        ARGV << arg
-      end
-      $logger.debug("Minitest arguments are '#{saved_subargv}'")
-
-      # load openstudio_measure_tester gem
-      #begin
-        require 'minitest'
-        require 'minitest/reporters'
-
-        # Minitest Reports use a plugin that is normally found by Minitest::load_plugins using Gem.find
-        # until Gem.find is overloaded to find embedded gems, we will manually load the plugin here
-        require 'minitest/minitest_reporter_plugin'
-        Minitest.extensions << 'minitest_reporter'
-
-        require 'openstudio_measure_tester'
-      #rescue LoadError
-        #puts "Cannot load 'openstudio_measure_tester'"
-        #return 1
-      #end
-
-      runner = OpenStudioMeasureTester::Runner.new(directory)
-      result = runner.run_all(Dir.pwd) 
-      
-      if result != 0
-        $logger.error("Measure tester returned errors")
-        return 1
-      end
-    
-    elsif options[:start_server]
-
-      require_relative 'measure_manager_server'
-
-      port = options[:start_server_port]
-      if port.nil?
-        port = 1234
-      end
-
-      server = WEBrick::HTTPServer.new(:Port => port)
-
-      server.mount "/", MeasureManagerServlet
-
-      trap("INT") {
-          server.shutdown
-      }
-
-      server.start
-
-    else
-      $logger.error("Unknown measure command")
-      return 1
-    end
-
-    0
-  end
-end
-
-# Class to update openstudio models
-class Update
-
-  # Provides text for the main help functionality
-  def self.synopsis
-    'Updates OpenStudio Models to the current version'
-  end
-
-  # Executes code to update and compute arguments for measures
-  #
-  # @param [Array] sub_argv Options passed to the e command from the user input
-  # @return [Fixnum] Return status
-  #
-  def execute(sub_argv)
-
-    $logger.info "Update, sub_argv = #{sub_argv}"
-
-    options = {}
-    options[:keep] = false
-
-    opts = OptionParser.new do |o|
-      o.banner = 'Usage: openstudio update [options] PATH'
-      o.separator ''
-      o.separator 'Options:'
-      o.separator ''
-
-      o.on('-k', '--keep', 'Keep original files') do
-        options[:keep] = true
-      end
-    end
-
-    # Parse the options
-    argv = parse_options(opts, sub_argv)
-    return 0 if argv == nil
-
-    $logger.debug("Measure command: #{argv.inspect} #{options.inspect}")
-
-    if argv == []
-      $logger.error 'No path provided'
-      return 1
-    end
-    path = File.expand_path(argv[0])
-
-    $logger.debug("Path to examine is #{path}")
-
-    paths = []
-    if File.file?(path)
-      $logger.debug("Path is regular file")
-      paths << path
-    else
-      $logger.debug("Path is directory")
-      Dir.glob(path + "/*.osm").each do |path|
-        paths << path
-      end
-    end
-
-    vt = OpenStudio::OSVersion::VersionTranslator.new
-
-    result = 0
-    paths.each do |path|
-      if options[:keep]
-        FileUtils.cp(path, path + ".orig")
-      end
-
-      model = vt.loadModel(path)
-      if model.empty?
-        $logger.error("Could not read model at #{path}")
-        result = 1
-        next
-      end
-      model.get.save(path, true)
-    end
-
-    result
-  end
-end
-
 # Class to execute a ruby script
 class ExecuteRubyScript
 
@@ -1548,86 +999,6 @@ class InteractiveRubyShell
     end
 
     IRB.start_session(binding)
-
-    0
-  end
-end
-
-# Class to return the packaged OpenStudio version
-class OpenStudioVersion
-
-  # Provides text for the main help functionality
-  def self.synopsis
-    'Returns the OpenStudio version used by the CLI'
-  end
-
-  # Executes the OpenStudio commands to return the OpenStudio version
-  #
-  # @param [Array] sub_argv Options passed to the energyplus_version command from the user input
-  # @return [Fixnum] Return status
-  #
-  def execute(sub_argv)
-
-    $logger.info "OpenStudioVersion, sub_argv = #{sub_argv}"
-
-    options = {}
-
-    opts = OptionParser.new do |o|
-      o.banner = 'Usage: openstudio openstudio_version'
-    end
-
-    # Parse the options
-    argv = parse_options(opts, sub_argv)
-    return 0 if argv == nil
-
-    $logger.debug("OpenStudioVersion command: #{argv.inspect} #{options.inspect}")
-
-    unless argv == []
-      $logger.error 'Extra arguments passed to the openstudio_version command.'
-      return 1
-    end
-
-    safe_puts OpenStudio.openStudioLongVersion
-
-    0
-  end
-end
-
-# Class to return the EnergyPlus version
-class EnergyPlusVersion
-
-  # Provides text for the main help functionality
-  def self.synopsis
-    'Returns the EnergyPlus version used by the CLI'
-  end
-
-  # Executes the OpenStudio command to return the EnergyPlus version
-  #
-  # @param [Array] sub_argv Options passed to the openstudio_version command from the user input
-  # @return [Fixnum] Return status
-  #
-  def execute(sub_argv)
-
-    $logger.info "EnergyPlusVersion, sub_argv = #{sub_argv}"
-
-    options = {}
-
-    opts = OptionParser.new do |o|
-      o.banner = 'Usage: openstudio energyplus_version'
-    end
-
-    # Parse the options
-    argv = parse_options(opts, sub_argv)
-    return 0 if argv == nil
-
-    $logger.debug("EnergyPlusVersion command: #{argv.inspect} #{options.inspect}")
-
-    unless argv == []
-      $logger.error 'Arguments passed to the energyplus_version command.'
-      return 1
-    end
-
-    safe_puts OpenStudio.energyPlusVersion
 
     0
   end
@@ -1731,13 +1102,6 @@ end
 
 ### Configure Gems to load the correct Gem files
 ### @see http://rubygems.rubyforge.org/rubygems-update/Gem.html
-##local_dir = ENV['OPENSTUDIO_GEM_PATH'] ? ENV['OPENSTUDIO_GEM_PATH'] : "~/OpenStudio/v#{OpenStudio.openStudioVersion}"
-##ENV['GEM_PATH'] = OpenStudio::Workflow::Util::IO.is_windows? ? local_dir.gsub('/', '\\') : local_dir
-##$logger.debug "Set environment variable GEM_PATH to #{ENV['GEM_PATH']}"
-##ENV['GEM_HOME'] = OpenStudio::Workflow::Util::IO.is_windows? ? '\\' : '/'
-##$logger.debug "Set environment variable GEM_HOME to #{ENV['GEM_HOME']}"
-##Gem.clear_paths
-##$logger.debug 'Reset Gem paths; openstudio associated gems should load correctly'
 
 # Execute the CLI interface, and exit with the proper error code
 $logger.info "Executing argv: #{ARGV}"
