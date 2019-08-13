@@ -321,9 +321,10 @@ class OpenstudiorubyConan(ConanFile):
                               'usr-x64-mswin64_140.lib',
                               'wait_for_single_fd-x64-mswin64_140.lib']
 
+        n_libs = len(libs)
         n_expected_libs = len(expected_libs)
-        if (len(libs) == len(n_expected_libs)):
-            self.output.success("Found {} libs".format(len(libs)))
+        if (n_libs == n_expected_libs):
+            self.output.success("Found {} libs".format(n_libs))
 
         else:
             missing_libs = set(expected_libs) - set(libs)
@@ -337,7 +338,7 @@ class OpenstudiorubyConan(ConanFile):
                                   "{}".format(len(extra_libs), extra_libs))
 
             self.output.error("Found {} libs, expected {} "
-                              "libs".format(len(libs), len(n_expected_libs)))
+                              "libs".format(n_libs, n_expected_libs))
 
         # self.cpp_info.libdirs = ['lib', 'lib/ext', 'lib/enc']
         # Equivalent automatic detection
