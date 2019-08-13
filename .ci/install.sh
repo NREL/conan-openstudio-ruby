@@ -25,9 +25,9 @@ if [[ $machine == Darwin ]]; then
   pyenv virtualenv 3.7.1 conan
   pyenv rehash
   pyenv activate conan
-elif [[ $machine == Linux ]]; then
-  # You're not root by default in conanio docker images
-  sudo apt install libgdbm-dev
+#elif [[ $machine == Linux ]]; then
+#  # You're not root by default in conanio docker images
+#  sudo apt install libgdbm-dev
 fi
 
 pip install conan --upgrade

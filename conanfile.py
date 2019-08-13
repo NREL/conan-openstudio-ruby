@@ -235,7 +235,109 @@ class OpenstudiorubyConan(ConanFile):
         # Keep only the names:
         self.cpp_info.libs = [os.path.basename(x) for x in libs]
 
-        self.output.success("Found {} libs".format(len(libs)))
+        # These are the ext libs we expect on all platforms
+        ext_libs = [
+            'bigdecimal', 'bubblebabble', 'console', 'continuation',
+            'coverage', 'cparse', 'date_core', 'digest', 'escape', 'etc',
+            'fcntl', 'fiber', 'fiddle', 'generator', 'libenc', 'libtrans',
+            'md5', 'nkf', 'nonblock', 'objspace', 'openssl', 'parser',
+            'pathname', 'psych', 'ripper', 'rmd160', 'sdbm', 'sha1', 'sha2',
+            'sizeof', 'socket', 'stringio', 'strscan', 'wait', 'zlib']
+
+        if self.options.with_gdbm:
+            ext_libs += ['dbm', 'gdbm']
+        if self.options.with_readline:
+            ext_libs += ['readline']
+
+        # Not sure here...
+        if self.settings.os == 'Windows':
+            ext_libs += ['dltest', 'resolv']
+        elif self.settings.os in ['Linux', 'Macos']:
+            ext_libs += ['pty',
+                         'syslog']
+
+        # Now, append the lib extension, platform specific
+        ext_libs = ['{}.{}'.format(libname, libext) for libname in ext_libs]
+
+        if self.settings.os == 'Linux':
+            expected_libs = ['libruby-static.a'] + ext_libs
+
+        elif self.settings.os == 'Macos':
+            expected_libs = (['libruby.{v}-static.a'.format(v=self.version)] +
+                             ext_libs)
+
+        elif self.settings.os == 'Windows':
+            expected_libs = (['x64-vcruntime140-ruby250-static.lib'] +
+                             ext_libs)
+
+            expected_libs += ['at_exit-x64-mswin64_140.lib',
+                              'bignum-x64-mswin64_140.lib',
+                              'bug_3571-x64-mswin64_140.lib',
+                              'bug_5832-x64-mswin64_140.lib',
+                              'bug_reporter-x64-mswin64_140.lib',
+                              'call_without_gvl-x64-mswin64_140.lib',
+                              'class-x64-mswin64_140.lib',
+                              'compat-x64-mswin64_140.lib',
+                              'console-x64-mswin64_140.lib',
+                              'debug-x64-mswin64_140.lib',
+                              'dln-x64-mswin64_140.lib',
+                              'dot.dot-x64-mswin64_140.lib',
+                              'empty-x64-mswin64_140.lib',
+                              'exception-x64-mswin64_140.lib',
+                              'fd_setsize-x64-mswin64_140.lib',
+                              'file-x64-mswin64_140.lib',
+                              'float-x64-mswin64_140.lib',
+                              'foreach-x64-mswin64_140.lib',
+                              'funcall-x64-mswin64_140.lib',
+                              'hash-x64-mswin64_140.lib',
+                              'integer-x64-mswin64_140.lib',
+                              'internal_ivar-x64-mswin64_140.lib',
+                              'iseq_load-x64-mswin64_140.lib',
+                              'iter-x64-mswin64_140.lib',
+                              'memory_status-x64-mswin64_140.lib',
+                              'method-x64-mswin64_140.lib',
+                              'notimplement-x64-mswin64_140.lib',
+                              'num2int-x64-mswin64_140.lib',
+                              'numhash-x64-mswin64_140.lib',
+                              'path_to_class-x64-mswin64_140.lib',
+                              'postponed_job-x64-mswin64_140.lib',
+                              'printf-x64-mswin64_140.lib',
+                              'proc-x64-mswin64_140.lib',
+                              'protect-x64-mswin64_140.lib',
+                              'rational-x64-mswin64_140.lib',
+                              'rb_fatal-x64-mswin64_140.lib',
+                              'recursion-x64-mswin64_140.lib',
+                              'regexp-x64-mswin64_140.lib',
+                              'resize-x64-mswin64_140.lib',
+                              'scan_args-x64-mswin64_140.lib',
+                              'string-x64-mswin64_140.lib',
+                              'struct-x64-mswin64_140.lib',
+                              'symbol-x64-mswin64_140.lib',
+                              'thread_fd_close-x64-mswin64_140.lib',
+                              'time-x64-mswin64_140.lib',
+                              'tracepoint-x64-mswin64_140.lib',
+                              'typeddata-x64-mswin64_140.lib',
+                              'update-x64-mswin64_140.lib',
+                              'usr-x64-mswin64_140.lib',
+                              'wait_for_single_fd-x64-mswin64_140.lib']
+
+        n_expected_libs = len(expected_libs)
+        if (len(libs) == len(n_expected_libs)):
+            self.output.success("Found {} libs".format(len(libs)))
+
+        else:
+            missing_libs = set(expected_libs) - set(libs)
+            if missing_libs:
+                self.output.error("Missing {} libraries: "
+                                  "{}".format(len(missing_libs), missing_libs))
+
+            extra_libs = set(libs) - set(expected_libs)
+            if extra_libs:
+                self.output.error("Found {} extra libraries: "
+                                  "{}".format(len(extra_libs), extra_libs))
+
+            self.output.error("Found {} libs, expected {} "
+                              "libs".format(len(libs), len(n_expected_libs)))
 
         # self.cpp_info.libdirs = ['lib', 'lib/ext', 'lib/enc']
         # Equivalent automatic detection
