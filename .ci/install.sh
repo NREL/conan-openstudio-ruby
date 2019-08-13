@@ -26,7 +26,8 @@ if [[ $machine == Darwin ]]; then
   pyenv rehash
   pyenv activate conan
 elif [[ $machine == Linux ]]; then
-  apt install libgdbm-dev
+  # You're not root by default in conanio docker images
+  sudo apt install libgdbm-dev
 fi
 
 pip install conan --upgrade
