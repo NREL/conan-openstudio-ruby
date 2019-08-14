@@ -135,8 +135,6 @@ if(UNIX)
   )
   set(SWIG_EXECUTABLE ${PROJECT_BINARY_DIR}/SWIG-prefix/src/SWIG-install/bin/swig)
 
-  add_dependencies(openstudio SWIG)
-
 else()
   # SWIG requires MinGW to compile on windows, so we just copy in the prebuilt binary
   set(SWIG_ZIP "swigwin-3.0.12.zip")
@@ -180,6 +178,10 @@ list(APPEND EMBEDDED_PATHS "openstudio_cli.rb")
 
 embed_files("${FILES}" "${EMBEDDED_PATHS}" OUTPUT)
 
+set_source_files_properties(EmbeddedScripting.i
+  PROPERTIES CPLUSPLUS true
+)
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} )
 
 add_custom_command(
@@ -187,6 +189,9 @@ add_custom_command(
   COMMAND "${SWIG_EXECUTABLE}"
           "-ruby"
           -external-runtime "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
+  # For Unix, We use ExternalProject_Add, which won't happen at generation time, but creates a Target of name "SWIG",
+  #which we reference here to ensure SWIG is built before we try to use the SWIG_EXECUTABLE
+  DEPENDS SWIG
 )
 
 add_custom_command(
@@ -201,10 +206,15 @@ add_custom_command(
           "-D_WINDOWS"
           "-Fmicrosoft"
           "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
-  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
+  DEPENDS SWIG
+          "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
           "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
           "EmbeddedHelp.hpp"
 )
+
+set_source_files_properties(${EMBED_SOURCE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+
+source_group(embedded_files FILES ${OUTPUT})
 
 add_executable(${PROJECT_NAME}
   main.cpp
@@ -214,6 +224,16 @@ add_executable(${PROJECT_NAME}
   "${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx"
   ${OUTPUT}
 )
+
+# -Wno-deprecated-declaration, /wd4996: suppresses deprecated warning
+# -Wno-register, /wd5033: ISO C++1z does not allow register storage class specifier
+if(MSVC)
+  set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/bigobj /wd4996 /wd5033")
+  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx" PROPERTIES COMPILE_FLAGS "-DRUBY_EMBEDDED" )
+else()
+  set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wno-deprecated-declarations -Wno-register")
+  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx" PROPERTIES COMPILE_FLAGS "-DRUBY_EMBEDDED -Wno-unused-variable" )
+endif()
 
 # We are setting up a set of artificial dependencies here so that
 # cmake knows how to order the libraries properly

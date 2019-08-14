@@ -577,7 +577,7 @@ def parse_main_args(main_args)
     begin
       # DLM: test code, useful for testing from command line using system ruby
       #Gem::Specification.each do |spec|
-      #  if /openstudio/.match(spec.name) 
+      #  if /openstudio/.match(spec.name)
       #    original_embedded_gems[spec.name] = spec
       #  end
       #end
@@ -673,7 +673,6 @@ class CLI
   # This constant maps commands to classes in this CLI and stores meta-data on them
   def command_list
     {
-        run: [ Proc.new { ::Run }, {primary: true, working: true}],
         gem_list: [ Proc.new { ::GemList }, {primary: false, working: true}],
         gem_install: [ Proc.new { ::InstallGem }, {primary: false, working: false}], # DLM: needs Ruby built with FFI
         execute_ruby_script: [ Proc.new { ::ExecuteRubyScript }, {primary: false, working: true}],

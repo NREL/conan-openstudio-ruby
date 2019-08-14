@@ -685,7 +685,7 @@
 
 
 
-#include <cli/SWIGRubyRuntime.hxx>
+#include <SWIGRubyRuntime.hxx>
 
 
 
