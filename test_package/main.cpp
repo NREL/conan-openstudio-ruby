@@ -29,6 +29,7 @@
 
 #include "RubyInterpreter.hpp"
 #include "GC_Value.hpp"
+#include <embedded_files.hxx>
 
 #include <iostream>
 
@@ -42,6 +43,7 @@
 #endif
 
 extern "C" {
+  void Init_EmbeddedScripting(void);
   // INIT_DECLARATIONS;
 
   void Init_encdb();
@@ -192,6 +194,25 @@ int main(int argc, char *argv[])
     swig::GC_VALUE::rshift_id = rb_intern(">>");
 
     // INIT_CALLS;
+    // in case any further init methods try to require files, init this first
+    Init_EmbeddedScripting();
+
+    // Need embedded_help for requiring files out of the embedded system
+    auto embedded_extensions_string = embedded_files::getFileAsString(":/embedded_help.rb");
+
+    try {
+      rubyInterpreter.evalString(embedded_extensions_string);
+    }
+    catch (const std::exception& e) {
+      rubyInterpreter.evalString(R"(STDOUT.flush)");
+      std::cout << "Exception in embedded_help: " << e.what() << std::endl; // endl will flush
+      return ruby_cleanup(1);
+    }
+    catch (...) {
+      rubyInterpreter.evalString(R"(STDOUT.flush)");
+      std::cout << "Unknown Exception in embedded_help" << std::endl; // endl will flush
+      return ruby_cleanup(1);
+    }
 
     //// encodings
     Init_encdb();
@@ -545,10 +566,11 @@ int main(int argc, char *argv[])
   return ruby_cleanup(0);
 }
 
-// Our ruby is patched to include this, so I can't delete these
 extern "C" {
   int rb_hasFile(const char *t_filename) {
-    return false;
+    // TODO Consider expanding this to use the path which we have artificially defined in embedded_help.rb
+    std::string expandedName = std::string(":/ruby/2.5.0/") + std::string(t_filename) + ".rb";
+    return embedded_files::hasFile(expandedName);
   }
 
   int rb_require_embedded(const char *t_filename) {

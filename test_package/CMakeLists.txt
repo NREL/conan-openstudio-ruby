@@ -1,7 +1,48 @@
-project(openstudio)
 cmake_minimum_required(VERSION 3.10.2)
-
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
+
+
+# Use ccache is available, has to be before "project()"
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  # Support Unix Makefiles and Ninja
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
+project(openstudio)
+
+# Xcode/Ninja generators undefined MAKE
+if(CMAKE_GENERATOR MATCHES "Make")
+  set(MAKE "$(MAKE)")
+else()
+  set(MAKE make)
+endif()
+
+# Add Color Output if Using Ninja
+macro(AddCXXFlagIfSupported flag test)
+  CHECK_CXX_COMPILER_FLAG(${flag} ${test})
+  if(${${test}})
+    message("adding ${flag}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
+  endif()
+endmacro()
+
+if("Ninja" STREQUAL ${CMAKE_GENERATOR})
+  # Clang
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    AddCXXFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fcolor-diagnostics)
+  endif()
+
+  # g++
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    # For some reason it doesn't say its supported, but it works...
+    # AddCXXFlagIfSupported(-fdiagnostics-color COMPILER_SUPPORTS_fdiagnostics-color)
+    message(STATUS "Ninja: Forcing -fdiagnostics-color=always")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
+  endif()
+endif()
+
 
 #include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 #conan_basic_setup(TARGETS)
@@ -71,17 +112,106 @@ if ("${MODULE_ROOT}" STREQUAL "")
   set(MODULE_ROOT "${CONAN_OPENSTUDIO_RUBY_ROOT_DEBUG}")
 endif()
 
+
+#######################################################################
+#                               S W I G                               #
+#######################################################################
+
+include(ExternalProject)
+
+
+# SWIG
+# using forked version of SWIG at https://github.com/macumber/swig/tree/openstudio_swig_3_0_12
+if(UNIX)
+  # We patch it up with a version of pcre we provide to avoid having to have the requirement locally
+  ExternalProject_Add(SWIG
+    URL http://openstudio-resources.s3.amazonaws.com/dependencies/swig-3.0.12.tar.gz
+    URL_MD5 a7d384966974ed79455a455b517ad83d
+    PATCH_COMMAND cp ${PROJECT_SOURCE_DIR}/dependencies/pcre-8.31.tar.bz2 ${PROJECT_BINARY_DIR}/SWIG-prefix/src/SWIG && cd ${PROJECT_BINARY_DIR}/SWIG-prefix/src/SWIG && ./Tools/pcre-build.sh
+    CONFIGURE_COMMAND ./autogen.sh && ./configure --prefix=${PROJECT_BINARY_DIR}/SWIG-prefix/src/SWIG-install
+    BUILD_COMMAND ${MAKE}
+    INSTALL_COMMAND ${MAKE} install
+    BUILD_IN_SOURCE 1
+  )
+  set(SWIG_EXECUTABLE ${PROJECT_BINARY_DIR}/SWIG-prefix/src/SWIG-install/bin/swig)
+
+  add_dependencies(openstudio SWIG)
+
+else()
+  # SWIG requires MinGW to compile on windows, so we just copy in the prebuilt binary
+  set(SWIG_ZIP "swigwin-3.0.12.zip")
+  set(SWIG_DIR "swigwin-3.0.12")
+  set(SWIG_EXPECTED_HASH "8ee412d1278ba3cac22e58f26a842918")
+  if(EXISTS "${PROJECT_BINARY_DIR}/${SWIG_ZIP}")
+    file(MD5 "${PROJECT_BINARY_DIR}/${SWIG_ZIP}" SWIG_HASH)
+  endif()
+  if(NOT EXISTS "${PROJECT_BINARY_DIR}/${SWIG_ZIP}" OR NOT EXISTS "${PROJECT_BINARY_DIR}/${SWIG_DIR}" OR NOT "${SWIG_HASH}" MATCHES "${SWIG_EXPECTED_HASH}")
+    message(STATUS "Downloading SWIG)")
+    file(DOWNLOAD "http://openstudio-resources.s3.amazonaws.com/dependencies/${SWIG_ZIP}" "${PROJECT_BINARY_DIR}/${SWIG_ZIP}" TIMEOUT 120 INACTIVITY_TIMEOUT 120 SHOW_PROGRESS EXPECTED_MD5 ${SWIG_EXPECTED_HASH})
+    execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory "${PROJECT_BINARY_DIR}/${SWIG_DIR}")
+    execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz "${PROJECT_BINARY_DIR}/${SWIG_ZIP}" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")
+  endif()
+
+  set(SWIG_EXECUTABLE ${PROJECT_BINARY_DIR}/${SWIG_DIR}/swig.exe)
+endif()
+
+#######################################################################
+#                        E M B E D   F I L E S                        #
+#######################################################################
+
+# TODO: WE DO NEED TO EMBED STUFF, SO PUT THAT BACK!
+include("embedded/EmbedFiles.cmake")
+add_subdirectory("embedded")
+
 message("Searching for ruby modules in '${MODULE_ROOT}/lib/**/*.rb'")
 file(GLOB_RECURSE  EXTENSION_RB  FOLLOW_SYMLINKS "${MODULE_ROOT}/lib/**/*.rb")
 
+foreach( _FILE ${EXTENSION_RB} )
+  file(RELATIVE_PATH LOCATION ${MODULE_ROOT}/lib ${_FILE})
+  list(APPEND FILES ${_FILE})
+  list(APPEND EMBEDDED_PATHS ${LOCATION})
+endforeach()
+
+list(APPEND FILES "${CMAKE_CURRENT_SOURCE_DIR}/embedded_help.rb")
+list(APPEND EMBEDDED_PATHS "embedded_help.rb")
+
+list(APPEND FILES "${CMAKE_CURRENT_SOURCE_DIR}/openstudio_cli.rb")
+list(APPEND EMBEDDED_PATHS "openstudio_cli.rb")
+
+embed_files("${FILES}" "${EMBEDDED_PATHS}" OUTPUT)
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} )
+
+add_custom_command(
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
+  COMMAND "${SWIG_EXECUTABLE}"
+          "-ruby"
+          -external-runtime "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
+)
+
+add_custom_command(
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx"
+  COMMAND "${SWIG_EXECUTABLE}"
+          "-ruby"
+          "-c++"
+          -o "${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx"
+          "-fvirtual"
+          "-I${PROJECT_SOURCE_DIR}/src"
+          "-I${PROJECT_BINARY_DIR}/src"
+          "-D_WINDOWS"
+          "-Fmicrosoft"
+          "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
+  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
+          "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
+          "EmbeddedHelp.hpp"
+)
 
 add_executable(${PROJECT_NAME}
   main.cpp
-  # "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
+  "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
   RubyException.hpp
   RubyInterpreter.hpp
-  # "${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx"
+  "${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx"
   ${OUTPUT}
 )
 
