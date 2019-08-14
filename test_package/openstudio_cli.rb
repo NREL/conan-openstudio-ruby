@@ -440,6 +440,42 @@ def parse_main_args(main_args)
   Gem.paths.path << ':/ruby/2.5.0/gems/'
   Gem.paths.path << ':/ruby/2.5.0/bundler/gems/'
 
+  # find all the embedded gems
+  original_embedded_gems = {}
+  begin
+    EmbeddedScripting::allFileNamesAsString().split(';').each do |f|
+      if md = /specifications\/.*\.gemspec$/.match(f) ||
+         md = /bundler\/.*\.gemspec$/.match(f)
+        begin
+          spec = EmbeddedScripting::getFileAsString(f)
+          s = eval(spec)
+          s.loaded_from = f
+          original_embedded_gems[s.name] = s
+
+          init_count = 0
+          Gem::Specification.each {|x| init_count += 1}
+
+          # if already have an equivalent spec this will be a no-op
+          Gem::Specification.add_spec(s)
+
+          post_count = 0
+          Gem::Specification.each {|x| post_count += 1}
+
+          if post_count == init_count
+            $logger.debug "Found system gem #{s.name} #{s.version}, overrides embedded gem"
+          end
+
+        rescue LoadError => e
+          safe_puts e.message
+        rescue => e
+          safe_puts e.message
+        end
+      end
+    end
+  rescue NameError => e
+    # EmbeddedScripting not available
+  end
+
   # activate or remove bundler
   Gem::Specification.each do |spec|
     if spec.gem_dir.chars.first == ':'
@@ -539,9 +575,19 @@ def parse_main_args(main_args)
     current_dir = Dir.pwd
 
     begin
+      # DLM: test code, useful for testing from command line using system ruby
+      #Gem::Specification.each do |spec|
+      #  if /openstudio/.match(spec.name) 
+      #    original_embedded_gems[spec.name] = spec
+      #  end
+      #end
+
       # get a list of all the embedded gems
       dependencies = []
-
+      original_embedded_gems.each_value do |spec|
+        $logger.debug "Adding dependency on #{spec.name} '~> #{spec.version}'"
+        dependencies << Gem::Dependency.new(spec.name, "~> #{spec.version}")
+      end
       #dependencies.each {|d| $logger.debug "Added dependency #{d}"}
 
       # resolve dependencies
@@ -553,6 +599,20 @@ def parse_main_args(main_args)
       activation_requests.each do |request|
         do_activate = true
         spec = request.spec
+
+        # check if this is one of our embedded gems
+        if original_embedded_gems[spec.name]
+
+          # check if gem can be loaded from RUBYLIB, this supports developer use case
+          original_load_path.each do |lp|
+            if File.exists?(File.join(lp, spec.name)) || File.exists?(File.join(lp, spec.name + '.rb')) || File.exists?(File.join(lp, spec.name + '.so'))
+              $logger.debug "Found #{spec.name} in '#{lp}', overrides gem #{spec.spec_file}"
+              Gem::Specification.remove_spec(spec)
+              do_activate = false
+              break
+            end
+          end
+        end
 
         if do_activate
           $logger.debug "Activating gem #{spec.spec_file}"
