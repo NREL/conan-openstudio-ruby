@@ -75,6 +75,7 @@ class TestPackageConan(ConanFile):
             return msg
 
         cli_path = os.path.abspath(os.path.join("bin", "openstudio"))
+
         print("CWD={}".format(os.path.abspath('.')))
         print("source_folder={}".format(os.path.abspath(self.source_folder)))
 
@@ -86,7 +87,11 @@ class TestPackageConan(ConanFile):
         failed_tests = []
         passed_tests = []
         for test_arg in all_test_args:
-            cmd = "{} {} --name={}".format(cli_path, test_arg[0], test_arg[1])
+            # test_bundle.rb in particular will need the path to the CLI to
+            # spin off other processes, so pass it as an environment variable
+            cmd = "OS_CLI_PATH='{c}' {c} {t} --name={n}".format(c=cli_path,
+                                                                t=test_arg[0],
+                                                                n=test_arg[1])
             self.output.info(cmd)
             # Run all tests even if failed, we'll unwind later
             try:

@@ -65,6 +65,12 @@ if original_arch
   RbConfig::CONFIG['arch'] = original_arch
 end
 
+module OpenStudio
+  def self.getOpenStudioCLI
+    return ENV["OS_CLI_PATH"]
+  end
+end
+
 module Gem
 class Specification < BasicSpecification
   def gem_dir
