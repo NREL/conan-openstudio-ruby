@@ -8,12 +8,22 @@ import os
 import re
 import glob as gb
 
+
 class TestFailedException(ConanException):
     pass
+
 
 class TestPackageConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
+
+    def requirements(self):
+        """
+        Declare required dependencies for testing
+        """
+        self.requires("swig_installer/4.0.0@bincrafters/stable")
+        self.requires("zlib/1.2.11@conan/stable")
+        self.options["zlib"].minizip = True
 
     def build(self):
         cmake = CMake(self)

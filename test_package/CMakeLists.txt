@@ -43,67 +43,8 @@ if("Ninja" STREQUAL ${CMAKE_GENERATOR})
   endif()
 endif()
 
-
-#include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-#conan_basic_setup(TARGETS)
-
-if(NOT CONAN_OPENSTUDIO_ALREADY_RUN)
-
-  set(CMAKE_CONAN_EXPECTED_HASH 709180234748692a642f9e5c4d80d328)
-  set(CMAKE_CONAN_VERSION "v0.14")
-
-  if(EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-    file(MD5 "${CMAKE_BINARY_DIR}/conan.cmake" CMAKE_CONAN_HASH)
-  endif()
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake" OR NOT "${CMAKE_CONAN_HASH}" MATCHES "${CMAKE_CONAN_EXPECTED_HASH}")
-    # Put it in CMAKE_BINARY_DIR so we don't end up with two when building OpenStudioApplication
-    message(STATUS "openstudio: Downloading conan.cmake ${CMAKE_CONAN_VERSION} from https://github.com/conan-io/cmake-conan")
-    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/${CMAKE_CONAN_VERSION}/conan.cmake"
-       "${CMAKE_BINARY_DIR}/conan.cmake")
-  else()
-    message(STATUS "openstudio: using existing conan.cmake")
-  endif()
-
-  include(${CMAKE_BINARY_DIR}/conan.cmake)
-
-  conan_check(VERSION 1.0.0 REQUIRED)
-
-  message(STATUS "openstudio: RUNNING CONAN")
-
-  conan_add_remote(NAME bincrafters
-    URL https://api.bintray.com/conan/bincrafters/public-conan)
-  conan_add_remote(NAME nrel
-    URL https://api.bintray.com/conan/commercialbuilding/nrel)
-
-  list(APPEND CONAN_OPTIONS "zlib:minizip=True")
-  # You do want to rebuild packages if there's a newer recipe in the remote (which applies mostly to our own openstudio_ruby where we don't
-  # bump the actual package version when we make changes) than the binaries were built with
-  # 'outdated' also acts like 'missing': if no binary, will build them.
-  # list(APPEND CONAN_BUILD "outdated")
-
-
-  # This will create the conanbuildinfo.cmake in the current binary dir, not the cmake_binary_dir
-  conan_cmake_run(REQUIRES
-    # Track NREL/stable in general, on a feature branch this could be temporarily switched to NREL/testing
-    openstudio_ruby/2.5.5@nrel/stable
-    BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
-    OPTIONS ${CONAN_OPTIONS}
-    BUILD ${CONAN_BUILD}
-    # Passes `-u, --update`    to conan install: Check updates exist from upstream remotes
-    # That and build=outdated should ensure we track the right
-    # UPDATE
-  )
-
-  set(CONAN_OPENSTUDIO_ALREADY_RUN TRUE)
-
-  #message("CONAN_TARGETS = ${CONAN_TARGETS}")
-  message(STATUS "openstudio: DONE RUNNING CONAN")
-
-else()
-
-  message(STATUS "openstudio: CONAN RUN BY CALLING SCRIPT")
-
-endif()
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
 
 message("CONAN_LIBS=${CONAN_LIBS}")
 
@@ -117,40 +58,13 @@ endif()
 #                               S W I G                               #
 #######################################################################
 
-include(ExternalProject)
-
-
-# SWIG
-# using forked version of SWIG at https://github.com/macumber/swig/tree/openstudio_swig_3_0_12
-if(UNIX)
-  # We patch it up with a version of pcre we provide to avoid having to have the requirement locally
-  ExternalProject_Add(SWIG
-    URL http://openstudio-resources.s3.amazonaws.com/dependencies/swig-3.0.12.tar.gz
-    URL_MD5 a7d384966974ed79455a455b517ad83d
-    PATCH_COMMAND cp ${PROJECT_SOURCE_DIR}/dependencies/pcre-8.31.tar.bz2 ${PROJECT_BINARY_DIR}/SWIG-prefix/src/SWIG && cd ${PROJECT_BINARY_DIR}/SWIG-prefix/src/SWIG && ./Tools/pcre-build.sh
-    CONFIGURE_COMMAND ./autogen.sh && ./configure --prefix=${PROJECT_BINARY_DIR}/SWIG-prefix/src/SWIG-install
-    BUILD_COMMAND ${MAKE}
-    INSTALL_COMMAND ${MAKE} install
-    BUILD_IN_SOURCE 1
-  )
-  set(SWIG_EXECUTABLE ${PROJECT_BINARY_DIR}/SWIG-prefix/src/SWIG-install/bin/swig)
-
-else()
-  # SWIG requires MinGW to compile on windows, so we just copy in the prebuilt binary
-  set(SWIG_ZIP "swigwin-3.0.12.zip")
-  set(SWIG_DIR "swigwin-3.0.12")
-  set(SWIG_EXPECTED_HASH "8ee412d1278ba3cac22e58f26a842918")
-  if(EXISTS "${PROJECT_BINARY_DIR}/${SWIG_ZIP}")
-    file(MD5 "${PROJECT_BINARY_DIR}/${SWIG_ZIP}" SWIG_HASH)
-  endif()
-  if(NOT EXISTS "${PROJECT_BINARY_DIR}/${SWIG_ZIP}" OR NOT EXISTS "${PROJECT_BINARY_DIR}/${SWIG_DIR}" OR NOT "${SWIG_HASH}" MATCHES "${SWIG_EXPECTED_HASH}")
-    message(STATUS "Downloading SWIG)")
-    file(DOWNLOAD "http://openstudio-resources.s3.amazonaws.com/dependencies/${SWIG_ZIP}" "${PROJECT_BINARY_DIR}/${SWIG_ZIP}" TIMEOUT 120 INACTIVITY_TIMEOUT 120 SHOW_PROGRESS EXPECTED_MD5 ${SWIG_EXPECTED_HASH})
-    execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory "${PROJECT_BINARY_DIR}/${SWIG_DIR}")
-    execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz "${PROJECT_BINARY_DIR}/${SWIG_ZIP}" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")
-  endif()
-
-  set(SWIG_EXECUTABLE ${PROJECT_BINARY_DIR}/${SWIG_DIR}/swig.exe)
+# We use conan swig_installer which enhances our PATH to include the CONAN_BIN_DIRS_SWIG_INSTALLER already
+# So I could just do:
+# set(SWIG_EXECUTABLE swig)
+# But better be safe
+find_program(SWIG_EXECUTABLE swig)
+if(NOT SWIG_EXECUTABLE)
+  message(FATAL_ERROR "Couldn't find swig, which shouldn't happen. CONAN_BIN_DIRS_SWIG_INSTALLER=${CONAN_BIN_DIRS_SWIG_INSTALLER}")
 endif()
 
 #######################################################################
@@ -189,9 +103,6 @@ add_custom_command(
   COMMAND "${SWIG_EXECUTABLE}"
           "-ruby"
           -external-runtime "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
-  # For Unix, We use ExternalProject_Add, which won't happen at generation time, but creates a Target of name "SWIG",
-  #which we reference here to ensure SWIG is built before we try to use the SWIG_EXECUTABLE
-  DEPENDS SWIG
 )
 
 add_custom_command(
@@ -206,8 +117,7 @@ add_custom_command(
           "-D_WINDOWS"
           "-Fmicrosoft"
           "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
-  DEPENDS SWIG
-          "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
+  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
           "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.hxx"
           "EmbeddedHelp.hpp"
 )
@@ -226,7 +136,7 @@ add_executable(${PROJECT_NAME}
 )
 
 # -Wno-deprecated-declaration, /wd4996: suppresses deprecated warning
-# -Wno-register, /wd5033: ISO C++1z does not allow register storage class specifier
+# -Wno-register, /wd5033: ISO C++1z does not allow *register* storage class specifier
 if(MSVC)
   set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/bigobj /wd4996 /wd5033")
   set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx" PROPERTIES COMPILE_FLAGS "-DRUBY_EMBEDDED" )
