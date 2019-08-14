@@ -10,6 +10,31 @@ A [conan](https://conan.io/) package to build ruby for [OpenStudio](https://gith
 
 CI is done by Travis for Linux&Mac, and AppVeyor for Windows. To ignore specific commits, please add tags in your commit message such as `[skip ci]` (skip all), `[skip travis]` or `[skip appveyor]`.
 
+## Testing
+
+There is a `test_package` folder that builds a CLI that relies on `openstudio_ruby`, as well as `swig_installer` and `zlib` (to embed files).
+
+It's a CLI that has most features of openstudio's CLI, except openstudio-specific stuff (like ApplyMeasure, Run, Update).
+
+It should hopefully help us:
+
+* Catch things that break early on, before we notice it on OpenStudio's side
+* Allow us to test/debug cli ruby specific issues (encodings, gem_install, interactive, etc)
+
+
+If you run the `conan create` command, it will automatically run the tests against the package it built right after.
+From the root of the repo:
+
+```
+conan create . nrel/testing
+```
+
+If you only wanted to run the tests against a package you already have (downloaded or built), you can also do that like so:
+
+```
+conan test test_package openstudio_ruby/2.5.5@nrel/stable
+```
+
 ## Uploading to Bintray (unnecessary due to CI)
 
 Full instructions available at [Conan Docs](https://docs.conan.io/en/latest/uploading_packages/bintray/uploading_bintray.html).
