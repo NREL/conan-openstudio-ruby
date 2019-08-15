@@ -208,7 +208,7 @@ if(WIN32)
   set(ADDITIONAL_RUBY_LIBS_RELEASE ${FFI} Iphlpapi)
   set(ADDITIONAL_RUBY_LIBS_DEBUG ${FFID} Iphlpapi)
   LINK_DEBUG_AND_RELEASE(additional_ruby_libs "${ADDITIONAL_RUBY_LIBS_DEBUG}" "${ADDITIONAL_RUBY_LIBS_RELEASE}")
-else()
+endif()
 
 if(APPLE)
   find_library(COREFOUNDATION_LIBRARY CoreFoundation )
