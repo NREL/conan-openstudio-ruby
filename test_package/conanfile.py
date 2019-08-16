@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, tools
 from conans.errors import ConanException
 import os
 import re
@@ -76,12 +76,18 @@ class TestPackageConan(ConanFile):
 
         cli_path = os.path.abspath(os.path.join("bin", "openstudio"))
 
-        print("CWD={}".format(os.path.abspath('.')))
-        print("source_folder={}".format(os.path.abspath(self.source_folder)))
+        # print("CWD={}".format(os.path.abspath('.')))
+        # print("source_folder={}".format(os.path.abspath(self.source_folder)))
 
         # No point in trying to run tests if the --help doesn't even work
         self.run('{} --help'.format(cli_path))
         self.output.success("Test Passed - Running openstudio --help")
+
+        # This works, showing that we correctly pass OS_CLI as an env
+        # variable
+        # with tools.environment_append({'OS_CLI': cli_path}):
+        #     self.run('{} -e "puts ENV[\'OS_CLI\']"'.format(cli_path))
+        #     self.output.success("OS_CLI")
 
         all_test_args = self._discover_tests()
         failed_tests = []
@@ -89,9 +95,10 @@ class TestPackageConan(ConanFile):
         for test_arg in all_test_args:
             # test_bundle.rb in particular will need the path to the CLI to
             # spin off other processes, so pass it as an environment variable
-            cmd = "OS_CLI_PATH='{c}' {c} {t} --name={n}".format(c=cli_path,
-                                                                t=test_arg[0],
-                                                                n=test_arg[1])
+            # (Could also just do the rough `os.environ["OS_CLI"] = cli_path`)
+            with tools.environment_append({'OS_CLI': cli_path}):
+                cmd = "{c} {t} --name={n}".format(c=cli_path, t=test_arg[0],
+                                                  n=test_arg[1])
             self.output.info(cmd)
             # Run all tests even if failed, we'll unwind later
             try:
