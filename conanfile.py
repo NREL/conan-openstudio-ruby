@@ -97,9 +97,9 @@ class OpenstudiorubyConan(ConanFile):
             # if not, it'll fail because it's downloading a travis package and
             # can't resolve a path when trying to build gdbm
             # > dyld: Library not loaded: /Users/travis/.conan/data/readline/7.0/bincrafters/stable/package/988863d075519fe477ab5c0452ee71c84a94de8a/lib/libhistory.7.dylib
-            self.requires("readline/7.0@bincrafters/stable")
-            # Shared Not available on Mac
-            # self.options["readline"].shared = False
+            self.requires("readline/7.0@jmarrec/testing")
+            # Shared Not available on Mac on bincrafters but is on my fork
+            # self.options["readline"].shared = True
             # self.options["readline"].fPIC = True
 
         if self.options.with_gmp:
