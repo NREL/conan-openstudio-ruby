@@ -92,10 +92,7 @@ class OpenstudiorubyConan(ConanFile):
             self.options["gdbm"].libgdbm_compat = True
 
         if self.options.with_readline:
-            # Shared option (to build static) is only available on
-            # bincrafters/testing following my PR but this recipe isn't on
-            # bintray, so keep tracking my fork for now
-            self.requires("readline/7.0@jmarrec/testing")
+            self.requires("readline/7.0@bincrafters/stable")
             # self.options["readline"].shared = True
             # self.options["readline"].fPIC = True
 
