@@ -51,7 +51,7 @@ if (INTEGRATED_CONAN)
   if(NOT MSVC)
     set(CONAN_FFI "libffi/3.2.1@bincrafters/stable")
     set(CONAN_LIBYAML "libyaml/0.2.2@bincrafters/stable")
-    set(CONAN_READLINE "readline/7.0@bincrafters/stable")
+    set(CONAN_READLINE "readline/7.0@jmarrec/testing")  # static not available on bincrafters/stable yet
     set(CONAN_GDBM "gdbm/1.18.1@bincrafters/stable")
     set(CONAN_GMP "gmp/6.1.2@bincrafters/stable")
   endif()
