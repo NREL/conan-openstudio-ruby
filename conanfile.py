@@ -92,13 +92,10 @@ class OpenstudiorubyConan(ConanFile):
             self.options["gdbm"].libgdbm_compat = True
 
         if self.options.with_readline:
-            # TODO: On mac you MUST build this one from source
-            # because it's shared
-            # if not, it'll fail because it's downloading a travis package and
-            # can't resolve a path when trying to build gdbm
-            # > dyld: Library not loaded: /Users/travis/.conan/data/readline/7.0/bincrafters/stable/package/988863d075519fe477ab5c0452ee71c84a94de8a/lib/libhistory.7.dylib
+            # Shared option (to build static) is only available on
+            # bincrafters/testing following my PR but this recipe isn't on
+            # bintray, so keep tracking my fork for now
             self.requires("readline/7.0@jmarrec/testing")
-            # Shared Not available on Mac on bincrafters but is on my fork
             # self.options["readline"].shared = True
             # self.options["readline"].fPIC = True
 
