@@ -71,38 +71,13 @@ endif()
 #                               G E M S                               #
 #######################################################################
 
-# build and release openstudio gems at https://github.com/NREL/OpenStudio-gems
-# upload the openstudio-gems-DATE.tar.gz to the dependencies location on s3, then update the MD5sum and url below
-# TODO: Update to 20191004 @tijcolem
-set(OPENSTUDIO_GEMS_ZIP_FILENAME "openstudio3-gems-20190715.tar.gz")
-set(OPENSTUDIO_GEMS_ZIP_EXPECTED_MD5 "5268f0e0b52a72700b8b821316f034b1")
-set(OPENSTUDIO_GEMS_ZIP_LOCAL_PATH "${PROJECT_BINARY_DIR}/${OPENSTUDIO_GEMS_ZIP_FILENAME}")
-if(EXISTS "${OPENSTUDIO_GEMS_ZIP_LOCAL_PATH}")
-  file(MD5 "${OPENSTUDIO_GEMS_ZIP_LOCAL_PATH}" OPENSTUDIO_GEMS_ZIP_MD5)
-endif()
+# Minimal set of gems, off of branch develop3-minimal on https://github.com/NREL/OpenStudio-gems
+set(OPENSTUDIO_GEMS_ZIP_FILENAME "openstudio3-gems-minimal-20191015.tar.gz")
+set(OPENSTUDIO_GEMS_ZIP_LOCAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/${OPENSTUDIO_GEMS_ZIP_FILENAME}")
 
-if(NOT OPENSTUDIO_GEMS_ZIP_MD5 STREQUAL OPENSTUDIO_GEMS_ZIP_EXPECTED_MD5)
-  message(STATUS "Downloading OpenStudio Gems: ${OPENSTUDIO_GEMS_ZIP_FILENAME}")
-  file(DOWNLOAD "http://openstudio-resources.s3.amazonaws.com/dependencies/${OPENSTUDIO_GEMS_ZIP_FILENAME}"
-    ${OPENSTUDIO_GEMS_ZIP_LOCAL_PATH}
-    INACTIVITY_TIMEOUT 120
-    SHOW_PROGRESS
-    EXPECTED_MD5 ${OPENSTUDIO_GEMS_ZIP_EXPECTED_MD5})
-
-  file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/openstudio-gems")
-  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${OPENSTUDIO_GEMS_ZIP_LOCAL_PATH} WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")
-
-  file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/embedded_files")
-
-  # TODO: IDEALLY WE SHOULD DOWNLOAD SOMETHING THAT JUST INCLUDES MINITEST, JSON_PURE, ETC
-  # Now I delete the openstudo-super-specific ones (most will depend on openstudio itself...)
-  # and they are problematic too since they go well above MAX_PATH on windows, and MSVC won't #include these
-  file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/openstudio-gems/ruby/2.5.0/gems/openstudio_measure_tester-0.1.7")
-  file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/openstudio-gems/ruby/2.5.0/gems/openstudio-extension-0.1.1")
-  file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/openstudio-gems/ruby/2.5.0/gems/openstudio-standards-0.2.9")
-  file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/openstudio-gems/ruby/2.5.0/gems/openstudio-workflow-1.3.3")
-
-endif()
+file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/openstudio-gems")
+execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${OPENSTUDIO_GEMS_ZIP_LOCAL_PATH} WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")
+file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/embedded_files")
 
 #######################################################################
 #                        E M B E D   F I L E S                        #
