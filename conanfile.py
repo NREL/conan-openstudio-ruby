@@ -315,6 +315,11 @@ class OpenstudiorubyConan(ConanFile):
                               'usr-x64-mswin64_140.lib',
                               'wait_for_single_fd-x64-mswin64_140.lib']
 
+
+            self.output.warn(
+                "Since we are building a custom libffi, we are packaging it, as it's required for linking our ruby")
+            expected_libs += ['libffi.lib']
+
         n_libs = len(libs)
         n_expected_libs = len(expected_libs)
         if (n_libs == n_expected_libs):
