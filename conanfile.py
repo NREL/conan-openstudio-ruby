@@ -317,9 +317,9 @@ class OpenstudiorubyConan(ConanFile):
                               'usr-x64-mswin64_140.lib',
                               'wait_for_single_fd-x64-mswin64_140.lib']
 
-
             self.output.warn(
-                "Since we are building a custom libffi, we are packaging it, as it's required for linking our ruby")
+                "Since we are building a custom libffi, we are packaging it, "
+                "as it's required for linking our ruby")
             expected_libs += ['libffi.lib']
 
         n_libs = len(libs)
@@ -355,3 +355,24 @@ class OpenstudiorubyConan(ConanFile):
         self.output.info("cpp_info.libs = {}".format(self.cpp_info.libs))
         self.output.info("cpp_info.includedirs = "
                          "{}".format(self.cpp_info.includedirs))
+
+        # PATH / ENV stuff
+        bindir = os.path.join(self.package_folder, "bin")
+        self.output.info('Appending PATH environment variable: '
+                         '{}'.format(bindir)
+        self.env_info.PATH.append(bindir)
+        self.env_info.RUBY_EXEC_PREFIX = self.package_folder
+        self.env_info.RUBY_BINDIR = bindir
+        self.env_info.RUBY_LIBDIR = os.path.join(self.package_folder, "lib")
+
+
+        # Rewrite shebangs
+        bin_scripts = ['gem', 'ri', 'irb', 'rdoc', 'erb', 'rake']
+        for bin_script in bin_scripts:
+            bin_script_p = os.path.join(self.package_folder, 'bin', bin_script)
+            with open(bin_script_p, 'r') as f:
+                lines = f.read().splitlines()
+            lines[0] = "#!{}".format(os.path.join(self.package_folder,
+                                                  'bin/ruby'))
+            with open(bin_script_p, 'w') as f:
+                f.write("\n".join(lines))
