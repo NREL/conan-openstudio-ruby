@@ -680,9 +680,9 @@ class CLI
   def command_list
     {
         gem_list: [ Proc.new { ::GemList }, {primary: false, working: true}],
-        gem_install: [ Proc.new { ::InstallGem }, {primary: false, working: false}], # DLM: needs Ruby built with FFI
+        gem_install: [ Proc.new { ::InstallGem }, {primary: false, working: true}], # DLM: needs Ruby built with FFI
         execute_ruby_script: [ Proc.new { ::ExecuteRubyScript }, {primary: false, working: true}],
-        interactive_ruby: [ Proc.new { ::InteractiveRubyShell }, {primary: false, working: false}], # DLM: not working
+        interactive_ruby: [ Proc.new { ::InteractiveRubyShell }, {primary: false, working: true}], # DLM: not working
         ruby_version: [ Proc.new { ::RubyVersion }, {primary: false, working: true}],
         list_commands: [ Proc.new { ::ListCommands }, {primary: true, working: true}]
     }
