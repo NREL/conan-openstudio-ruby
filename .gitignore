@@ -1,1 +1,4 @@
 build/
+test_gems/
+.bundle/
+Gemfile.lock
