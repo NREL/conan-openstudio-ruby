@@ -22,7 +22,7 @@ class TestPackageConan(ConanFile):
         Declare required dependencies for testing
         """
         self.requires("swig_installer/4.0.0@bincrafters/stable")
-        self.requires("zlib/1.2.11@conan/stable")
+        self.requires("zlib/1.2.11")
         self.options["zlib"].minizip = True
 
     def build(self):

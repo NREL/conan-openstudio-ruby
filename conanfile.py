@@ -67,13 +67,15 @@ class OpenstudiorubyConan(ConanFile):
         # (not sure which will be default on OpenStudio's CMake),
         # but at least that doesn't have actual incompatibility
         del self.settings.compiler.libcxx
+        del self.settings.compiler.cppstd
 
     def requirements(self):
         """
         Declare required dependencies
         """
-        self.requires("OpenSSL/1.1.0g@conan/stable")
-        self.requires("zlib/1.2.11@conan/stable")
+        # 1.1.1x isn't supported by ruby 2.5.5, build fails
+        self.requires("openssl/1.1.0l")
+        self.requires("zlib/1.2.11")
 
         if self.options.with_libyaml:
             self.requires("libyaml/0.2.2@bincrafters/stable")
@@ -81,7 +83,7 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["libyaml"].fPIC = True
 
         if self.options.with_libffi:
-            self.requires("libffi/3.2.1@bincrafters/stable")
+            self.requires("libffi/3.2.1")
             self.options["libffi"].shared = False
             # self.options["libffi"].fPIC = True
 
@@ -97,7 +99,7 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["readline"].fPIC = True
 
         if self.options.with_gmp:
-            self.requires("gmp/6.1.2@bincrafters/stable")
+            self.requires("gmp/6.1.2")
 
     def build_requirements(self):
         """
@@ -106,7 +108,8 @@ class OpenstudiorubyConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
-        self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
+        # TODO: temp, pending https://github.com/bincrafters/conan-ruby_installer/pull/7
+        self.build_requires("ruby_installer/2.5.5@jmarrec/testing")
         self.build_requires("bison_installer/3.3.2@bincrafters/stable")
 
     def build(self):
