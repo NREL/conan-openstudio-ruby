@@ -15,7 +15,7 @@ class OpenstudiorubyConan(ConanFile):
     description = "Static ruby for use in OpenStudio's Command Line Interface"
     topics = ("ruby", "openstudio")
     # THIS is what creates the package_id (sha) that will determine whether
-    # we pull binaries or build them
+    # we pull binaries from bintray or build them
     settings = "os", "compiler", "build_type", "arch"
     exports_sources = "*"
     generators = "cmake"
