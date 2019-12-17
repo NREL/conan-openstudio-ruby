@@ -147,10 +147,16 @@ $<IF:$<BOOL:${CURRENT_CONAN_READLINE_ROOT}>,--with-readline-dir=${CURRENT_CONAN_
 $<IF:$<BOOL:${CURRENT_CONAN_GMP_ROOT}>,--with-gmp-dir=${CURRENT_CONAN_GMP_ROOT} ,>"
 )
 
+# openssl (> 1.1.0) from conan center index now renames debug libraries to libssld and libcryptod
+FindValue(CONAN_LIBS_OPENSSL)
+set(OPENSSL_LIBCRYPTO_NAME $<IF:$<CONFIG:Debug>,libcryptod,libcrypto>)
+set(OPENSSL_LIBSSL_NAME $<IF:$<CONFIG:Debug>,libssld,libssl>)
+
+# TODO: Unused right now
 # TODO: once/if gdbm works on MSVC, check the gdbm_compat.lib name and others
 set(EXTLIBS
 "$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_ZLIB}>,${CURRENT_CONAN_LIB_DIRS_ZLIB}/zlib.lib ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_OPENSSL}>,${CURRENT_CONAN_LIB_DIRS_OPENSSL}/libcrypto.lib ${CURRENT_CONAN_LIB_DIRS_OPENSSL}/libssl.lib ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_OPENSSL}>,${CURRENT_CONAN_LIB_DIRS_OPENSSL}/${OPENSSL_LIBCRYPTO_NAME}.lib ${CURRENT_CONAN_LIB_DIRS_OPENSSL}/${OPENSSL_LIBSSL_NAME}.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_LIBFFI}>,${CURRENT_CONAN_LIB_DIRS_LIBFFI}/libffi.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_LIBYAML}>,${CURRENT_CONAN_LIB_DIRS_LIBYAML}/yaml.lib ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_LIB_DIRS_GDBM}>,${CURRENT_CONAN_LIB_DIRS_GDBM}/gdbm.lib ,>\
