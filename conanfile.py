@@ -42,9 +42,9 @@ class OpenstudiorubyConan(ConanFile):
                 "Conan LIBFFI will not allow linking right now with MSVC, "
                 "so temporarilly built it from CMakeLists instead")
             self.options.with_libffi = False
-            self.output.warn(
+            self.output.info(
                 "Conan LibYAML will not link properly right now with MSVC, "
-                "so temporarilly disable it")
+                "so using built-in Psych provided libYAML")
             self.options.with_libyaml = False
             self.output.warn(
                 "Conan GMP isn't supported on MSVC")
