@@ -15,7 +15,7 @@ environment:
         # To check if it works with MSVC 2019, we also produce a Release build on 2019, x64 only
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
           CONAN_VISUAL_VERSIONS: 16
-          CONAN_BUILD_TYPES: Release
+          CONAN_BUILD_TYPES: Release,Debug
 
 install:
   - set PATH=%PYTHON_HOME%;%PYTHON_HOME%/Scripts/;%PATH%
