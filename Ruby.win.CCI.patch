@@ -34,3 +34,18 @@ index 4f21856..74b3914 100644
      end
  
      # OpenSSL <= 1.0.2: libeay32.lib and ssleay32.lib.
+diff --git a/win32/Makefile.sub b/win32/Makefile.sub
+index 0bb61fb..beb0783 100644
+--- a/win32/Makefile.sub
++++ b/win32/Makefile.sub
+@@ -563,7 +563,10 @@ $(CONFIG_H): $(MKFILES) $(srcdir)/win32/Makefile.sub $(win_srcdir)/Makefile.sub
+ #define SIZEOF_LONG_LONG 0
+ !endif
+ #define SIZEOF___INT64 8
++// Avoid hitting C4117 redefined preprocessor macro
++#ifndef _INTEGRAL_MAX_BITS
+ #define _INTEGRAL_MAX_BITS 64
++#endif
+ !if $(LARGEFILE_SUPPORT)
+ #define SIZEOF_OFF_T 8
+ !else
