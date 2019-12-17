@@ -1,5 +1,16 @@
+@ECHO OFF
+
 REM Whitespace is critically important with system variables on Windows
 
+ECHO "================== BUILD_RUBY.BAT =============="
+
+REM Unused right now, but will consider relying on it
+set CONF_ARGS=${CONF_ARGS}
+set EXTLIBS=${EXTLIBS}
+ECHO "EXTLIBS=%EXTLIBS%"
+ECHO "CONF_ARGS='%CONF_ARGS%'"
+
+@ECHO ON
 
 set CL=/MP
 set CFLAGS=${CURRENT_CMAKE_C_FLAGS} -wd4996 -we4028 -we4142 -Zm600 -Zi
@@ -15,6 +26,8 @@ set LIBYAML_DIR=${CURRENT_CONAN_LIBYAML_ROOT}
 set LIBYAML_LIBS=${CURRENT_CONAN_LIB_DIRS_LIBYAML}/yaml.lib
 
 set PATH=${CMAKE_BINARY_DIR}/tools/bin;%PATH%
+
+@ECHO OFF
 
 set EXTLIBS=
 set CONF_ARGS=
@@ -52,6 +65,7 @@ echo "New Flags %CFLAGS%"
 echo "EXTLIBS='%EXTLIBS%'"
 echo "CONF_ARGS='%CONF_ARGS%'"
 
+@ECHO ON
 
 call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --with-static-linked-ext %CONF_ARGS% --without-win32ole --disable-install-doc --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --target=x64-mswin64 --with-baseruby="%BASE_RUBY%" 
 
