@@ -108,8 +108,7 @@ class OpenstudiorubyConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
-        # TODO: temp, pending https://github.com/bincrafters/conan-ruby_installer/pull/7
-        self.build_requires("ruby_installer/2.5.5@jmarrec/testing")
+        self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
         self.build_requires("bison_installer/3.3.2@bincrafters/stable")
 
     def build(self):
