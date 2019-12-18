@@ -8,11 +8,16 @@ environment:
     matrix:
 
         # 2017 is the target MSVC for now, so build Release and Debug, x64 only
+        # I separate the release and debug because I'm hitting the 60 minute per build job Appveyor limit...
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
           CONAN_VISUAL_VERSIONS: 15
-          CONAN_BUILD_TYPES: Release,Debug
+          CONAN_BUILD_TYPES: Release
+        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+          CONAN_VISUAL_VERSIONS: 15
+          CONAN_BUILD_TYPES: Debug
 
           # We now can support MSVC 2019: build both Release and Debug, x64 only
+          # This works under 1hr
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
           CONAN_VISUAL_VERSIONS: 16
           CONAN_BUILD_TYPES: Release,Debug
