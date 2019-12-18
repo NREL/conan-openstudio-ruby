@@ -15,7 +15,7 @@ class OpenstudiorubyConan(ConanFile):
     description = "Static ruby for use in OpenStudio's Command Line Interface"
     topics = ("ruby", "openstudio")
     # THIS is what creates the package_id (sha) that will determine whether
-    # we pull binaries or build them
+    # we pull binaries from bintray or build them
     settings = "os", "compiler", "build_type", "arch"
     exports_sources = "*"
     generators = "cmake"
@@ -67,13 +67,15 @@ class OpenstudiorubyConan(ConanFile):
         # (not sure which will be default on OpenStudio's CMake),
         # but at least that doesn't have actual incompatibility
         del self.settings.compiler.libcxx
+        del self.settings.compiler.cppstd
 
     def requirements(self):
         """
         Declare required dependencies
         """
-        self.requires("OpenSSL/1.1.0g@conan/stable")
-        self.requires("zlib/1.2.11@conan/stable")
+        # 1.1.1x isn't supported by ruby 2.5.5, build fails
+        self.requires("openssl/1.1.0l")
+        self.requires("zlib/1.2.11")
 
         if self.options.with_libyaml:
             self.requires("libyaml/0.2.2@bincrafters/stable")
@@ -81,7 +83,7 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["libyaml"].fPIC = True
 
         if self.options.with_libffi:
-            self.requires("libffi/3.2.1@bincrafters/stable")
+            self.requires("libffi/3.2.1")
             self.options["libffi"].shared = False
             # self.options["libffi"].fPIC = True
 
@@ -97,7 +99,7 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["readline"].fPIC = True
 
         if self.options.with_gmp:
-            self.requires("gmp/6.1.2@bincrafters/stable")
+            self.requires("gmp/6.1.2")
 
     def build_requirements(self):
         """

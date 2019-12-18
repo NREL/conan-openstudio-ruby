@@ -1,0 +1,51 @@
+diff --git a/ext/digest/digest_conf.rb b/ext/digest/digest_conf.rb
+index 915b618..f5209da 100644
+--- a/ext/digest/digest_conf.rb
++++ b/ext/digest/digest_conf.rb
+@@ -16,9 +16,13 @@ def find_openssl_library
+ 
+   if $mswin
+     # OpenSSL >= 1.1.0: libcrypto.lib and libssl.lib.
++    # Potentially with 'd' appended (conan center index)
+     if have_library("libcrypto", "CRYPTO_malloc") &&
+         have_library("libssl", "SSL_new")
+       return true
++    elsif have_library("libcryptod", "CRYPTO_malloc") &&
++        have_library("libssld", "SSL_new")
++      return true
+     end
+ 
+     # OpenSSL <= 1.0.2: libeay32.lib and ssleay32.lib.
+diff --git a/ext/openssl/extconf.rb b/ext/openssl/extconf.rb
+index 4f21856..74b3914 100644
+--- a/ext/openssl/extconf.rb
++++ b/ext/openssl/extconf.rb
+@@ -55,9 +55,13 @@ def find_openssl_library
+ 
+   if $mswin
+     # OpenSSL >= 1.1.0: libcrypto.lib and libssl.lib.
++    # Potentially with 'd' appended (conan center index)
+     if have_library("libcrypto", "CRYPTO_malloc") &&
+         have_library("libssl", "SSL_new")
+       return true
++    elsif have_library("libcryptod", "CRYPTO_malloc") &&
++        have_library("libssld", "SSL_new")
++      return true
+     end
+ 
+     # OpenSSL <= 1.0.2: libeay32.lib and ssleay32.lib.
+diff --git a/win32/Makefile.sub b/win32/Makefile.sub
+index 0bb61fb..beb0783 100644
+--- a/win32/Makefile.sub
++++ b/win32/Makefile.sub
+@@ -563,7 +563,10 @@ $(CONFIG_H): $(MKFILES) $(srcdir)/win32/Makefile.sub $(win_srcdir)/Makefile.sub
+ #define SIZEOF_LONG_LONG 0
+ !endif
+ #define SIZEOF___INT64 8
++// Avoid hitting C4117 redefined preprocessor macro
++#ifndef _INTEGRAL_MAX_BITS
+ #define _INTEGRAL_MAX_BITS 64
++#endif
+ !if $(LARGEFILE_SUPPORT)
+ #define SIZEOF_OFF_T 8
+ !else
