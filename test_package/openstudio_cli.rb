@@ -67,7 +67,7 @@ end
 
 module OpenStudio
   def self.getOpenStudioCLI
-    return ENV["OS_CLI_PATH"]
+    return ENV["OS_CLI"]
   end
 end
 
