@@ -1,4 +1,6 @@
 require 'minitest/autorun'
+require 'fileutils'
+require 'tmpdir'
 
 # test bundle capability in CLI
 # currently CLI cannot do bundle install, rely on system bundle for that for now
@@ -12,13 +14,43 @@ class Bundle_Test < Minitest::Test
     end
   end
 
+  def prepare_test_folder(folder_name)
+    # This folder contains the test.rb and the Gemfile needed to run the test
+    ori_folder = File.join(File.dirname(__FILE__), folder_name)
+
+    # Get a temp folder, and use that for testing
+    # eg: On Ubuntu: "/tmp/bundle20191218-30742-1dinigo"
+    #     On Win10: C:/Users/julien/AppData/Local/Temp/bundle20191218-30742-1dinigo
+    test_folder = Dir.mktmpdir(folder_name)
+    puts "Running '#{folder_name}' test in '#{test_folder}'"
+
+    # Copy content of ori_folder to test_folder
+    # same as cp -R ori_folder/* test_folder/
+    # FileUtils.cp_r File.join(ori_folder, '/.'), test_folder
+
+    # Just to be safe (in case user **previously** ran test_package locally
+    # before this change meaning in-place, they might have Gemfile.lock,
+    # so I'll specifically look for Gemfile and test.rb only
+    file_list = ["Gemfile", "test.rb"].map{|f| File.join(ori_folder, f)}.select{|f| File.exists?(f)}
+    assert(file_list.size > 0)
+    FileUtils.cp_r(file_list, test_folder)
+
+    # When we're done, we'll remove the tmp dir
+    at_exit  { FileUtils.remove_entry(test_folder) }
+
+    return test_folder
+  end
+
   def test_bundle
     original_dir = Dir.pwd
-    Dir.chdir(File.join(File.dirname(__FILE__), 'bundle'))
 
-    rm_if_exist('Gemfile.lock')
-    rm_if_exist('./test_gems')
-    rm_if_exist('./bundle')
+    test_folder = prepare_test_folder('bundle')
+    Dir.chdir(test_folder)
+
+    # No need to... it's a temp folder
+    #rm_if_exist('Gemfile.lock')
+    #rm_if_exist('./test_gems')
+    #rm_if_exist('./bundle')
 
     assert(system('bundle install --path ./test_gems'))
     assert(system('bundle lock --add_platform ruby'))
@@ -30,11 +62,9 @@ class Bundle_Test < Minitest::Test
 
   def test_bundle_git
     original_dir = Dir.pwd
-    Dir.chdir(File.join(File.dirname(__FILE__), 'bundle_git'))
 
-    rm_if_exist('Gemfile.lock')
-    rm_if_exist('./test_gems')
-    rm_if_exist('./bundle')
+    test_folder = prepare_test_folder('bundle_git')
+    Dir.chdir(test_folder)
 
     assert(system('bundle install --path ./test_gems'))
     assert(system('bundle lock --add_platform ruby'))
@@ -46,7 +76,6 @@ class Bundle_Test < Minitest::Test
 
   def test_bundle_native
     original_dir = Dir.pwd
-    Dir.chdir(File.join(File.dirname(__FILE__), 'bundle_native'))
 
     if /mingw/.match(RUBY_PLATFORM) || /mswin/.match(RUBY_PLATFORM)
       skip("Native gems not supported on Windows")
@@ -54,9 +83,8 @@ class Bundle_Test < Minitest::Test
       skip("Native gems not supported on Unix or Mac")
     end
 
-    rm_if_exist('Gemfile.lock')
-    rm_if_exist('./test_gems')
-    rm_if_exist('./bundle')
+    test_folder = prepare_test_folder('bundle_native')
+    Dir.chdir(test_folder)
 
     assert(system('bundle install --path ./test_gems'))
     #assert(system('bundle lock --add_platform ruby'))
@@ -71,11 +99,9 @@ class Bundle_Test < Minitest::Test
 
   def test_bundle_no_install
     original_dir = Dir.pwd
-    Dir.chdir(File.join(File.dirname(__FILE__), 'bundle_no_install'))
 
-    rm_if_exist('Gemfile.lock')
-    rm_if_exist('./test_gems')
-    rm_if_exist('./bundle')
+    test_folder = prepare_test_folder('bundle_no_install')
+    Dir.chdir(test_folder)
 
     #assert(system('bundle install --path ./test_gems'))
     #assert(system('bundle lock --add_platform ruby'))
@@ -89,7 +115,9 @@ class Bundle_Test < Minitest::Test
 
   def test_no_bundle
     original_dir = Dir.pwd
-    Dir.chdir(File.join(File.dirname(__FILE__), 'no_bundle'))
+
+    test_folder = prepare_test_folder('no_bundle')
+    Dir.chdir(test_folder)
 
     puts "'#{OpenStudio::getOpenStudioCLI}' --verbose test.rb"
     assert(system("'#{OpenStudio::getOpenStudioCLI}' --verbose test.rb"))
