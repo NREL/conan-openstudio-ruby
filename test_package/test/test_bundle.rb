@@ -7,6 +7,11 @@ require 'tmpdir'
 # in future, bundle install should be done like: openstudio --bundle_install Gemfile --bundle_path ./test_gems
 class Bundle_Test < Minitest::Test
 
+  def setup
+    @cli_path = File.expand_path(File.join(File.dirname(__FILE__), '..', '/bin/openstudio'))
+  end
+
+
   def rm_if_exist(p)
     if File.exist?(p)
       # comment out if you want to test without rebundling
@@ -64,7 +69,7 @@ class Bundle_Test < Minitest::Test
     assert(system('bundle install --path ./test_gems'))
     assert(system('bundle lock --add_platform ruby'))
     temp_fixing_bundler_version(test_folder)
-    assert(system("'#{OpenStudio::getOpenStudioCLI}' --bundle Gemfile --bundle_path './test_gems' --verbose test.rb"))
+    assert(system("'#{@cli_path}' --bundle Gemfile --bundle_path './test_gems' --verbose test.rb"))
 
   ensure
     Dir.chdir(original_dir)
@@ -79,7 +84,7 @@ class Bundle_Test < Minitest::Test
     assert(system('bundle install --path ./test_gems'))
     assert(system('bundle lock --add_platform ruby'))
     temp_fixing_bundler_version(test_folder)
-    assert(system("'#{OpenStudio::getOpenStudioCLI}' --bundle Gemfile --bundle_path './test_gems' --verbose test.rb"))
+    assert(system("'#{@cli_path}' --bundle Gemfile --bundle_path './test_gems' --verbose test.rb"))
 
   ensure
     Dir.chdir(original_dir)
@@ -103,7 +108,7 @@ class Bundle_Test < Minitest::Test
       assert(system('bundle lock --add_platform mswin64'))
     end
     temp_fixing_bundler_version(test_folder)
-    assert(system("'#{OpenStudio::getOpenStudioCLI}' --bundle Gemfile --bundle_path './test_gems' --verbose test.rb"))
+    assert(system("'#{@cli_path}' --bundle Gemfile --bundle_path './test_gems' --verbose test.rb"))
 
   ensure
     Dir.chdir(original_dir)
@@ -119,7 +124,7 @@ class Bundle_Test < Minitest::Test
     #assert(system('bundle lock --add_platform ruby'))
 
     # intentionally called with dependencies not found in the CLI, expected to fail
-    assert_equal(system("'#{OpenStudio::getOpenStudioCLI}' --bundle Gemfile --verbose test.rb"), false)
+    assert_equal(system("'#{@cli_path}' --bundle Gemfile --verbose test.rb"), false)
 
   ensure
     Dir.chdir(original_dir)
@@ -131,8 +136,8 @@ class Bundle_Test < Minitest::Test
     test_folder = prepare_test_folder('no_bundle')
     Dir.chdir(test_folder)
 
-    puts "'#{OpenStudio::getOpenStudioCLI}' --verbose test.rb"
-    assert(system("'#{OpenStudio::getOpenStudioCLI}' --verbose test.rb"))
+    puts "'#{@cli_path}' --verbose test.rb"
+    assert(system("'#{@cli_path}' --verbose test.rb"))
 
   ensure
     Dir.chdir(original_dir)

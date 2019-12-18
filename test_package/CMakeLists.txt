@@ -219,3 +219,9 @@ elseif(WIN32)
   target_link_libraries(openstudio wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi)
   set_target_properties(openstudio PROPERTIES LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRT")
 endif()
+
+#######################################################################
+#                               T E S T S                             #
+#######################################################################
+
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/test" DESTINATION "${PROJECT_BINARY_DIR}")

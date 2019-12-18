@@ -38,7 +38,12 @@ class TestPackageConan(ConanFile):
         to openstudio CLI
         eg: [(test_file, test_name), (test_file, test_name2)]
         """
-        test_folder = os.path.join(self.source_folder, "test")
+
+        # The test_folder is copied by test_package/CMakeLists.txt
+        # to the build/test folder. That has the advantage of being able to
+        # locate the CLI with a relative path
+
+        test_folder = os.path.join(self.build_folder, "test")
 
         # Glob all tests files
         glob_pattern = os.path.join(test_folder, "test*.rb")
@@ -50,7 +55,7 @@ class TestPackageConan(ConanFile):
         all_test_args = []
         for test_file in test_files:
 
-            rel_path = os.path.relpath(test_file, start=self.source_folder)
+            rel_path = os.path.relpath(test_file, start=self.build_folder)
 
             with open(test_file, 'r') as f:
                 content = f.read()
@@ -88,6 +93,13 @@ class TestPackageConan(ConanFile):
         # with tools.environment_append({'OS_CLI': cli_path}):
         #     self.run('{} -e "puts ENV[\'OS_CLI\']"'.format(cli_path))
         #     self.output.success("OS_CLI")
+
+        # That works too, but below when runing test_xxx.rb it doesn't...
+        # Now that the test folder is copied over to the build/test folder we
+        # can locate the CLI with a relative path so that's fine...
+        # with tools.environment_append({'OS_CLI': cli_path}):
+        #     self.run("{c} -e 'puts OpenStudio::getOpenStudioCLI'".format(
+        #         c=cli_path))
 
         all_test_args = self._discover_tests()
         failed_tests = []

@@ -8,7 +8,11 @@ class EmbeddedHelp_Test < Minitest::Test
 
   def test_dir_glob
     original_dir = Dir.pwd
-    Dir.chdir(File.join(File.dirname(__FILE__), '..'))
+
+    # Now we're running that from the test_package/build/xsfsdfds/test
+    # instead of test_package/test
+    # Dir.chdir(File.join(File.dirname(__FILE__), '..'))
+    Dir.chdir(File.join(File.dirname(__FILE__), '../../..'))
 
     # test things that should work in ruby or CLI
     no_block_glob = Dir["*.txt", "*.rb"]
