@@ -359,12 +359,11 @@ class OpenstudiorubyConan(ConanFile):
         # PATH / ENV stuff
         bindir = os.path.join(self.package_folder, "bin")
         self.output.info('Appending PATH environment variable: '
-                         '{}'.format(bindir)
+                         '{}'.format(bindir))
         self.env_info.PATH.append(bindir)
         self.env_info.RUBY_EXEC_PREFIX = self.package_folder
         self.env_info.RUBY_BINDIR = bindir
         self.env_info.RUBY_LIBDIR = os.path.join(self.package_folder, "lib")
-
 
         # Rewrite shebangs
         bin_scripts = ['gem', 'ri', 'irb', 'rdoc', 'erb', 'rake']
