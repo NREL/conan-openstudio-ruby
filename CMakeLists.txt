@@ -28,6 +28,10 @@ if (INTEGRATED_CONAN)
 
   conan_add_remote(NAME bincrafters
     URL https://api.bintray.com/conan/bincrafters/public-conan)
+  
+  # TODO: Temp
+  conan_add_remote(NAME jmarrec
+    URL https://api.bintray.com/conan/jmarrec/testing)
 
 
   set(CONAN_BUILD "missing")
