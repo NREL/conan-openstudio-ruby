@@ -68,7 +68,7 @@ if (INTEGRATED_CONAN)
 
   conan_cmake_run(REQUIRES
     openssl/${OPENSSL_VERSION}
-    ruby_installer/2.5.5@jmarrec/testing # TODO: temp, revert to @bincrafters/stable
+    ruby_installer/2.5.5@bincrafters/stable
     zlib/1.2.11
     ${CONAN_FFI}
     ${CONAN_LIBYAML}
@@ -111,7 +111,7 @@ macro(FindValue ValueName)
   set(LocalVar $<$<CONFIG:Debug>:${${ValueName}_DEBUG}>$<$<CONFIG:Release>:${${ValueName}_RELEASE}>$<$<CONFIG:RelWithDebInfo>:${$ValueName}_RELWITHDEBINFO}>$<$<CONFIG:MinSizeRel>:${${ValueName}_MINSIZEREL}>
   )
 #  list(JOIN LocalVar "" LocalVar)
-  string(STRIP ${LocalVar} LocalVar)
+  string(STRIP "${LocalVar}" LocalVar)
   set(CURRENT_${ValueName} $<IF:$<BOOL:${LocalVar}>,${LocalVar},${${ValueName}}>)
   # For debug purposes
   # message(STATUS "Found '${ValueName}' as '${CURRENT_${ValueName}}'")
