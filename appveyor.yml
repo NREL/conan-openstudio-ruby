@@ -7,6 +7,12 @@ environment:
 
     matrix:
 
+        # Try a Release build on 32bit
+        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+          CONAN_VISUAL_VERSIONS: 16
+          CONAN_BUILD_TYPES: Release
+          CONAN_ARCHS: x86
+
         # We now can support MSVC 2019: build both Release and Debug, x64 only
         # This works under 1hr
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
@@ -24,12 +30,6 @@ environment:
           CONAN_VISUAL_VERSIONS: 15
           CONAN_BUILD_TYPES: Debug
           CONAN_ARCHS: x86_64
-
-        # Try a Release build on 32bit
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-          CONAN_VISUAL_VERSIONS: 16
-          CONAN_BUILD_TYPES: Release
-          CONAN_ARCHS: x86
 
 install:
   - set PATH=%PYTHON_HOME%;%PYTHON_HOME%/Scripts/;%PATH%
