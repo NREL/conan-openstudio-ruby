@@ -109,7 +109,7 @@ class OpenstudiorubyConan(ConanFile):
         not be retrieved.
         """
         self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
-        self.build_requires("bison_installer/3.3.2@bincrafters/stable")
+        self.build_requires("bison/3.5.3")
 
     def build(self):
         """
