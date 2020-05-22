@@ -25,7 +25,7 @@ set LIBFFI_LIBS=${CURRENT_CONAN_LIB_DIRS_LIBFFI}/libffi.lib
 set LIBYAML_DIR=${CURRENT_CONAN_LIBYAML_ROOT}
 set LIBYAML_LIBS=${CURRENT_CONAN_LIB_DIRS_LIBYAML}/yaml.lib
 
-set PATH=${CMAKE_BINARY_DIR}/tools/bin;%PATH%
+set PATH=${CMAKE_BINARY_DIR}/tools/bin;${CONAN_BIN_DIRS_BISON_INSTALLER};%PATH%
 
 @ECHO OFF
 
@@ -88,5 +88,5 @@ for /R "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-build/enc/" %%f in (*.lib) do (
 )
 
 IF "%ARCH%" == "x86" (
-    "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/i386-mswin32_140/rbconfig.rb" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/rbconfig.rb"
+    "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-build/rbconfig.rb" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/rbconfig.rb"
 )

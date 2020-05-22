@@ -61,6 +61,7 @@ if (INTEGRATED_CONAN)
   conan_cmake_run(REQUIRES
     openssl/${OPENSSL_VERSION}
     ruby_installer/2.5.5@bincrafters/stable
+    bison_installer/3.3.2@bincrafters/stable
     zlib/1.2.11
     ${CONAN_FFI}
     ${CONAN_LIBYAML}
@@ -133,6 +134,8 @@ FindValue(CONAN_LIB_DIRS_READLINE)
 
 FindValue(CONAN_GMP_ROOT)
 FindValue(CONAN_LIB_DIRS_GMP)
+
+FindValue(CONAN_BIN_DIRS_BISON_INSTALLER)
 
 if(NOT UNIX)
   # conan-ffi doesn't link properly, so build from source.
