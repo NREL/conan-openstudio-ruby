@@ -86,7 +86,3 @@ for /R "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-build/ext/" %%f in (*.lib) do (
 for /R "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-build/enc/" %%f in (*.lib) do (
   "${CMAKE_COMMAND}" -E copy_if_different %%f "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc/"
 )
-
-IF "%ARCH%" == "x86" (
-    "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-build/rbconfig.rb" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/rbconfig.rb"
-)
