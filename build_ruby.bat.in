@@ -60,14 +60,16 @@ IF "%LIBYAML_DIR%" == "" (
     set CONF_ARGS=%CONF_ARGS% --with-libyaml-dir="%LIBYAML_DIR%"
     ECHO "LibYAML defined: %LIBYAML_DIR%"
 )
-
+IF "%ARCH%" == "x64" (
+  set CONF_ARGS=%CONF_ARGS% --target=x64-mswin64"
+)
 echo "New Flags %CFLAGS%"
 echo "EXTLIBS='%EXTLIBS%'"
 echo "CONF_ARGS='%CONF_ARGS%'"
 
 @ECHO ON
 
-call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --with-static-linked-ext %CONF_ARGS% --without-win32ole --disable-install-doc --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --target=x64-mswin64 --with-baseruby="%BASE_RUBY%" 
+call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --with-static-linked-ext %CONF_ARGS% --without-win32ole --disable-install-doc --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --with-baseruby="%BASE_RUBY%" 
 
 nmake /k
 nmake /k install-nodoc
