@@ -1,0 +1,36 @@
+From 032db375f481313ad6295524f4f144f2aa070ab9 Mon Sep 17 00:00:00 2001
+From: Julien Marrec <julien.marrec@gmail.com>
+Date: Mon, 6 Apr 2020 18:16:40 +0200
+Subject: [PATCH] patch to support version ranges for MSVC
+
+---
+ win32/Makefile.sub | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/win32/Makefile.sub b/win32/Makefile.sub
+index beb0783..56c4499 100644
+--- a/win32/Makefile.sub
++++ b/win32/Makefile.sub
+@@ -534,9 +534,19 @@ $(CONFIG_H): $(MKFILES) $(srcdir)/win32/Makefile.sub $(win_srcdir)/Makefile.sub
+ 	@$(IFCHANGE) "--timestamp=$(@:/=\)" $(RUBY_CONFIG_H:/=\) <<
+ #ifndef $(guard)
+ #define $(guard) 1
++!if $(MSC_VER) >= 1920
++#if _MSC_VER < 1920
++#error MSC version unmatch: _MSC_VER: >= 1920 is expected.
++#endif
++!else if $(MSC_VER) >= 1910
++#if _MSC_VER < 1910 || _MSC_VER >= 1920
++#error MSC version unmatch: _MSC_VER: >= 1910 and < 1920 is expected.
++#endif
++!else
+ #if _MSC_VER != $(MSC_VER)
+ #error MSC version unmatch: _MSC_VER: $(MSC_VER) is expected.
+ #endif
++!endif
+ #define RUBY_MSVCRT_VERSION $(RT_VER)
+ #define STDC_HEADERS 1
+ #define HAVE_SYS_TYPES_H 1
+-- 
+2.21.0.windows.1
+
