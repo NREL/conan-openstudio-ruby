@@ -147,6 +147,7 @@ class OpenstudiorubyConan(ConanFile):
 
         eg:
             include/ruby-2.5.0/x64-mswin64_140
+            include/ruby-2.5.0/i386-mswin32_140
             include/ruby-2.5.0/x86_64-linux
             include/ruby-2.5.0/x86_64-darwin17
         """
@@ -211,7 +212,7 @@ class OpenstudiorubyConan(ConanFile):
 
         # Remove the non-static VS libs
         if self.settings.os == "Windows":
-            non_stat_re = re.compile(r'x64-vcruntime[0-9]+-ruby[0-9]+\.lib')
+            non_stat_re = re.compile(r'(x64-)?vcruntime[0-9]+-ruby[0-9]+\.lib')
             exclude_libs = [x for x in libs
                             if non_stat_re.search(x)]
             if not exclude_libs:
@@ -263,63 +264,72 @@ class OpenstudiorubyConan(ConanFile):
                              ext_libs)
 
         elif self.settings.os == 'Windows':
-            expected_libs = (['x64-vcruntime140-ruby250-static.lib'] +
-                             ext_libs)
+            # bignum-i386-mswin32_140.lib
+            # bignum-x64-mswin64_140.lib
+            if self.settings.arch == "x86":
+                libarch = "i386-mswin32_140"
+                expected_libs = (['vcruntime140-ruby250-static.lib'] +
+                                 ext_libs)
+            else:
+                libarch = "x64-mswin64_140"
+                expected_libs = (['x64-vcruntime140-ruby250-static.lib'] +
+                                 ext_libs)
 
-            expected_libs += ['at_exit-x64-mswin64_140.lib',
-                              'bignum-x64-mswin64_140.lib',
-                              'bug_3571-x64-mswin64_140.lib',
-                              'bug_5832-x64-mswin64_140.lib',
-                              'bug_reporter-x64-mswin64_140.lib',
-                              'call_without_gvl-x64-mswin64_140.lib',
-                              'class-x64-mswin64_140.lib',
-                              'compat-x64-mswin64_140.lib',
-                              'console-x64-mswin64_140.lib',
-                              'debug-x64-mswin64_140.lib',
-                              'dln-x64-mswin64_140.lib',
-                              'dot.dot-x64-mswin64_140.lib',
-                              'empty-x64-mswin64_140.lib',
-                              'exception-x64-mswin64_140.lib',
-                              'fd_setsize-x64-mswin64_140.lib',
-                              'file-x64-mswin64_140.lib',
-                              'float-x64-mswin64_140.lib',
-                              'foreach-x64-mswin64_140.lib',
-                              'funcall-x64-mswin64_140.lib',
-                              'hash-x64-mswin64_140.lib',
-                              'integer-x64-mswin64_140.lib',
-                              'internal_ivar-x64-mswin64_140.lib',
-                              'iseq_load-x64-mswin64_140.lib',
-                              'iter-x64-mswin64_140.lib',
-                              'memory_status-x64-mswin64_140.lib',
-                              'method-x64-mswin64_140.lib',
-                              'notimplement-x64-mswin64_140.lib',
-                              'num2int-x64-mswin64_140.lib',
-                              'numhash-x64-mswin64_140.lib',
-                              'path_to_class-x64-mswin64_140.lib',
-                              'postponed_job-x64-mswin64_140.lib',
-                              'printf-x64-mswin64_140.lib',
-                              'proc-x64-mswin64_140.lib',
-                              'protect-x64-mswin64_140.lib',
-                              'rational-x64-mswin64_140.lib',
-                              'rb_fatal-x64-mswin64_140.lib',
-                              'recursion-x64-mswin64_140.lib',
-                              'regexp-x64-mswin64_140.lib',
-                              'resize-x64-mswin64_140.lib',
-                              'scan_args-x64-mswin64_140.lib',
-                              'string-x64-mswin64_140.lib',
-                              'struct-x64-mswin64_140.lib',
-                              'symbol-x64-mswin64_140.lib',
-                              'thread_fd_close-x64-mswin64_140.lib',
-                              'time-x64-mswin64_140.lib',
-                              'tracepoint-x64-mswin64_140.lib',
-                              'typeddata-x64-mswin64_140.lib',
-                              'update-x64-mswin64_140.lib',
-                              'usr-x64-mswin64_140.lib',
-                              'wait_for_single_fd-x64-mswin64_140.lib']
-
+            expected_libs += ['at_exit-{l}.lib',
+                              'bignum-{l}.lib',
+                              'bug_3571-{l}.lib',
+                              'bug_5832-{l}.lib',
+                              'bug_reporter-{l}.lib',
+                              'call_without_gvl-{l}.lib',
+                              'class-{l}.lib',
+                              'compat-{l}.lib',
+                              'console-{l}.lib',
+                              'debug-{l}.lib',
+                              'dln-{l}.lib',
+                              'dot.dot-{l}.lib',
+                              'empty-{l}.lib',
+                              'exception-{l}.lib',
+                              'fd_setsize-{l}.lib',
+                              'file-{l}.lib',
+                              'float-{l}.lib',
+                              'foreach-{l}.lib',
+                              'funcall-{l}.lib',
+                              'hash-{l}.lib',
+                              'integer-{l}.lib',
+                              'internal_ivar-{l}.lib',
+                              'iseq_load-{l}.lib',
+                              'iter-{l}.lib',
+                              'memory_status-{l}.lib',
+                              'method-{l}.lib',
+                              'notimplement-{l}.lib',
+                              'num2int-{l}.lib',
+                              'numhash-{l}.lib',
+                              'path_to_class-{l}.lib',
+                              'postponed_job-{l}.lib',
+                              'printf-{l}.lib',
+                              'proc-{l}.lib',
+                              'protect-{l}.lib',
+                              'rational-{l}.lib',
+                              'rb_fatal-{l}.lib',
+                              'recursion-{l}.lib',
+                              'regexp-{l}.lib',
+                              'resize-{l}.lib',
+                              'scan_args-{l}.lib',
+                              'string-{l}.lib',
+                              'struct-{l}.lib',
+                              'symbol-{l}.lib',
+                              'thread_fd_close-{l}.lib',
+                              'time-{l}.lib',
+                              'tracepoint-{l}.lib',
+                              'typeddata-{l}.lib',
+                              'update-{l}.lib',
+                              'usr-{l}.lib',
+                              'wait_for_single_fd-{l}.lib']
+            expected_libs = [x.format(l=libarch) for x in expected_libs]
 
             self.output.warn(
-                "Since we are building a custom libffi, we are packaging it, as it's required for linking our ruby")
+                "Since we are building a custom libffi, we are packaging it, "
+                "as it's required for linking our ruby")
             expected_libs += ['libffi.lib']
 
         n_libs = len(libs)

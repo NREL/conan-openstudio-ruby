@@ -61,7 +61,7 @@ IF "%LIBYAML_DIR%" == "" (
     ECHO "LibYAML defined: %LIBYAML_DIR%"
 )
 IF "%ARCH%" == "x64" (
-  set CONF_ARGS=%CONF_ARGS% --target=x64-mswin64"
+    set CONF_ARGS=%CONF_ARGS% --target=x64-mswin64"
 )
 echo "New Flags %CFLAGS%"
 echo "EXTLIBS='%EXTLIBS%'"
@@ -87,3 +87,6 @@ for /R "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-build/enc/" %%f in (*.lib) do (
   "${CMAKE_COMMAND}" -E copy_if_different %%f "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/enc/"
 )
 
+IF "%ARCH%" == "x86" (
+    "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/i386-mswin32_140/rbconfig.rb" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/ruby/2.5.0/rbconfig.rb"
+)
