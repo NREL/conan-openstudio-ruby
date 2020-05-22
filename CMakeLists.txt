@@ -33,12 +33,8 @@ if (INTEGRATED_CONAN)
   conan_add_remote(NAME jmarrec
     URL https://api.bintray.com/conan/jmarrec/testing)
 
- # TODO: Temp
-  conan_add_remote(NAME jmarrec
-    URL https://api.bintray.com/conan/jmarrec/testing)
-
-
-
+  #conan_add_remote(NAME jmarrec
+  #  URL https://api.bintray.com/conan/jmarrec/testing)
 
   set(CONAN_BUILD "missing")
   if (APPLE)
