@@ -92,6 +92,9 @@ class OpenstudiorubyConan(ConanFile):
             self.options["gdbm"].shared = False
             # self.options["gdbm"].fPIC = True
             self.options["gdbm"].libgdbm_compat = True
+            self.options["gdbm"].with_libiconv = True
+            if self.options.with_readline:
+                self.options["gdbm"].with_readline = True
 
         if self.options.with_readline:
             self.requires("readline/8.0")
@@ -109,7 +112,7 @@ class OpenstudiorubyConan(ConanFile):
         not be retrieved.
         """
         self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
-        self.build_requires("bison_installer/3.3.2@bincrafters/stable")
+        self.build_requires("bison/3.5.3")
 
     def build(self):
         """
