@@ -37,6 +37,8 @@ if (INTEGRATED_CONAN)
     list(APPEND CONAN_BUILD "zlib")
   endif()
   list(APPEND CONAN_OPTIONS "zlib:minizip=True")
+  list(APPEND CONAN_OPTIONS "gdbm:with_libiconv=True")
+  list(APPEND CONAN_OPTIONS "gdbm:libgdbm_compat=True")
 
   # Passing shared=False is fine (but also already the default)
   # Passing fPIC=True is already the default on Unix, and doesn't exist on Windows (options is deleted in most recipes)
@@ -54,6 +56,7 @@ if (INTEGRATED_CONAN)
     set(CONAN_FFI "libffi/3.3")
     set(CONAN_LIBYAML "libyaml/0.2.2@bincrafters/stable")
     set(CONAN_READLINE "readline/8.0")
+    list(APPEND CONAN_OPTIONS "gdbm:with_readline=True")
     set(CONAN_GDBM "gdbm/1.18.1")
     set(CONAN_GMP "gmp/6.2.0")
   endif()
@@ -61,7 +64,7 @@ if (INTEGRATED_CONAN)
   conan_cmake_run(REQUIRES
     openssl/${OPENSSL_VERSION}
     ruby_installer/2.5.5@bincrafters/stable
-    bison_installer/3.3.2@bincrafters/stable
+    bison/3.5.3
     zlib/1.2.11
     ${CONAN_FFI}
     ${CONAN_LIBYAML}
