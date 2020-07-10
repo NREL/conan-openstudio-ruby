@@ -118,7 +118,11 @@ class OpenstudiorubyConan(ConanFile):
         not be retrieved.
         """
         self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
-        self.build_requires("bison/3.5.3")
+        # cant use bison/3.5.3 from CCI as it uses m4 which won't build
+        # with x86. So use bincrafters' still but explicitly add bin dir
+        # to PATH later in CMakeLists.txt
+        # self.build_requires("bison/3.5.3")
+        self.build_requires("bison_installer/3.3.2@bincrafters/stable")
 
     def build(self):
         """
