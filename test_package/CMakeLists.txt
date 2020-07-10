@@ -58,14 +58,24 @@ endif()
 #                               S W I G                               #
 #######################################################################
 
-# We use conan swig_installer which enhances our PATH to include the CONAN_BIN_DIRS_SWIG_INSTALLER already
-# So I could just do:
-# set(SWIG_EXECUTABLE swig)
-# But better be safe
-find_program(SWIG_EXECUTABLE swig)
-if(NOT SWIG_EXECUTABLE)
-  message(FATAL_ERROR "Couldn't find swig, which shouldn't happen. CONAN_BIN_DIRS_SWIG_INSTALLER=${CONAN_BIN_DIRS_SWIG_INSTALLER}")
-endif()
+macro(FindValue ValueName)
+  set(LocalVar "")
+  set(LocalVar $<$<CONFIG:Debug>:${${ValueName}_DEBUG}>$<$<CONFIG:Release>:${${ValueName}_RELEASE}>$<$<CONFIG:RelWithDebInfo>:${$ValueName}_RELWITHDEBINFO}>$<$<CONFIG:MinSizeRel>:${${ValueName}_MINSIZEREL}>
+  )
+#  list(JOIN LocalVar "" LocalVar)
+  string(STRIP ${LocalVar} LocalVar)
+  set(CURRENT_${ValueName} $<IF:$<BOOL:${LocalVar}>,${LocalVar},${${ValueName}}>)
+  # For debug purposes
+  # message(STATUS "Found '${ValueName}' as '${CURRENT_${ValueName}}'")
+endmacro()
+
+# So instead, we use a generator expression to find the right value. At least it makes sense, and should be robust.
+FindValue(CONAN_SWIG_ROOT)
+
+set(SWIG_EXECUTABLE "${CURRENT_CONAN_SWIG_ROOT}/bin/swig")
+
+# The conan-provided binary has a built-in swiglib (`swig -swiglib`) that points to the build box on which it was built, which is problematic for us.
+set(SWIG_LIB "${CURRENT_CONAN_SWIG_ROOT}/bin/swiglib")
 
 #######################################################################
 #                               G E M S                               #
@@ -147,14 +157,16 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_BINARY_DIR} ${PROJECT_
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
-  COMMAND "${SWIG_EXECUTABLE}"
+  COMMAND ${CMAKE_COMMAND} -E env SWIG_LIB="${SWIG_LIB}"
+          "${SWIG_EXECUTABLE}"
           "-ruby"
           -external-runtime "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
 )
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx"
-  COMMAND "${SWIG_EXECUTABLE}"
+  COMMAND ${CMAKE_COMMAND} -E env SWIG_LIB="${SWIG_LIB}"
+          "${SWIG_EXECUTABLE}"
           "-ruby"
           "-c++"
           -o "${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx"

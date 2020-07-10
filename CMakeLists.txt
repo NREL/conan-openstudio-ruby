@@ -24,7 +24,7 @@ if (INTEGRATED_CONAN)
   include(${CMAKE_BINARY_DIR}/conan.cmake)
   message("RUNNING CONAN")
 
-  conan_check(VERSION 1.18.0 REQUIRED)
+  conan_check(VERSION 1.25.0 REQUIRED)
 
   conan_add_remote(NAME bincrafters
     URL https://api.bintray.com/conan/bincrafters/public-conan)
@@ -55,11 +55,11 @@ if (INTEGRATED_CONAN)
   #list(APPEND CONAN_OPTIONS "libffi:shared=False")
 
   if(NOT MSVC)
-    set(CONAN_FFI "libffi/3.2.1")
+    set(CONAN_FFI "libffi/3.3")
     set(CONAN_LIBYAML "libyaml/0.2.2@bincrafters/stable")
-    set(CONAN_READLINE "readline/7.0@bincrafters/stable")
-    set(CONAN_GDBM "gdbm/1.18.1@bincrafters/stable")
-    set(CONAN_GMP "gmp/6.1.2")
+    set(CONAN_READLINE "readline/8.0")
+    set(CONAN_GDBM "gdbm/1.18.1")
+    set(CONAN_GMP "gmp/6.2.0")
   endif()
 
   conan_cmake_run(REQUIRES
