@@ -88,6 +88,12 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["libffi"].fPIC = True
 
         if self.options.with_gdbm:
+            # NOTE: I have uploaded the gdbm/1.18.1 to the NREL remote
+            # with the status of this PR https://github.com/conan-io/conan-center-index/pull/2180
+            # at SHA https://github.com/conan-io/conan-center-index/pull/2180/commits/fad6b09ec294e8c0d186caea0c38bd6941dc0343
+            # So for now that'll only work if you have the NREL remote **before**
+            # the conan-center one...
+            # `conan remote update nrel https://api.bintray.com/conan/commercialbuilding/nrel --insert 0`
             self.requires("gdbm/1.18.1")
             self.options["gdbm"].shared = False
             # self.options["gdbm"].fPIC = True
