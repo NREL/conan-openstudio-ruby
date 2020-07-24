@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-set -ex
+# -e: exit as soon as one command fails
+# -x: print each command about to be execute with a leading "+"
+set -x
 
 if [[ "$(uname -s)" == 'Darwin' ]]; then
     if which pyenv > /dev/null; then
