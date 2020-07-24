@@ -98,7 +98,7 @@ class OpenstudiorubyConan(ConanFile):
             self.options["gdbm"].shared = False
             # self.options["gdbm"].fPIC = True
             self.options["gdbm"].libgdbm_compat = True
-            self.options["gdbm"].with_libiconv = True
+            self.options["gdbm"].with_libiconv = False
             self.options["gdbm"].with_nls = False
             if self.options.with_readline:
                 self.options["gdbm"].with_readline = True
