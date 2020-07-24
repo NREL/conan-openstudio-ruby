@@ -23,10 +23,22 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
   done
 
   echo "======== LISTING THE GDBM LIB FOLDERS ========"
-  find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'lib' -type 'd' | xargs -i@ sh -c 'echo @ && ls @'
+  find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'lib' -type 'd'|while read dirname; do
+    echo $dirname
+    ls $dirname
+    echo ""
+    echo ""
+    echo ""
+  done
 
   echo "======== LISTING THE GDBM INCLUDE FOLDERS ========"
-  find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'include' -type 'd' | xargs -i@ sh -c 'echo @ && ls @'
+  find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'include' -type 'd'|while read dirname; do
+    echo $dirname
+    ls $dirname
+    echo ""
+    echo ""
+    echo ""
+  done
 
   echo "=========== RUBY CONFIG.LOG ================"
   find ~/.conan/data/openstudio_ruby/2.5.5/nrel/testing/build -name "mkmf.log"|while read fname; do
