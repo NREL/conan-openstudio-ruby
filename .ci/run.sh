@@ -14,8 +14,7 @@ fi
 python build.py
 
 if [[ "$(uname -s)" == 'Darwin' ]]; then
-  find ~/.conan/data/openstudio_ruby/2.5.5/nrel/testing/build/*/Ruby-prefix/src/Ruby/ext/gdbm -name “mkmf.log”
-  find . -name "*.yml"|while read fname; do
+  find ~/.conan/data/openstudio_ruby/2.5.5/nrel/testing/build/*/Ruby-prefix/src/Ruby/ext/gdbm -name “mkmf.log”|while read fname; do
     echo "============== $fname ============"
     cat $fname
     echo ""
