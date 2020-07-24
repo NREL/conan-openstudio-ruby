@@ -41,11 +41,21 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
   done
 
   echo "=========== RUBY CONFIG.LOG ================"
-  find ~/.conan/data/openstudio_ruby/2.5.5/nrel/testing/build -name "mkmf.log"|while read fname; do
+  find ~/.conan/data/openstudio_ruby/2.5.5/nrel/testing/build -name "config.log"|while read fname; do
     echo "============== $fname ============"
     cat $fname
     echo ""
     echo ""
     echo ""
   done
+
+  echo "=========== RUBY CONFIG.STATUS ================"
+  find ~/.conan/data/openstudio_ruby/2.5.5/nrel/testing/build -name "config.status"|while read fname; do
+    echo "============== $fname ============"
+    cat $fname
+    echo ""
+    echo ""
+    echo ""
+  done
+
 fi
