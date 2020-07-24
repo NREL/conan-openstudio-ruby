@@ -96,7 +96,7 @@ class OpenstudiorubyConan(ConanFile):
             # `conan remote update nrel https://api.bintray.com/conan/commercialbuilding/nrel --insert 0`
             self.requires("gdbm/1.18.1")
             self.options["gdbm"].shared = False
-            # self.options["gdbm"].fPIC = True
+            self.options["gdbm"].fPIC = True
             self.options["gdbm"].libgdbm_compat = True
             self.options["gdbm"].with_libiconv = False
             self.options["gdbm"].with_nls = False
