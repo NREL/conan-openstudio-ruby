@@ -57,5 +57,4 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
     echo ""
     echo ""
   done
-
 fi
