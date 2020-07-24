@@ -123,6 +123,8 @@ class OpenstudiorubyConan(ConanFile):
         # with x86. So use bincrafters' still but explicitly add bin dir
         # to PATH later in CMakeLists.txt
         # self.build_requires("bison/3.5.3")
+        # TODO: once https://github.com/conan-io/conan-center-index/pull/2250
+        # is merged, revisit this
         self.build_requires("bison_installer/3.3.2@bincrafters/stable")
 
     def build(self):
