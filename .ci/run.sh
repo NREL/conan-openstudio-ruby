@@ -2,7 +2,7 @@
 
 # -e: exit as soon as one command fails
 # -x: print each command about to be execute with a leading "+"
-set -x
+set -ex
 
 if [[ "$(uname -s)" == 'Darwin' ]]; then
     if which pyenv > /dev/null; then
