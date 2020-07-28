@@ -8,10 +8,12 @@ environment:
     matrix:
 
         # Try a Release build on 32bit
+        # Pending https://github.com/conan-io/conan-center-index/pull/2298 we need to force require msys2
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
           CONAN_VISUAL_VERSIONS: 16
           CONAN_BUILD_TYPES: Release
           CONAN_ARCHS: x86
+          CONAN_BUILD_REQUIRES: msys2/20190524
 
         # We now can support MSVC 2019: build both Release and Debug, x64 only
         # This works under 1hr
