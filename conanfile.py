@@ -122,10 +122,10 @@ class OpenstudiorubyConan(ConanFile):
         # cant use bison/3.5.3 from CCI as it uses m4 which won't build
         # with x86. So use bincrafters' still but explicitly add bin dir
         # to PATH later in CMakeLists.txt
-        self.build_requires("bison/3.5.3")
+        # self.build_requires("bison/3.5.3")
         # TODO: once https://github.com/conan-io/conan-center-index/pull/2250
-        # is merged, revisit this
-        # self.build_requires("bison_installer/3.3.2@bincrafters/stable")
+        # is merged, revisit this. Edit: PR merged but still another problem...
+        self.build_requires("bison_installer/3.3.2@bincrafters/stable")
 
     def build(self):
         """
