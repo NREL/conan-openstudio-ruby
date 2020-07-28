@@ -39,7 +39,7 @@ if __name__ == "__main__":
     # When pure_c is False, it  will create, for GCC >=5, one build for
     # compiler.libcxx=libstdc++ and one for compiler.libcxx=libstc++11.
     # Then we filter the old ABI ones out since that will never happen
-    # wheb run from OpenStudio's CMake
+    # when run from OpenStudio's CMake
     # cf: https://docs.conan.io/en/latest/howtos/manage_gcc_abi.html
     pure_c = False
 
