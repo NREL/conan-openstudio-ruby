@@ -37,8 +37,9 @@ if (INTEGRATED_CONAN)
     list(APPEND CONAN_BUILD "zlib")
   endif()
   list(APPEND CONAN_OPTIONS "zlib:minizip=True")
-  list(APPEND CONAN_OPTIONS "gdbm:with_libiconv=True")
   list(APPEND CONAN_OPTIONS "gdbm:libgdbm_compat=True")
+  list(APPEND CONAN_OPTIONS "gdbm:with_libiconv=False")
+  list(APPEND CONAN_OPTIONS "gdbm:with_nls=False")
 
   # Passing shared=False is fine (but also already the default)
   # Passing fPIC=True is already the default on Unix, and doesn't exist on Windows (options is deleted in most recipes)
@@ -46,7 +47,6 @@ if (INTEGRATED_CONAN)
   #list(APPEND CONAN_OPTIONS "libyaml:shared=False")
   #list(APPEND CONAN_OPTIONS "gdbm:fPIC=True")
   #list(APPEND CONAN_OPTIONS "gdbm:shared=False")
-  #list(APPEND CONAN_OPTIONS "gdbm:libgdbm_compat=True")
   #list(APPEND CONAN_OPTIONS "readline:fPIC=True")
   #list(APPEND CONAN_OPTIONS "readline:shared=False")
   #list(APPEND CONAN_OPTIONS "fPIC=True")
@@ -65,7 +65,8 @@ if (INTEGRATED_CONAN)
     openssl/${OPENSSL_VERSION}
     ruby_installer/2.5.5@bincrafters/stable
     # cant use bison/3.5.3 from CCI as it uses m4 which won't build with x86. So use bincrafters' still but explicitly add bin dir to PATH later
-    bison_installer/3.3.2@bincrafters/stable
+    # bison_installer/3.3.2@bincrafters/stable
+    bison/3.5.3
     zlib/1.2.11
     ${CONAN_FFI}
     ${CONAN_LIBYAML}
