@@ -78,13 +78,13 @@ class OpenstudiorubyConan(ConanFile):
         self.requires("zlib/1.2.11")
 
         if self.options.with_libyaml:
-            self.requires("libyaml/0.2.2@bincrafters/stable")
-            self.options["libyaml"].shared = False
+            self.requires("libyaml/0.2.5")
+            # self.options["libyaml"].shared = False
             # self.options["libyaml"].fPIC = True
 
         if self.options.with_libffi:
             self.requires("libffi/3.3")
-            self.options["libffi"].shared = False
+            # self.options["libffi"].shared = False
             # self.options["libffi"].fPIC = True
 
         if self.options.with_gdbm:
@@ -95,8 +95,8 @@ class OpenstudiorubyConan(ConanFile):
             # the conan-center one...
             # `conan remote update nrel https://api.bintray.com/conan/commercialbuilding/nrel --insert 0`
             self.requires("gdbm/1.18.1")
-            self.options["gdbm"].shared = False
-            self.options["gdbm"].fPIC = True
+            # self.options["gdbm"].shared = False
+            # self.options["gdbm"].fPIC = True
             self.options["gdbm"].libgdbm_compat = True
             self.options["gdbm"].with_libiconv = False
             self.options["gdbm"].with_nls = False
