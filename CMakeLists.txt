@@ -58,7 +58,7 @@ if (INTEGRATED_CONAN)
 
   if(NOT MSVC)
     set(CONAN_FFI "libffi/3.3")
-    set(CONAN_LIBYAML "libyaml/0.2.2@bincrafters/stable")
+    set(CONAN_LIBYAML "libyaml/0.2.5")
     set(CONAN_READLINE "readline/8.0")
     list(APPEND CONAN_OPTIONS "gdbm:with_readline=True")
     set(CONAN_GDBM "gdbm/1.18.1")
