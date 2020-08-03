@@ -1,0 +1,21 @@
+# Autodetect text files
+* text=auto eol=lf
+
+# Unless the name matches the following overriding patterns
+
+# Definitively text files
+*.py text
+*.patch text
+*.bat text
+*.bat.in text
+*.txt text
+*.cmake text
+*.rb text
+*.yml text
+*.xml text
+*.cpp text
+*.hpp text
+*.i text
+*.hxx.in text
+*.cxx.in text
+Gemfile text
