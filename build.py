@@ -63,7 +63,9 @@ if __name__ == "__main__":
     try:
         builder.run()
     except:
-        for p in gb.glob(os.path.join(os.path.expanduser("~"), ".conan", "data", "bison", "**", "config.log"), recursive=True)
+        for p in gb.glob(os.path.join(os.path.expanduser("~"), ".conan",
+                                      "data", "bison", "**", "config.log"),
+                         recursive=True):
             with open(p, 'r') as f:
                 content = f.read()
 
