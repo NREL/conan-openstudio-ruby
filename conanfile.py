@@ -119,6 +119,7 @@ class OpenstudiorubyConan(ConanFile):
         not be retrieved.
         """
         self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
+
         # cant use bison/3.5.3 from CCI as it uses m4 which won't build
         # with x86. So use bincrafters' still but explicitly add bin dir
         # to PATH later in CMakeLists.txt
@@ -133,7 +134,12 @@ class OpenstudiorubyConan(ConanFile):
         # if self.settings.os == "Windows" and self.settings.arch == 'x86':
         #     self.build_requires("bison_installer/3.3.2@bincrafters/stable")
         # else:
-        self.build_requires("bison/3.7.1")
+
+        # You CANNOT use bison 3.7.1 as it's stricter and will throw
+        # redefinition errors in Ruby' parser.c
+        # I had to patch bison 3.5.3 and upload it to NREL's remote to remove
+        # the YACC env variable
+        self.build_requires("bison/3.5.3")
 
     def build(self):
         """

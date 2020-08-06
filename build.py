@@ -60,18 +60,22 @@ if __name__ == "__main__":
                                 "bison:build_type": "Release",
                                 "ruby_installer:build_type": "Release",
                             })
-    try:
-        builder.run()
-    except:
-        for p in gb.glob(os.path.join(os.path.expanduser("~"), ".conan",
-                                      "data", "bison", "**", "config.log"),
-                         recursive=True):
-            with open(p, 'r') as f:
-                content = f.read()
 
-            print("=========================================================")
-            print(p)
-            print("---------------------------------------------------------")
-            print(content)
-            print("=========================================================")
+    builder.run()
+
+    # Debug
+    # try:
+    #     builder.run()
+    # except:
+    #     for p in gb.glob(os.path.join(os.path.expanduser("~"), ".conan",
+    #                                   "data", "bison", "**", "config.log"),
+    #                      recursive=True):
+    #         with open(p, 'r') as f:
+    #             content = f.read()
+
+    #         print("========================================================")
+    #         print(p)
+    #         print("--------------------------------------------------------")
+    #         print(content)
+    #         print("========================================================")
 

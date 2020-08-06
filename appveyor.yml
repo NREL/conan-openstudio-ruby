@@ -17,7 +17,7 @@ environment:
           CONAN_VISUAL_VERSIONS: 15
           CONAN_BUILD_TYPES: Debug
           CONAN_ARCHS: x86_64
-          CONAN_BUILD_REQUIRES: msys2/20190524
+          # CONAN_BUILD_REQUIRES: msys2/20190524
 
         # We now can support MSVC 2019: build both Release and Debug, x64 only
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
