@@ -6,6 +6,9 @@ from cpt.printer import Printer
 from cpt.ci_manager import CIManager
 from bincrafters import build_template_default
 
+# Debug
+import glob as gb
+
 if __name__ == "__main__":
 
     # CONAN_STABLE_PATTERN env variable is used to set:
@@ -57,5 +60,16 @@ if __name__ == "__main__":
                                 "bison:build_type": "Release",
                                 "ruby_installer:build_type": "Release",
                             })
+    try:
+        builder.run()
+    except:
+        for p in gb.glob(os.path.join(os.path.expanduser("~"), ".conan", "data", "bison", "**", "config.log"), recursive=True)
+            with open(p, 'r') as f:
+                content = f.read()
 
-    builder.run()
+            print("=========================================================")
+            print(p)
+            print("---------------------------------------------------------")
+            print(content)
+            print("=========================================================")
+

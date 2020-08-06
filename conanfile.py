@@ -133,7 +133,7 @@ class OpenstudiorubyConan(ConanFile):
         # if self.settings.os == "Windows" and self.settings.arch == 'x86':
         #     self.build_requires("bison_installer/3.3.2@bincrafters/stable")
         # else:
-        self.build_requires("bison/3.5.3")
+        self.build_requires("bison/3.7.1")
 
     def build(self):
         """
