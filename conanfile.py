@@ -137,8 +137,6 @@ class OpenstudiorubyConan(ConanFile):
 
         # You CANNOT use bison 3.7.1 as it's stricter and will throw
         # redefinition errors in Ruby' parser.c
-        # I had to patch bison 3.5.3 and upload it to NREL's remote to remove
-        # the YACC env variable
         self.build_requires("bison/3.5.3")
 
     def build(self):
