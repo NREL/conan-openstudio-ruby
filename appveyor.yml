@@ -7,23 +7,23 @@ environment:
 
     matrix:
 
-#        # 2017 is the target MSVC for now, so build Release and Debug, x64 only
-#        # I separate the release and debug because I'm hitting the 60 minute per build job Appveyor limit...
-#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-#          CONAN_VISUAL_VERSIONS: 15
-#          CONAN_BUILD_TYPES: Release
-#          CONAN_ARCHS: x86_64
-#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-#          CONAN_VISUAL_VERSIONS: 15
-#          CONAN_BUILD_TYPES: Debug
-#          CONAN_ARCHS: x86_64
-#          # CONAN_BUILD_REQUIRES: msys2/20190524
-#
-#        # We now can support MSVC 2019: build both Release and Debug, x64 only
-#        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-#          CONAN_VISUAL_VERSIONS: 16
-#          CONAN_BUILD_TYPES: Release
-#          CONAN_ARCHS: x86_64
+        # 2017 is the target MSVC for now, so build Release and Debug, x64 only
+        # I separate the release and debug because I'm hitting the 60 minute per build job Appveyor limit...
+        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+          CONAN_VISUAL_VERSIONS: 15
+          CONAN_BUILD_TYPES: Release
+          CONAN_ARCHS: x86_64
+        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+          CONAN_VISUAL_VERSIONS: 15
+          CONAN_BUILD_TYPES: Debug
+          CONAN_ARCHS: x86_64
+          # CONAN_BUILD_REQUIRES: msys2/20190524
+
+        # We now can support MSVC 2019: build both Release and Debug, x64 only
+        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+          CONAN_VISUAL_VERSIONS: 16
+          CONAN_BUILD_TYPES: Release
+          CONAN_ARCHS: x86_64
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
           CONAN_VISUAL_VERSIONS: 16
           CONAN_BUILD_TYPES: Debug
