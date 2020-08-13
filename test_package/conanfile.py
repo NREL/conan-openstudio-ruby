@@ -21,9 +21,17 @@ class TestPackageConan(ConanFile):
         """
         Declare required dependencies for testing
         """
-        self.requires("swig/4.0.1")
         self.requires("zlib/1.2.11")
         self.options["zlib"].minizip = True
+
+    def build_requirements(self):
+        """
+        Build requirements are requirements that are only installed and used
+        when the package is built from sources. If there is an existing
+        pre-compiled binary, then the build requirements for this package will
+        not be retrieved.
+        """
+        self.requires("swig/4.0.1")
 
     def build(self):
         cmake = CMake(self)
