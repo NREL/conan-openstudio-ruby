@@ -35,7 +35,7 @@ environment:
           CONAN_VISUAL_VERSIONS: 16
           CONAN_BUILD_TYPES: Release
           CONAN_ARCHS: x86
-          CONAN_BUILD_REQUIRES: msys2/20190524
+          # CONAN_BUILD_REQUIRES: msys2/20190524
 
 install:
   - set PATH=%PYTHON_HOME%;%PYTHON_HOME%/Scripts/;%PATH%

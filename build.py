@@ -55,11 +55,11 @@ if __name__ == "__main__":
     )
 
     # There's no reason to use Debug builds of the build_requirements at least
-    builder.update_build_if(lambda build: True,
-                            new_settings={
-                                "bison:build_type": "Release",
-                                "ruby_installer:build_type": "Release",
-                            })
+    # builder.update_build_if(lambda build: True,
+                            # new_settings={
+                                # "bison:build_type": "Release",
+                                # "ruby_installer:build_type": "Release",
+                            # })
 
     builder.run()
 
