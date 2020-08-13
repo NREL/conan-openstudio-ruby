@@ -24,7 +24,7 @@ if (INTEGRATED_CONAN)
   include(${CMAKE_BINARY_DIR}/conan.cmake)
   message("RUNNING CONAN")
 
-  conan_check(VERSION 1.24.0 REQUIRED)
+  conan_check(VERSION 1.28.0 REQUIRED)
 
   conan_add_remote(NAME bincrafters
     URL https://api.bintray.com/conan/bincrafters/public-conan)
