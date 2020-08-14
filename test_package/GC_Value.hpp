@@ -147,3 +147,4 @@ ID swig::GC_VALUE::lshift_id;
 ID swig::GC_VALUE::rshift_id;
 
 #endif // CLI_GC_VALUE_HPP
+
