@@ -23,7 +23,6 @@ class TestPackageConan(ConanFile):
         """
         self.requires("zlib/1.2.11")
         self.options["zlib"].minizip = True
-        self.requires("swig/4.0.1")
 
     def build_requirements(self):
         """
@@ -32,7 +31,7 @@ class TestPackageConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
-        pass
+        self.build_requires("swig/4.0.1")
 
     def build(self):
         cmake = CMake(self)
