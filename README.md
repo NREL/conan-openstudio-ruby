@@ -60,3 +60,53 @@ conan user -p <API_KEY> -r nrel commercialbuilding
 conan create . openstudio_ruby/2.5.5@nrel/testing -r nrel
 conan upload openstudio_ruby/2.5.5@nrel/testing -r nrel
 ```
+
+## Conan and the recipe hash: how to produce the same hash
+
+Conan's hash is computed by looking at which files are exported. So you need to make sure that are using the same configuration on all machines.
+
+### Line endings
+
+Line endings matter! This means that by the Git for windows default, you will not compute the same hash since it defaults to CRLF line endings.
+
+```
+git config --system core.autocrlf input
+git config --system core.eol lf
+```
+
+If you had already checked out the repo before settings these settings, you need to tell git to pick the right line endings now:
+
+```
+cd conan-openstudio-ruby
+git checkout-index --force --all
+git rm --cached -r .  # Remove every file from git's index.
+git reset --hard      # Rewrite git's index to pick up all the new line endings.
+```
+
+### Revisions:
+
+You `conan.conf` should contain `general.revisions_enabled=True`:
+
+```
+$ conan config get general.revisions_enabled
+True
+```
+
+If not, activate it via editing `~/.conan.conf` or by typing `conan config set general.revisions_enabled=True`
+
+### Hooks
+
+The conan-center-index hook in particular will modify the conandata.yml if any, so if you are manually building dependencies from CCI, you need to be consistent.
+To activate the hook:
+
+```
+conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+conan config set hooks.conan-center
+```
+
+Make sure every machine returns the same:
+
+```
+$ conan config get hooks
+attribute_checker,conan-center
+```
