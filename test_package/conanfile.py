@@ -109,6 +109,13 @@ class TestPackageConan(ConanFile):
         #     self.run("{c} -e 'puts OpenStudio::getOpenStudioCLI'".format(
         #         c=cli_path))
 
+        # Appveyor on debug is too slow to run tests under 1hr
+        # In fact, let's speed everything up and disable tests on Debug period
+        if ((self.settings.build_type == "Debug")
+            # & (self.settings.os == "Windows")
+            ):
+            return
+
         all_test_args = self._discover_tests()
         failed_tests = []
         passed_tests = []
