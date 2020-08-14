@@ -151,7 +151,7 @@ exporting the recipe from the conan-center-index repository. From the repository
 that you have the same hooks, etc, and there will be human errors.
 
 ```
-conan download zlib/1.2.11@ --recipe
+conan download -r nrel zlib/1.2.11@ --recipe
 conan install zlib/1.2.11@ -b zlib -o zlib:minizip=True -s build_type=Release
 conan install zlib/1.2.11@ -b zlib -o zlib:minizip=True -s build_type=Debug
 ```
