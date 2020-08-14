@@ -34,3 +34,8 @@ pip install conan --upgrade
 pip install conan_package_tools bincrafters_package_tools
 # Creates the conan data directory
 conan user
+# Create a reproducible config, and enable revisions
+conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+conan config set hooks.conan-center
+conan config set general.revisions_enabled=True
+conan config set general.parallel_download=8
