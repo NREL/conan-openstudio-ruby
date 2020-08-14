@@ -61,7 +61,39 @@ conan create . openstudio_ruby/2.5.5@nrel/testing -r nrel
 conan upload openstudio_ruby/2.5.5@nrel/testing -r nrel
 ```
 
+## Copying a CCI recipe and vendoring it to NREL's remote
+
+eg vendoring zlib/1.2.11
+
+```bash
+# Wipe dir to be sure
+/bin/rm -Rf /home/julien/.conan/data/zlib/1.2.11
+
+# Download recipe and all binary packages from CCI's remote
+conan download -r conan-center zlib/1.2.11@
+
+# Might want to make sure nothing is existing?
+conan remove -r nrel zlib/1.2.11@
+
+# Note: sometimes going to bintray and deleting the complete package helps (eg if you have inadvertantly uploaded several revisions and now you get "Upload skipped, package existing")
+
+# Upload recipe
+conan upload zlib/1.2.11@ -r nrel --all --no-overwrite recipe --parallel
+
+# Check result?
+conan search -r nrel zlib/1.2.11@
+# Or output to a html table
+conan search -r nrel zlib/1.2.11@ --table zlib.html
+# Or a json
+conan search -r nrel zlib/1.2.11@ --json zlib.json
+```
+
 ## Conan and the recipe hash: how to produce the same hash
+
+This section is especially true should you need to manually build some packages or package configurations for example
+if CCI doesn't even have a package for the compiler or the recipe option you need.
+
+eg: `zlib` with the `minizip=True` option)
 
 Conan's hash is computed by looking at which files are exported. So you need to make sure that are using the same configuration on all machines.
 
@@ -109,4 +141,33 @@ Make sure every machine returns the same:
 ```
 $ conan config get hooks
 attribute_checker,conan-center
+```
+
+### Avoiding human errors for CCI packages
+
+If you are trying to add packages for new configurations/options, instead of building from the repo, you should download then build.
+This is especially true for conan-center-index. Downloading the recipe and building it from cache is much better than creating or
+exporting the recipe from the conan-center-index repository. From the repository you need to check that you are in the same commit,
+that you have the same hooks, etc, and there will be human errors.
+
+```
+conan download zlib/1.2.11@ --recipe
+conan install zlib/1.2.11@ -b zlib -o zlib:minizip=True -s build_type=Release
+conan install zlib/1.2.11@ -b zlib -o zlib:minizip=True -s build_type=Debug
+```
+
+### Making sure you do not export a NEW recipe
+
+Find the current revision
+
+```
+$ conan search -r nrel zlib/1.2.11@ -rev
+0df31fd24179543f5720ec7beb2a88d7
+```
+
+Then specify it in the upload command! That way you're sure you're exporting the right one (= appending packages).
+
+```
+conan upload zlib/1.2.11@ -r nrel --all --parallel --no-overwrite all
+conan upload zlib/1.2.11@:0df31fd24179543f5720ec7beb2a88d7 -r nrel --all --parallel --no-overwrite all
 ```
