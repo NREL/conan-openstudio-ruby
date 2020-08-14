@@ -31,7 +31,7 @@ class TestPackageConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
-        self.build_requires("swig/4.0.1")
+        self.build_requires("swig/4.0.2")
 
     def build(self):
         cmake = CMake(self)
