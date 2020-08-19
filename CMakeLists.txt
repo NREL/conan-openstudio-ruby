@@ -312,6 +312,7 @@ else()
     URL https://codeload.github.com/ruby/ruby/tar.gz/v2_5_5
     URL_HASH SHA256=A3BA7160C7E0CE03865CDABA9B7C26974A8A0FC23FC953269E0463C5ACAFB7A1
     PATCH_COMMAND ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.CCI.patch  # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
+                  && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0001-patch-to-support-version-ranges-for-MSVC.patch
     CONFIGURE_COMMAND ""
     BUILD_COMMAND cmd /C "${CMAKE_BINARY_DIR}/build_ruby_$<CONFIG>.bat"
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/lib/libffi.lib" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/"
