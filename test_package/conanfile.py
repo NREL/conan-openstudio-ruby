@@ -98,7 +98,7 @@ class TestPackageConan(ConanFile):
                 self.run('{} --help'.format(cli_path))
                 self.output.success("Test Passed - Running openstudio --help")
             except:
-                self.run("CLI appears broken, but skipping since x86")
+                self.output.error("CLI appears broken, but skipping since x86")
                 return
         else:
             self.run('{} --help'.format(cli_path))
