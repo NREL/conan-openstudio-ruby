@@ -2,7 +2,7 @@ import sys
 import os
 import glob as gb
 import re
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, tools
 from conans.errors import ConanException, ConanInvalidConfiguration
 
 
@@ -17,7 +17,8 @@ class OpenstudiorubyConan(ConanFile):
     # THIS is what creates the package_id (sha) that will determine whether
     # we pull binaries from bintray or build them
     settings = "os", "compiler", "build_type", "arch"
-    exports_sources = "*"
+    exports_sources = ["CMakeLists.txt", "patches/*", "!patches/unused/*"
+                       "*.bat", "*.bat.in", "test_openssl_version.rb"]
     generators = "cmake"
 
     options = {
@@ -144,6 +145,11 @@ class OpenstudiorubyConan(ConanFile):
         This method is used to build the source code of the recipe using the
         CMakeLists.txt
         """
+
+        # Patching done in CMakeLists.txt for now
+        # for patch in self.conan_data["patches"][self.version]:
+        #     tools.patch(**patch)
+
         cmake = CMake(self)
         cmake.definitions["INTEGRATED_CONAN"] = False
         cmake.configure()
