@@ -26,6 +26,10 @@ if (INTEGRATED_CONAN)
 
   conan_check(VERSION 1.28.0 REQUIRED)
 
+  # Add NREL remote and place it first in line, since we vendored dependencies to NREL's repo, they will be picked first
+  conan_add_remote(NAME nrel INDEX 0
+    URL https://api.bintray.com/conan/commercialbuilding/nrel)
+
   conan_add_remote(NAME bincrafters
     URL https://api.bintray.com/conan/bincrafters/public-conan)
 
@@ -81,6 +85,7 @@ if (INTEGRATED_CONAN)
     BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
     GENERATORS cmake_find_package
     BUILD ${CONAN_BUILD}
+    OPTIONS ${CONAN_OPTIONS}
   )
 else()
   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
