@@ -408,8 +408,8 @@ def parse_main_args(main_args)
     # bundle was requested but bundle_path was not provided
     $logger.warn "Bundle activated but ENV['BUNDLE_PATH'] is not set"
 
-    $logger.info "Setting BUNDLE_PATH to ':/ruby/2.5.0/'"
-    ENV['BUNDLE_PATH'] = ':/ruby/2.5.0/'
+    $logger.info "Setting BUNDLE_PATH to ':/ruby/2.7.0/'"
+    ENV['BUNDLE_PATH'] = ':/ruby/2.7.0/'
 
   end
 
@@ -443,8 +443,8 @@ def parse_main_args(main_args)
 
   end
 
-  Gem.paths.path << ':/ruby/2.5.0/gems/'
-  Gem.paths.path << ':/ruby/2.5.0/bundler/gems/'
+  Gem.paths.path << ':/ruby/2.7.0/gems/'
+  Gem.paths.path << ':/ruby/2.7.0/bundler/gems/'
 
   # find all the embedded gems
   original_embedded_gems = {}
