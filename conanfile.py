@@ -307,11 +307,11 @@ class OpenstudiorubyConan(ConanFile):
             # bignum-x64-mswin64_140.lib
             if self.settings.arch == "x86":
                 libarch = "i386-mswin32_140"
-                expected_libs = (['vcruntime140-ruby250-static.lib'] +
+                expected_libs = (['vcruntime140-ruby270-static.lib'] +
                                  ext_libs)
             else:
                 libarch = "x64-mswin64_140"
-                expected_libs = (['x64-vcruntime140-ruby250-static.lib'] +
+                expected_libs = (['x64-vcruntime140-ruby270-static.lib'] +
                                  ext_libs)
 
             expected_libs += ['at_exit-{l}.lib',
