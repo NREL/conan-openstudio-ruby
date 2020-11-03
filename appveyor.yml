@@ -1,3 +1,9 @@
+# I ticked "Do not build feature branches with open Pull Requests" on the settings page instead
+#branches:
+  #only:
+  #- master
+  #- develop
+
 build: false
 
 environment:
