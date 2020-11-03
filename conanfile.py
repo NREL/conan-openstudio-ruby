@@ -275,7 +275,10 @@ class OpenstudiorubyConan(ConanFile):
             'fcntl', 'fiber', 'fiddle', 'generator', 'libenc', 'libtrans',
             'md5', 'nkf', 'nonblock', 'objspace', 'openssl', 'parser',
             'pathname', 'psych', 'ripper', 'rmd160', 'sdbm', 'sha1', 'sha2',
-            'sizeof', 'socket', 'stringio', 'strscan', 'wait', 'zlib']
+            'sizeof', 'socket', 'stringio', 'strscan', 'wait', 'zlib',
+            # Didn't exist in 2.5.5
+            'monitor',
+        ]
 
         if self.options.with_gdbm:
             ext_libs += ['dbm', 'gdbm']
