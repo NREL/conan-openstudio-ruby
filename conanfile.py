@@ -8,7 +8,7 @@ from conans.errors import ConanException, ConanInvalidConfiguration
 
 class OpenstudiorubyConan(ConanFile):
     name = "openstudio_ruby"
-    version = "2.5.5"
+    version = "2.7.2"
     license = "<Put the package license here>"  # TODO
     author = "NREL <openstudio@nrel.gov>"
     url = "https://github.com/NREL/conan-openstudio-ruby"
@@ -119,6 +119,8 @@ class OpenstudiorubyConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
+        # TODO: soon, see https://github.com/bincrafters/conan-ruby_installer/pull/8
+        # self.build_requires("ruby_installer/2.7.2@bincrafters/testing")
         self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
 
         # cant use bison/3.5.3 from CCI as it uses m4 which won't build
@@ -138,7 +140,7 @@ class OpenstudiorubyConan(ConanFile):
 
         # You CANNOT use bison 3.7.1 as it's stricter and will throw
         # redefinition errors in Ruby' parser.c
-        self.build_requires("bison/3.5.3")
+        self.build_requires("bison/3.7.1")
 
     def build(self):
         """
@@ -180,10 +182,10 @@ class OpenstudiorubyConan(ConanFile):
         on the platform
 
         eg:
-            include/ruby-2.5.0/x64-mswin64_140
-            include/ruby-2.5.0/i386-mswin32_140
-            include/ruby-2.5.0/x86_64-linux
-            include/ruby-2.5.0/x86_64-darwin17
+            include/ruby-2.7.0/x64-mswin64_140
+            include/ruby-2.7.0/i386-mswin32_140
+            include/ruby-2.7.0/x86_64-linux
+            include/ruby-2.7.0/x86_64-darwin17
         """
         found = []
 
@@ -393,9 +395,10 @@ class OpenstudiorubyConan(ConanFile):
         libdirs.sort(key=lambda p: len(os.path.normpath(p).split(os.sep)))
         self.cpp_info.libdirs = libdirs
 
-        self.cpp_info.includedirs = ['include', 'include/ruby-2.5.0']
+        self.cpp_info.includedirs = ['include', 'include/ruby-2.7.0']
         self.cpp_info.includedirs.append(self._find_config_header())
 
         self.output.info("cpp_info.libs = {}".format(self.cpp_info.libs))
+        self.output.info("cpp_info.libdirs = {}".format(self.cpp_info.libdirs))
         self.output.info("cpp_info.includedirs = "
                          "{}".format(self.cpp_info.includedirs))
