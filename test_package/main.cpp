@@ -127,6 +127,7 @@ extern "C" {
   void Init_fiddle(void);
   void Init_generator(void);
   void Init_md5(void);
+  void Init_monitor(void);
   void Init_nkf(void);
   void Init_nonblock(void);
   void Init_objspace(void);
@@ -417,6 +418,10 @@ int main(int argc, char *argv[])
     rb_provide("digest/md5");
     rb_provide("md5.so");
     rb_provide("digest/md5.so");
+
+    Init_monitor();
+    rb_provide("monitor");
+    rb_provide("monitor.so");
 
     Init_nkf();
     rb_provide("nkf");
