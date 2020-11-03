@@ -216,7 +216,9 @@ add_library(additional_ruby_libs empty.cpp)
 add_library(ruby_libs empty.cpp)
 target_link_libraries(ruby_libs PUBLIC CONAN_PKG::openstudio_ruby)
 target_link_libraries(ruby_libs PUBLIC additional_ruby_libs)
-
+# Threading library
+#find_package(Threads)
+#target_link_libraries(ruby_libs PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 
 target_link_libraries(openstudio ruby_libs)
 
@@ -225,7 +227,8 @@ if(APPLE)
   find_library(COREFOUNDATION_LIBRARY CoreFoundation )
   target_link_libraries(openstudio ${COREFOUNDATION_LIBRARY})
 elseif (UNIX)
-  target_link_libraries(additional_ruby_libs dl crypt)
+  # In 2.7.2, apparently you need rt and anl for undefined reference to `timer_settime' (rt) and `gai_suspend' (anl)
+  target_link_libraries(additional_ruby_libs dl crypt rt anl)
   # target_link_libraries(openstudio "icui18n" "icuuc" "gmp")
 elseif(WIN32)
   target_link_libraries(openstudio wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi)
