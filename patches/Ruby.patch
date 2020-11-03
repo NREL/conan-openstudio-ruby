@@ -106,8 +106,8 @@ index 07acc9a..52014b9 100644
  #include "probes.h"
  #include "iseq.h"
  
-+RUBY_EXTERN int rb_hasFile(const char *t_filename);
-+RUBY_EXTERN int rb_require_embedded(const char *t_filename);
++int rb_hasFile(const char *t_filename);
++int rb_require_embedded(const char *t_filename);
 +
  static VALUE ruby_dln_librefs;
  
