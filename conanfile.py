@@ -266,7 +266,8 @@ class OpenstudiorubyConan(ConanFile):
         # libs = [os.path.relpath(p, start=self.package_folder) for p in libs]
 
         # Keep only the names:
-        self.cpp_info.libs = [os.path.basename(x) for x in libs]
+        libnames = [os.path.basename(x) for x in libs]
+        self.cpp_info.libs = libnames
 
         # These are the ext libs we expect on all platforms
         ext_libs = [
@@ -368,18 +369,18 @@ class OpenstudiorubyConan(ConanFile):
                 "as it's required for linking our ruby")
             expected_libs += ['libffi.lib']
 
-        n_libs = len(libs)
+        n_libs = len(libnames)
         n_expected_libs = len(expected_libs)
         if (n_libs == n_expected_libs):
             self.output.success("Found {} libs".format(n_libs))
 
         else:
-            missing_libs = set(expected_libs) - set(libs)
+            missing_libs = set(expected_libs) - set(libnames)
             if missing_libs:
                 self.output.error("Missing {} libraries: "
                                   "{}".format(len(missing_libs), missing_libs))
 
-            extra_libs = set(libs) - set(expected_libs)
+            extra_libs = set(libnames) - set(expected_libs)
             if extra_libs:
                 self.output.error("Found {} extra libraries: "
                                   "{}".format(len(extra_libs), extra_libs))
