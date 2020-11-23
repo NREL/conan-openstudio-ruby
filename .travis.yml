@@ -27,6 +27,9 @@ matrix:
       - <<: *osx
         osx_image: xcode11.4
         env: CONAN_APPLE_CLANG_VERSIONS=11.0 CONAN_ARCHS=x86_64 CONAN_BUILD_TYPES=Release,Debug
+      - <<: *osx
+        osx_image: xcode12.2
+        env: CONAN_APPLE_CLANG_VERSIONS=12.0 CONAN_ARCHS=x86_64 CONAN_BUILD_TYPES=Release,Debug
 
 install:
   - chmod +x .ci/install.sh
