@@ -1,14 +1,13 @@
 diff --git a/win32/Makefile.sub b/win32/Makefile.sub
-index 7542430848..8022554702 100644
+index 326bd7fa7a..1d1bc0385a 100644
 --- a/win32/Makefile.sub
 +++ b/win32/Makefile.sub
-@@ -1165,7 +1165,7 @@ $(LIBRUBY_SO):    $(LIBRUBY_A) $(DLDOBJS) $(RUBYDEF) $(RUBY_SO_NAME).res
-                @-$(PRE_LIBRUBY_UPDATE)
+@@ -1152,7 +1152,7 @@ $(LIBRUBY_SO):	$(LIBRUBY_A) $(DLDOBJS) $(RUBYDEF) $(RUBY_SO_NAME).res
+ 		@-$(PRE_LIBRUBY_UPDATE)
  !endif
-                $(ECHO) linking shared-library $(@:\=/)
--               $(Q) $(LDSHARED) $(DLDOBJS) $(LIBRUBY_A) \
-+               $(Q) $(LDSHARED) $(MAINOBJ) $(DLDOBJS) $(LIBRUBY_A) \
-                        $(RUBY_SO_NAME).res $(SOLIBS) $(EXTSOLIBS) $(LIBS) -Fe$@ -link $(LDFLAGS) \
-                        $(LIBRUBY_DLDFLAGS)
-                @$(RM) dummy.lib dummy.exp
-
+ 		$(ECHO) linking shared-library $(@:\=/)
+-		$(Q) $(LDSHARED) $(DLDOBJS) $(LIBRUBY_A) \
++		$(Q) $(LDSHARED) $(MAINOBJ) $(DLDOBJS) $(LIBRUBY_A) \
+ 			$(RUBY_SO_NAME).res $(SOLIBS) $(EXTSOLIBS) $(LIBS) -Fe$@ -link $(LDFLAGS) \
+ 			$(LIBRUBY_DLDFLAGS)
+ 		@$(RM) dummy.lib dummy.exp
