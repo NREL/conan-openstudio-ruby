@@ -153,8 +153,8 @@ FindValue(CONAN_BIN_DIRS_BISON_INSTALLER)
 
 if(NOT UNIX)
   # conan-ffi doesn't link properly, so build from source.
-  set(CURRENT_CONAN_LIBFFI_ROOT ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/)
-  set(CURRENT_CONAN_LIB_DIRS_LIBFFI ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/lib)
+  #set(CURRENT_CONAN_LIBFFI_ROOT ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/)
+  #set(CURRENT_CONAN_LIB_DIRS_LIBFFI ${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/lib)
 
   # Adjust build flags:
   # If these flags are not set correctly on Windows we get a failure to link
