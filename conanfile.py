@@ -38,8 +38,9 @@ class OpenstudiorubyConan(ConanFile):
             self.output.warn(
                 "Readline (hence GDBM) will not work on MSVC right now")
             self.options.with_gdbm = False
-            # TODO: temporary try
-            self.options.with_readline = True
+            # TODO: vcpkg supports readline, see https://github.com/ruby/ruby/blob/1b377b32c8616f85c0a97e68758c5c2db83f2169/.github/workflows/windows.yml#L28
+            # But conan readline doesn't support msvc
+            self.options.with_readline = False
             self.output.warn(
                 "Conan LIBFFI will not allow linking right now with MSVC, "
                 "so temporarilly built it from CMakeLists instead")
@@ -75,7 +76,7 @@ class OpenstudiorubyConan(ConanFile):
         """
         Declare required dependencies
         """
-        self.requires("openssl/1.1.1i") # fails with 1.1.1h https://github.com/openssl/openssl/issues/3884
+        self.requires("openssl/1.1.1i")  # fails with 1.1.1h https://github.com/openssl/openssl/issues/3884
         self.requires("zlib/1.2.11")
 
         if self.options.with_libyaml:
