@@ -289,7 +289,11 @@ class OpenstudiorubyConan(ConanFile):
 
         # Not sure here...
         if self.settings.os == 'Windows':
-            ext_libs += ['dltest', 'resolv']
+            ext_libs += ['dlntest', 'resolv',
+                         # Using the included libffi
+                         'libffi_convenience',
+                         # Now with win32ole
+                         'win32ole']
         elif self.settings.os in ['Linux', 'Macos']:
             ext_libs += ['pty',
                          'syslog']
@@ -320,16 +324,20 @@ class OpenstudiorubyConan(ConanFile):
                               'bignum-{l}.lib',
                               'bug_3571-{l}.lib',
                               'bug_5832-{l}.lib',
+                              'bug_14834-{l}.lib',
                               'bug_reporter-{l}.lib',
                               'call_without_gvl-{l}.lib',
                               'class-{l}.lib',
                               'compat-{l}.lib',
                               'console-{l}.lib',
+                              'cxxanyargs-{l}.lib',
                               'debug-{l}.lib',
                               'dln-{l}.lib',
                               'dot.dot-{l}.lib',
                               'empty-{l}.lib',
+                              'enumerator_kw-{l}.lib',
                               'exception-{l}.lib',
+                              'extract-{l}.lib',
                               'fd_setsize-{l}.lib',
                               'file-{l}.lib',
                               'float-{l}.lib',
@@ -351,6 +359,7 @@ class OpenstudiorubyConan(ConanFile):
                               'proc-{l}.lib',
                               'protect-{l}.lib',
                               'rational-{l}.lib',
+                              'rb_call_super_kw-{l}.lib',
                               'rb_fatal-{l}.lib',
                               'recursion-{l}.lib',
                               'regexp-{l}.lib',
@@ -368,10 +377,7 @@ class OpenstudiorubyConan(ConanFile):
                               'wait_for_single_fd-{l}.lib']
             expected_libs = [x.format(l=libarch) for x in expected_libs]
 
-            self.output.warn(
-                "Since we are building a custom libffi, we are packaging it, "
-                "as it's required for linking our ruby")
-            expected_libs += ['libffi.lib']
+
 
         n_libs = len(libnames)
         n_expected_libs = len(expected_libs)
