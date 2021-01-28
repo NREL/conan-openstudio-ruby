@@ -69,10 +69,13 @@ echo "CONF_ARGS='%CONF_ARGS%'"
 
 @ECHO ON
 
-call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --with-static-linked-ext %CONF_ARGS% --without-win32ole --disable-install-doc --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --with-baseruby="%BASE_RUBY%" 
+call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --disable-install-doc --with-static-linked-ext --without-ext=+,dbm,gdbm --enable-bundled-libffi %CONF_ARGS% --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --with-baseruby="%BASE_RUBY%" 
 
-nmake /k
-nmake /k install-nodoc
+
+nmake incs
+nmake extract-extlibs
+nmake
+nmake install-nodoc
 
 REM "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin"
 REM "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin"
