@@ -82,7 +82,7 @@ set(SWIG_LIB "${CURRENT_CONAN_SWIG_ROOT}/bin/swiglib")
 #######################################################################
 
 # Minimal set of gems, off of branch develop3-minimal on https://github.com/NREL/OpenStudio-gems
-set(OPENSTUDIO_GEMS_ZIP_FILENAME "openstudio3-gems-minimal-20201103-linux.tar.gz")
+set(OPENSTUDIO_GEMS_ZIP_FILENAME "openstudio3-gems-minimal-20210128.tar.gz")
 set(OPENSTUDIO_GEMS_ZIP_LOCAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/${OPENSTUDIO_GEMS_ZIP_FILENAME}")
 
 file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/openstudio-gems")
