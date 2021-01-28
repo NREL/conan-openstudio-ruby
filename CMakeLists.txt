@@ -314,12 +314,10 @@ else()
     DEPENDS GetTools FFI
     #    URL https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.5.tar.gz
     #    URL_HASH SHA256=28a945fdf340e6ba04fc890b98648342e3cccfd6d223a48f3810572f11b2514c
-    #URL https://codeload.github.com/ruby/ruby/tar.gz/v2_7_2
-    URL https://openstudio-sdk-dependencies.s3-us-west-2.amazonaws.com/ruby/test/ruby-2.7.2.tar.gz
-    #URL_HASH SHA256=60986e07bbf1d69f547951dfb76ac4cdee6128a26f235f7501080cc308d30c9f
-    URL_HASH SHA256=616183eb9433cf9579b91d30a10a6ab52dd731e09887039ec4d6a4991a211ff7
+    URL https://codeload.github.com/ruby/ruby/tar.gz/v2_7_2
+    URL_HASH SHA256=60986e07bbf1d69f547951dfb76ac4cdee6128a26f235f7501080cc308d30c9f
 
-    PATCH_COMMAND ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.CCI.patch  # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
+    PATCH_COMMAND ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.CCI.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.272.patch  # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
                   && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0001-patch-to-support-version-ranges-for-MSVC.patch
     CONFIGURE_COMMAND ""
     BUILD_COMMAND cmd /C "${CMAKE_BINARY_DIR}/build_ruby_$<CONFIG>.bat"
