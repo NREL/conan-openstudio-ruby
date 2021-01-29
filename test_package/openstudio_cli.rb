@@ -448,40 +448,11 @@ def parse_main_args(main_args)
 
   # find all the embedded gems
   original_embedded_gems = {}
-  begin
-    EmbeddedScripting::allFileNamesAsString().split(';').each do |f|
-      if md = /specifications\/.*\.gemspec$/.match(f) ||
-         md = /bundler\/.*\.gemspec$/.match(f)
-        begin
-          spec = EmbeddedScripting::getFileAsString(f)
-          s = eval(spec)
-          s.loaded_from = f
-          original_embedded_gems[s.name] = s
 
-          init_count = 0
-          Gem::Specification.each {|x| init_count += 1}
-
-          # if already have an equivalent spec this will be a no-op
-          Gem::Specification.add_spec(s)
-
-          post_count = 0
-          Gem::Specification.each {|x| post_count += 1}
-
-          if post_count == init_count
-            $logger.debug "Found system gem #{s.name} #{s.version}, overrides embedded gem"
-          end
-
-        rescue LoadError => e
-          safe_puts e.message
-        rescue => e
-          safe_puts e.message
-        end
-      end
-    end
-  rescue NameError => e
-    # EmbeddedScripting not available
-  end
-
+  # Add the gem spec paths. This filepath name gets appended with 'specification' 
+  # This will trigger Gem to reload all gems in these paths. 
+  Gem::Specification.dirs=( [":/ruby/2.7.0", ":/ruby/2.5.0/gems", ":/ruby/2.5.0/bundler/gems" ] ) 
+  
   # activate or remove bundler
   Gem::Specification.each do |spec|
     if spec.gem_dir.chars.first == ':'
