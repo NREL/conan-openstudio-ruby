@@ -1,0 +1,15 @@
+diff --git a/lib/rubygems/util.rb b/lib/rubygems/util.rb
+index 7fc239af9a..505dd9b11b 100644
+--- a/lib/rubygems/util.rb
++++ b/lib/rubygems/util.rb
+@@ -92,7 +92,9 @@ def self.traverse_parents(directory, &block)
+
+   def self.glob_files_in_dir(glob, base_path)
+     if RUBY_VERSION >= "2.5"
+-      Dir.glob(glob, base: base_path).map! {|f| File.expand_path(f, base_path) }
++      Dir.glob(File.expand_path(glob, base_path))
++      #Below fails on windows. Throws invalid argument" 
++      #Dir.glob(glob, base: base_path).map! {|f| File.expand_path(f, base_path) }
+     else
+       Dir.glob(File.expand_path(glob, base_path))
+     end
