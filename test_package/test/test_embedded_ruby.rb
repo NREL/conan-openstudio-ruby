@@ -25,7 +25,7 @@ class EmbeddedRuby_Test < Minitest::Test
 
   def test_bigdecimal
     require 'bigdecimal'
-    d = BigDecimal.new("0")
+    d = BigDecimal("0")
     assert(true)
   end
 
