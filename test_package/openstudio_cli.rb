@@ -451,7 +451,7 @@ def parse_main_args(main_args)
 
   # Add the gem spec paths. This filepath name gets appended with 'specification' 
   # This will trigger Gem to reload all gems in these paths. 
-  Gem::Specification.dirs=( [":/ruby/2.7.0", ":/ruby/2.5.0/gems", ":/ruby/2.5.0/bundler/gems" ] ) 
+  Gem::Specification.dirs=( [":/ruby/2.7.0", ":/ruby/2.7.0/gems", ":/ruby/2.7.0/bundler/gems" ] ) 
   
   # activate or remove bundler
   Gem::Specification.each do |spec|

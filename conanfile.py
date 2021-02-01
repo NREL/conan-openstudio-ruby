@@ -76,7 +76,7 @@ class OpenstudiorubyConan(ConanFile):
         """
         Declare required dependencies
         """
-        self.requires("openssl/1.1.1i")  # fails with 1.1.1h https://github.com/openssl/openssl/issues/3884
+        self.requires("openssl/1.1.0l") # fails with 1.1.1h https://github.com/openssl/openssl/issues/3884`
         self.requires("zlib/1.2.11")
 
         if self.options.with_libyaml:
