@@ -127,6 +127,7 @@ extern "C" {
   void Init_fiddle(void);
   void Init_generator(void);
   void Init_md5(void);
+  void Init_monitor(void);
   void Init_nkf(void);
   void Init_nonblock(void);
   void Init_objspace(void);
@@ -418,6 +419,10 @@ int main(int argc, char *argv[])
     rb_provide("md5.so");
     rb_provide("digest/md5.so");
 
+    Init_monitor();
+    rb_provide("monitor");
+    rb_provide("monitor.so");
+
     Init_nkf();
     rb_provide("nkf");
     rb_provide("nkf.so");
@@ -569,7 +574,7 @@ int main(int argc, char *argv[])
 extern "C" {
   int rb_hasFile(const char *t_filename) {
     // TODO Consider expanding this to use the path which we have artificially defined in embedded_help.rb
-    std::string expandedName = std::string(":/ruby/2.5.0/") + std::string(t_filename) + ".rb";
+    std::string expandedName = std::string(":/ruby/2.7.0/") + std::string(t_filename) + ".rb";
     return embedded_files::hasFile(expandedName);
   }
 

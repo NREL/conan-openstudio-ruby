@@ -17,7 +17,7 @@ index 915b618..f5209da 100644
  
      # OpenSSL <= 1.0.2: libeay32.lib and ssleay32.lib.
 diff --git a/ext/openssl/extconf.rb b/ext/openssl/extconf.rb
-index 4f21856..74b3914 100644
+index 264130b..7f228e6 100644
 --- a/ext/openssl/extconf.rb
 +++ b/ext/openssl/extconf.rb
 @@ -55,9 +55,13 @@ def find_openssl_library
@@ -35,10 +35,10 @@ index 4f21856..74b3914 100644
  
      # OpenSSL <= 1.0.2: libeay32.lib and ssleay32.lib.
 diff --git a/win32/Makefile.sub b/win32/Makefile.sub
-index 0bb61fb..beb0783 100644
+index c080e53..d5f253f 100644
 --- a/win32/Makefile.sub
 +++ b/win32/Makefile.sub
-@@ -563,7 +563,10 @@ $(CONFIG_H): $(MKFILES) $(srcdir)/win32/Makefile.sub $(win_srcdir)/Makefile.sub
+@@ -635,7 +635,10 @@ $(CONFIG_H): $(MKFILES) $(srcdir)/win32/Makefile.sub $(win_srcdir)/Makefile.sub
  #define SIZEOF_LONG_LONG 0
  !endif
  #define SIZEOF___INT64 8

@@ -60,7 +60,7 @@ class Bundle_Test < Minitest::Test
     original_dir = Dir.pwd
 
     if !system('bundle')
-      skip("test_bundle requires a valid ruby 2.5.5 with 'bundle' gem installed")
+      skip("test_bundle requires a valid ruby 2.7.2 with 'bundle' gem installed")
     end
 
     test_folder = prepare_test_folder('bundle')
@@ -85,7 +85,7 @@ class Bundle_Test < Minitest::Test
     original_dir = Dir.pwd
 
     if !system('bundle')
-      skip("test_bundle_git requires a valid ruby 2.5.5 with 'bundle' gem installed")
+      skip("test_bundle_git requires a valid ruby 2.7.2 with 'bundle' gem installed")
     end
 
     test_folder = prepare_test_folder('bundle_git')
