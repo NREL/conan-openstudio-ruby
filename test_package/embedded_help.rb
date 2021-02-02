@@ -322,8 +322,11 @@ class IO
     end
 
     #puts "self.original_read, name = #{name}, args = #{args}, block_given? = #{block_given?}"
+    # ruby2.7+ now issues warning: "Using the last argument as keyword parameters is deprecated"
+    # The optional args for IO.read should be a hash. This does simple conversion before sending to IO.read
+    args = Hash[*args]
     #STDOUT.flush
-    return original_read(name, *args)
+    return original_read(name, **args)
   end
 
   def self.open(name, *args)
