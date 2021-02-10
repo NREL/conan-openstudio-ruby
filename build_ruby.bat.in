@@ -69,7 +69,7 @@ echo "CONF_ARGS='%CONF_ARGS%'"
 
 @ECHO ON
 
-call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --disable-install-doc --with-static-linked-ext --without-ext=+,dbm,gdbm --enable-bundled-libffi %CONF_ARGS% --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --with-baseruby="%BASE_RUBY%" 
+call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --disable-install-doc ---enable-load-relative  -with-static-linked-ext --without-ext=+,dbm,gdbm --enable-bundled-libffi %CONF_ARGS% --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --with-baseruby="%BASE_RUBY%" 
 
 
 nmake incs
