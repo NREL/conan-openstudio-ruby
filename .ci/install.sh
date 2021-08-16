@@ -40,4 +40,4 @@ conan config set hooks.conan-center
 conan config set general.revisions_enabled=True
 conan config set general.parallel_download=8
 # already done in the travis settings
-# conan remote update nrel https://api.bintray.com/conan/commercialbuilding/nrel --insert 0
+# conan remote update nrel https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio --insert 0

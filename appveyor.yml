@@ -51,7 +51,7 @@ install:
   - conan config set general.revisions_enabled=True
   - conan config set general.parallel_download=8
   # Already done in the appveyor settings
-  # - conan remote update nrel https://api.bintray.com/conan/commercialbuilding/nrel --insert 0
+  # - conan remote update nrel https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio --insert 0
 
 test_script:
 - python build.py
