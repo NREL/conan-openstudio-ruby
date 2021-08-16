@@ -88,6 +88,7 @@ jobs:
           CONAN_STABLE_BRANCH_PATTERN: master
           CONAN_CHANNEL: testing
           CONAN_REMOTES: https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio,https://bincrafters.jfrog.io/artifactory/api/conan/public-conan
+          CONAN_VISUAL_RUNTIMES: MD,MDd   # Ignoring MT and MTd
         run: |
           bincrafters-package-tools --auto
 
