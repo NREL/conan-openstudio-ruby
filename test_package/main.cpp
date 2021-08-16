@@ -43,8 +43,10 @@
 #endif
 
 extern "C" {
+
   void Init_EmbeddedScripting(void);
   // INIT_DECLARATIONS;
+
   void Init_encdb();
 
   //void Init_ascii(); // this is not included in libenc
@@ -148,17 +150,16 @@ extern "C" {
   void Init_zlib(void);
 
   void Init_openssl(void);
+  void Init_ruby_description(void);
 
-  void Init_nonblock(void);
-
-  #ifndef _WIN32
-    void Init_console(void);
-    void Init_dbm(void);
-    void Init_gdbm(void);
-    void Init_pty(void);
-    void Init_readline(void);
-    void Init_syslog(void);
-  #endif
+#ifndef _WIN32
+  void Init_console(void);
+  void Init_dbm(void);
+  void Init_gdbm(void);
+  void Init_pty(void);
+  void Init_readline(void);
+  void Init_syslog(void);
+#endif
 }
 
 std::vector<std::string> paths;
@@ -387,7 +388,9 @@ int main(int argc, char *argv[])
 
     Init_cparse();
     rb_provide("cparse");
+    rb_provide("racc/cparse");
     rb_provide("cparse.so");
+    rb_provide("racc/cparse.so");
 
     Init_date_core();
     rb_provide("date_core");
@@ -418,8 +421,8 @@ int main(int argc, char *argv[])
     rb_provide("fiddle.so");
 
     Init_generator();
-    rb_provide("generator");
-    rb_provide("generator.so");
+    rb_provide("json/ext/generator");
+    rb_provide("json/ext/generator.so");
 
     Init_md5();
     rb_provide("md5");
@@ -438,14 +441,18 @@ int main(int argc, char *argv[])
     Init_nonblock();
     rb_provide("nonblock");
     rb_provide("nonblock.so");
+    rb_provide("io/nonblock");
+    rb_provide("io/nonblock.so");
+
+    Init_ruby_description();
 
     Init_objspace();
     rb_provide("objspace");
     rb_provide("objspace.so");
 
     Init_parser();
-    rb_provide("parser");
-    rb_provide("parser.so");
+    rb_provide("json/ext/parser");
+    rb_provide("json/ext/parser.so");
 
     Init_pathname();
     rb_provide("pathname");
@@ -515,33 +522,33 @@ int main(int argc, char *argv[])
     rb_provide("io/nonblock");
     rb_provide("io/nonblock.so");
 
-   #ifndef _WIN32
+#ifndef _WIN32
 
     // DLM: we have Init_console on Windows but crashes when try to init it, fails to load openssl
-     Init_console();
-     rb_provide("console");
-     rb_provide("console.so");
+    Init_console();
+    rb_provide("console");
+    rb_provide("console.so");
 
-     Init_dbm();
-     rb_provide("dbm");
-     rb_provide("dbm.so");
+    Init_dbm();
+    rb_provide("dbm");
+    rb_provide("dbm.so");
 
-     Init_gdbm();
-     rb_provide("gdbm");
-     rb_provide("gdbm.so");
+    Init_gdbm();
+    rb_provide("gdbm");
+    rb_provide("gdbm.so");
 
-     Init_pty();
-     rb_provide("pty");
-     rb_provide("pty.so");
+    Init_pty();
+    rb_provide("pty");
+    rb_provide("pty.so");
 
-     Init_readline();
-     rb_provide("readline");
-     rb_provide("readline.so");
+    Init_readline();
+    rb_provide("readline");
+    rb_provide("readline.so");
 
-     Init_syslog();
-     rb_provide("syslog");
-     rb_provide("syslog.so");
-    #endif
+    Init_syslog();
+    rb_provide("syslog");
+    rb_provide("syslog.so");
+#endif
   }
 
   // DLM: this will interpret any strings passed on the command line as UTF-8
