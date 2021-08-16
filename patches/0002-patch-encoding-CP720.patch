@@ -1,0 +1,13 @@
+diff --git a/enc/ascii.c b/enc/ascii.c
+index 8b32c414fe..a2fef2f879 100644
+--- a/enc/ascii.c
++++ b/enc/ascii.c
+@@ -61,6 +61,8 @@ OnigEncodingDefine(ascii, ASCII) = {
+ ENC_ALIAS("BINARY", "ASCII-8BIT")
+ ENC_REPLICATE("IBM437", "ASCII-8BIT")
+ ENC_ALIAS("CP437", "IBM437")
++ENC_REPLICATE("IBM720", "ASCII-8BIT")
++ENC_ALIAS("CP720", "IBM720")
+ ENC_REPLICATE("IBM737", "ASCII-8BIT")
+ ENC_ALIAS("CP737", "IBM737")
+ ENC_REPLICATE("IBM775", "ASCII-8BIT")
