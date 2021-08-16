@@ -82,7 +82,7 @@ set(SWIG_LIB "${CURRENT_CONAN_SWIG_ROOT}/bin/swiglib")
 #######################################################################
 
 # Minimal set of gems, off of branch develop3-minimal on https://github.com/NREL/OpenStudio-gems
-set(OPENSTUDIO_GEMS_ZIP_FILENAME "openstudio3-gems-minimal-20191015.tar.gz")
+set(OPENSTUDIO_GEMS_ZIP_FILENAME "openstudio3-gems-minimal-20210128.tar.gz")
 set(OPENSTUDIO_GEMS_ZIP_LOCAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/${OPENSTUDIO_GEMS_ZIP_FILENAME}")
 
 file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/openstudio-gems")
@@ -216,7 +216,9 @@ add_library(additional_ruby_libs empty.cpp)
 add_library(ruby_libs empty.cpp)
 target_link_libraries(ruby_libs PUBLIC CONAN_PKG::openstudio_ruby)
 target_link_libraries(ruby_libs PUBLIC additional_ruby_libs)
-
+# Threading library
+#find_package(Threads)
+#target_link_libraries(ruby_libs PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 
 target_link_libraries(openstudio ruby_libs)
 
@@ -225,7 +227,8 @@ if(APPLE)
   find_library(COREFOUNDATION_LIBRARY CoreFoundation )
   target_link_libraries(openstudio ${COREFOUNDATION_LIBRARY})
 elseif (UNIX)
-  target_link_libraries(additional_ruby_libs dl crypt)
+  # In 2.7.2, apparently you need rt and anl for undefined reference to `timer_settime' (rt) and `gai_suspend' (anl)
+  target_link_libraries(additional_ruby_libs dl crypt rt anl)
   # target_link_libraries(openstudio "icui18n" "icuuc" "gmp")
 elseif(WIN32)
   target_link_libraries(openstudio wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi)

@@ -11,7 +11,7 @@ diff --git a/win32/Makefile.sub b/win32/Makefile.sub
 index beb0783..56c4499 100644
 --- a/win32/Makefile.sub
 +++ b/win32/Makefile.sub
-@@ -534,9 +534,19 @@ $(CONFIG_H): $(MKFILES) $(srcdir)/win32/Makefile.sub $(win_srcdir)/Makefile.sub
+@@ -606,9 +606,19 @@ $(CONFIG_H): $(MKFILES) $(srcdir)/win32/Makefile.sub $(win_srcdir)/Makefile.sub
  	@$(IFCHANGE) "--timestamp=$(@:/=\)" $(RUBY_CONFIG_H:/=\) <<
  #ifndef $(guard)
  #define $(guard) 1

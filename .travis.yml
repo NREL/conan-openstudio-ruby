@@ -1,3 +1,8 @@
+branches:
+  only:
+  - master
+  - develop
+
 linux: &linux
    os: linux
    dist: bionic

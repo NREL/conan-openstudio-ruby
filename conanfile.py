@@ -8,7 +8,7 @@ from conans.errors import ConanException, ConanInvalidConfiguration
 
 class OpenstudiorubyConan(ConanFile):
     name = "openstudio_ruby"
-    version = "2.5.5"
+    version = "2.7.2"
     license = "<Put the package license here>"  # TODO
     author = "NREL <openstudio@nrel.gov>"
     url = "https://github.com/NREL/conan-openstudio-ruby"
@@ -38,6 +38,8 @@ class OpenstudiorubyConan(ConanFile):
             self.output.warn(
                 "Readline (hence GDBM) will not work on MSVC right now")
             self.options.with_gdbm = False
+            # TODO: vcpkg supports readline, see https://github.com/ruby/ruby/blob/1b377b32c8616f85c0a97e68758c5c2db83f2169/.github/workflows/windows.yml#L28
+            # But conan readline doesn't support msvc
             self.options.with_readline = False
             self.output.warn(
                 "Conan LIBFFI will not allow linking right now with MSVC, "
@@ -74,8 +76,7 @@ class OpenstudiorubyConan(ConanFile):
         """
         Declare required dependencies
         """
-        # 1.1.1x isn't supported by ruby 2.5.5, build fails
-        self.requires("openssl/1.1.0l")
+        self.requires("openssl/1.1.0l") # fails with 1.1.1h https://github.com/openssl/openssl/issues/3884`
         self.requires("zlib/1.2.11")
 
         if self.options.with_libyaml:
@@ -119,6 +120,8 @@ class OpenstudiorubyConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
+        # TODO: soon, see https://github.com/bincrafters/conan-ruby_installer/pull/8
+        # self.build_requires("ruby_installer/2.7.2@bincrafters/testing")
         self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
 
         # cant use bison/3.5.3 from CCI as it uses m4 which won't build
@@ -138,7 +141,7 @@ class OpenstudiorubyConan(ConanFile):
 
         # You CANNOT use bison 3.7.1 as it's stricter and will throw
         # redefinition errors in Ruby' parser.c
-        self.build_requires("bison/3.5.3")
+        self.build_requires("bison/3.7.1")
 
     def build(self):
         """
@@ -180,10 +183,10 @@ class OpenstudiorubyConan(ConanFile):
         on the platform
 
         eg:
-            include/ruby-2.5.0/x64-mswin64_140
-            include/ruby-2.5.0/i386-mswin32_140
-            include/ruby-2.5.0/x86_64-linux
-            include/ruby-2.5.0/x86_64-darwin17
+            include/ruby-2.7.0/x64-mswin64_140
+            include/ruby-2.7.0/i386-mswin32_140
+            include/ruby-2.7.0/x86_64-linux
+            include/ruby-2.7.0/x86_64-darwin17
         """
         found = []
 
@@ -264,7 +267,8 @@ class OpenstudiorubyConan(ConanFile):
         # libs = [os.path.relpath(p, start=self.package_folder) for p in libs]
 
         # Keep only the names:
-        self.cpp_info.libs = [os.path.basename(x) for x in libs]
+        libnames = [os.path.basename(x) for x in libs]
+        self.cpp_info.libs = libnames
 
         # These are the ext libs we expect on all platforms
         ext_libs = [
@@ -273,7 +277,10 @@ class OpenstudiorubyConan(ConanFile):
             'fcntl', 'fiber', 'fiddle', 'generator', 'libenc', 'libtrans',
             'md5', 'nkf', 'nonblock', 'objspace', 'openssl', 'parser',
             'pathname', 'psych', 'ripper', 'rmd160', 'sdbm', 'sha1', 'sha2',
-            'sizeof', 'socket', 'stringio', 'strscan', 'wait', 'zlib']
+            'sizeof', 'socket', 'stringio', 'strscan', 'wait', 'zlib',
+            # Didn't exist in 2.5.5
+            'monitor',
+        ]
 
         if self.options.with_gdbm:
             ext_libs += ['dbm', 'gdbm']
@@ -282,7 +289,11 @@ class OpenstudiorubyConan(ConanFile):
 
         # Not sure here...
         if self.settings.os == 'Windows':
-            ext_libs += ['dltest', 'resolv']
+            ext_libs += ['dlntest', 'resolv',
+                         # Using the included libffi
+                         'libffi_convenience',
+                         # Now with win32ole
+                         'win32ole']
         elif self.settings.os in ['Linux', 'Macos']:
             ext_libs += ['pty',
                          'syslog']
@@ -302,27 +313,31 @@ class OpenstudiorubyConan(ConanFile):
             # bignum-x64-mswin64_140.lib
             if self.settings.arch == "x86":
                 libarch = "i386-mswin32_140"
-                expected_libs = (['vcruntime140-ruby250-static.lib'] +
+                expected_libs = (['vcruntime140-ruby270-static.lib'] +
                                  ext_libs)
             else:
                 libarch = "x64-mswin64_140"
-                expected_libs = (['x64-vcruntime140-ruby250-static.lib'] +
+                expected_libs = (['x64-vcruntime140-ruby270-static.lib'] +
                                  ext_libs)
 
             expected_libs += ['at_exit-{l}.lib',
                               'bignum-{l}.lib',
                               'bug_3571-{l}.lib',
                               'bug_5832-{l}.lib',
+                              'bug_14834-{l}.lib',
                               'bug_reporter-{l}.lib',
                               'call_without_gvl-{l}.lib',
                               'class-{l}.lib',
                               'compat-{l}.lib',
                               'console-{l}.lib',
+                              'cxxanyargs-{l}.lib',
                               'debug-{l}.lib',
                               'dln-{l}.lib',
                               'dot.dot-{l}.lib',
                               'empty-{l}.lib',
+                              'enumerator_kw-{l}.lib',
                               'exception-{l}.lib',
+                              'extract-{l}.lib',
                               'fd_setsize-{l}.lib',
                               'file-{l}.lib',
                               'float-{l}.lib',
@@ -344,6 +359,7 @@ class OpenstudiorubyConan(ConanFile):
                               'proc-{l}.lib',
                               'protect-{l}.lib',
                               'rational-{l}.lib',
+                              'rb_call_super_kw-{l}.lib',
                               'rb_fatal-{l}.lib',
                               'recursion-{l}.lib',
                               'regexp-{l}.lib',
@@ -361,23 +377,20 @@ class OpenstudiorubyConan(ConanFile):
                               'wait_for_single_fd-{l}.lib']
             expected_libs = [x.format(l=libarch) for x in expected_libs]
 
-            self.output.warn(
-                "Since we are building a custom libffi, we are packaging it, "
-                "as it's required for linking our ruby")
-            expected_libs += ['libffi.lib']
 
-        n_libs = len(libs)
+
+        n_libs = len(libnames)
         n_expected_libs = len(expected_libs)
         if (n_libs == n_expected_libs):
             self.output.success("Found {} libs".format(n_libs))
 
         else:
-            missing_libs = set(expected_libs) - set(libs)
+            missing_libs = set(expected_libs) - set(libnames)
             if missing_libs:
                 self.output.error("Missing {} libraries: "
                                   "{}".format(len(missing_libs), missing_libs))
 
-            extra_libs = set(libs) - set(expected_libs)
+            extra_libs = set(libnames) - set(expected_libs)
             if extra_libs:
                 self.output.error("Found {} extra libraries: "
                                   "{}".format(len(extra_libs), extra_libs))
@@ -393,9 +406,10 @@ class OpenstudiorubyConan(ConanFile):
         libdirs.sort(key=lambda p: len(os.path.normpath(p).split(os.sep)))
         self.cpp_info.libdirs = libdirs
 
-        self.cpp_info.includedirs = ['include', 'include/ruby-2.5.0']
+        self.cpp_info.includedirs = ['include', 'include/ruby-2.7.0']
         self.cpp_info.includedirs.append(self._find_config_header())
 
         self.output.info("cpp_info.libs = {}".format(self.cpp_info.libs))
+        self.output.info("cpp_info.libdirs = {}".format(self.cpp_info.libdirs))
         self.output.info("cpp_info.includedirs = "
                          "{}".format(self.cpp_info.includedirs))
