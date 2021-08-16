@@ -73,9 +73,6 @@ jobs:
           conan config set general.revisions_enabled=True
           conan config set general.parallel_download=8
 
-          # No need for x86
-          echo "CONAN_ARCHS=x86_64" >> $GITHUB_ENV
-
           matrix="{\"name\": \"${{ matrix.build_name }}\", \"compiler\": \"${{ matrix.compiler }}\", \"version\": \"${{ matrix.version}}\", \"cwd\": \"./\", \"recipe_version\": \"2.7.2\"}"
           bincrafters-package-tools prepare-env --platform gha --config "${matrix}"
       - name: Run
@@ -88,58 +85,59 @@ jobs:
           CONAN_STABLE_BRANCH_PATTERN: master
           CONAN_CHANNEL: testing
           CONAN_REMOTES: https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio,https://bincrafters.jfrog.io/artifactory/api/conan/public-conan
+          CONAN_ARCHS: x86_64   # No need for x86
           CONAN_VISUAL_RUNTIMES: MD,MDd   # Ignoring MT and MTd
         run: |
           bincrafters-package-tools --auto
 
-       - name: Debug
-         if: ${{ failure() }}
-         shell: bash
-         run: |
-           # Debug: how to retrieve logs: remove the "-e" option above, then cat the logs you want:
-           set -x
+      - name: Debug
+        if: ${{ failure() }}
+        shell: bash
+        run: |
+          # Debug: how to retrieve logs: remove the "-e" option above, then cat the logs you want:
+          set -x
 
-           #if [[ "$(uname -s)" == 'Darwin' ]]; then
-           find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "mkmf.log"|while read fname; do
-             echo "============== $fname ============"
-             cat $fname
-             echo ""
-             echo ""
-             echo ""
-           done
+          #if [[ "$(uname -s)" == 'Darwin' ]]; then
+          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "mkmf.log"|while read fname; do
+            echo "============== $fname ============"
+            cat $fname
+            echo ""
+            echo ""
+            echo ""
+          done
 
-           # echo "======== LISTING THE GDBM LIB FOLDERS ========"
-           # find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'lib' -type 'd'|while read dirname; do
-           #   echo $dirname
-           #   ls $dirname
-           #   echo ""
-           #   echo ""
-           #   echo ""
-           # done
+          #echo "======== LISTING THE GDBM LIB FOLDERS ========"
+          #find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'lib' -type 'd'|while read dirname; do
+          #  echo $dirname
+          #  ls $dirname
+          #  echo ""
+          #  echo ""
+          #  echo ""
+          #done
 
-           # echo "======== LISTING THE GDBM INCLUDE FOLDERS ========"
-           # find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'include' -type 'd'|while read dirname; do
-           #   echo $dirname
-           #   ls $dirname
-           #   echo ""
-           #   echo ""
-           #   echo ""
-           # done
+          #echo "======== LISTING THE GDBM INCLUDE FOLDERS ========"
+          #find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'include' -type 'd'|while read dirname; do
+          #  echo $dirname
+          #  ls $dirname
+          #  echo ""
+          #  echo ""
+          #  echo ""
+          #done
 
-           echo "=========== RUBY CONFIG.LOG ================"
-           find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "config.log"|while read fname; do
-             echo "============== $fname ============"
-             cat $fname
-             echo ""
-             echo ""
-             echo ""
-           done
+          echo "=========== RUBY CONFIG.LOG ================"
+          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "config.log"|while read fname; do
+            echo "============== $fname ============"
+            cat $fname
+            echo ""
+            echo ""
+            echo ""
+          done
 
-           echo "=========== RUBY CONFIG.STATUS ================"
-           find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "config.status"|while read fname; do
-             echo "============== $fname ============"
-             cat $fname
-             echo ""
-             echo ""
-             echo ""
-           done
+          echo "=========== RUBY CONFIG.STATUS ================"
+          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "config.status"|while read fname; do
+            echo "============== $fname ============"
+            cat $fname
+            echo ""
+            echo ""
+            echo ""
+          done
