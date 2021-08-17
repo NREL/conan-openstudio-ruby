@@ -76,6 +76,7 @@ jobs:
           if [[ "${{ matrix.build_name }}" == 'Apple-Clang 10' ]]; then
             echo "MACOSX_DEPLOYMENT_TARGET=10.14" >> $GITHUB_ENV
             echo "SDKROOT=/Applications/Xcode_10.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" >> $GITHUB_ENV
+            echo "PATH=$PATH"
           elif [[ "${{ matrix.build_name }}" == 'MSVC-2017' ]]; then
             echo "AS=ml64 -nologo" >> $GITHUB_ENV
           fi
@@ -91,10 +92,11 @@ jobs:
           CONAN_UPLOAD_ONLY_WHEN_STABLE: 0
           CONAN_STABLE_BRANCH_PATTERN: master
           CONAN_CHANNEL: testing
-          CONAN_REMOTES: https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio,https://bincrafters.jfrog.io/artifactory/api/conan/public-conan
+          CONAN_REMOTES: https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio@True@nrel,https://bincrafters.jfrog.io/artifactory/api/conan/public-conan@True@bincrafters
           CONAN_ARCHS: x86_64   # No need for x86
           CONAN_VISUAL_RUNTIMES: MD,MDd   # Ignoring MT and MTd
         run: |
+          conan remote add --insert 0 -f nrel https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio
           bincrafters-package-tools --auto
 
       - name: Debug
