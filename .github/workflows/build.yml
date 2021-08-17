@@ -78,7 +78,7 @@ jobs:
           bincrafters-package-tools prepare-env --platform gha --config "${matrix}"
       - name: Run
         env:
-          CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }} # commercialbuilding, done to be able to customize on forks
+          CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }} # github-actions, done to be able to customize on forks
           CONAN_USERNAME: ${{ secrets.CONAN_USERNAME }}    # nrel, so that it produces openstudio_ruby/2.7.2@<CONAN_USERNAME>/<channel>
           CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}    # Actual secret
           CONAN_UPLOAD: ${{ secrets.CONAN_UPLOAD }} # https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio, done as a secret to be able to customize on forks
