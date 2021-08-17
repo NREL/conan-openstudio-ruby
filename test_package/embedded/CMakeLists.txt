@@ -6,7 +6,10 @@ add_executable(CreateEmbeddedSource
   CreateEmbeddedSource.cpp
 )
 
-target_link_libraries(CreateEmbeddedSource CONAN_PKG::zlib)
+target_link_libraries(CreateEmbeddedSource PRIVATE CONAN_PKG::zlib)
+if (MSVC)
+  target_link_libraries(CreateEmbeddedSource PRIVATE -IGNORE:4099)
+endif()
 
 # Add a specific manifest for CreateEmbeddedSource that will include the LongPathAware attribute, which,
 # in conjunction with the regkey LongPathsEnabled=1 will make it work with paths that are longer than MAX_PATH (win10 only)
