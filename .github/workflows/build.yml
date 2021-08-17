@@ -34,7 +34,7 @@ jobs:
           compiler: GCC
           version: 10
         - build_name: Apple-Clang 10
-          os: macos-10.15
+          os: macos-10.14
           compiler: APPLE_CLANG
           version: 10.0
         - build_name: Apple-Clang 11
@@ -50,7 +50,7 @@ jobs:
           compiler: VISUAL
           version: 16
         - build_name: MSVC-2017
-          os: windows-2016
+          os: vs2017-win2016
           compiler: VISUAL
           version: 15
 
