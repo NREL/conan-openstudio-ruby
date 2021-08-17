@@ -94,7 +94,7 @@ jobs:
         env:
           CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }} # github-actions, done to be able to customize on forks
           CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}    # Actual secret
-          CONAN_UPLOAD: ${{ secrets.CONAN_UPLOAD }} # https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio, done as a secret to be able to customize on forks
+          CONAN_UPLOAD: ${{ secrets.CONAN_UPLOAD }} # https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio@True@nrel, done as a secret to be able to customize on forks
           CONAN_UPLOAD_ONLY_WHEN_STABLE: 0
           CONAN_STABLE_BRANCH_PATTERN: master
           CONAN_CHANNEL: testing
