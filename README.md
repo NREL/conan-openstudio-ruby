@@ -4,7 +4,7 @@ A [conan](https://conan.io/) package to build ruby for [OpenStudio](https://gith
 
 ## Package Status
 
-| Bintray | Windows | Linux & macOS |
+| Artifactory | openstudio_ruby/stable | openstudio_ruby/testing |
 |:--------:|:---------:|:-----------------:|
 |[Download](https://conan.commercialbuildings.dev/ui/repos/tree/General/openstudio%2Fnrel%2Fopenstudio_ruby)|[![openstudio_ruby/stable](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml)|[![openstudio_ruby/testing](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml)|
 

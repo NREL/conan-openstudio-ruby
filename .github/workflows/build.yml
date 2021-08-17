@@ -1,4 +1,4 @@
-name: CI for conan-openstudio-ruby
+name: Conan
 
 on:
   push:
