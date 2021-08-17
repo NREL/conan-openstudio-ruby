@@ -73,6 +73,11 @@ jobs:
           conan config set general.revisions_enabled=True
           conan config set general.parallel_download=8
 
+          if [[ "${{ matrix.build_name }}" == 'Apple-Clang 10' ]]; then
+            echo "MACOSX_DEPLOYMENT_TARGET=10.14" >> $GITHUB_ENV
+            echo "SDKROOT=/Applications/Xcode_10.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" >> $GITHUB_ENV
+          fi
+
           matrix="{\"name\": \"${{ matrix.build_name }}\", \"compiler\": \"${{ matrix.compiler }}\", \"version\": \"${{ matrix.version}}\", \"cwd\": \"./\", \"recipe_version\": \"2.7.2\"}"
           bincrafters-package-tools prepare-env --platform gha --config "${matrix}"
       - name: Run
@@ -97,7 +102,17 @@ jobs:
           # Debug: how to retrieve logs: remove the "-e" option above, then cat the logs you want:
           set -x
 
+          echo "=========== MAKEFILE ================"
+          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "Makefile"|while read fname; do
+            echo "============== $fname ============"
+            cat $fname
+            echo ""
+            echo ""
+            echo ""
+          done
+
           #if [[ "$(uname -s)" == 'Darwin' ]]; then
+          echo "=========== RUBY MKMF.LOG ================"
           find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "mkmf.log"|while read fname; do
             echo "============== $fname ============"
             cat $fname
