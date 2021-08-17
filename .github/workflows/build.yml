@@ -74,12 +74,17 @@ jobs:
             echo "AS=ml64 -nologo" >> $GITHUB_ENV
           fi
 
+          # Use lowercase based on repository owner, so that NREL -> nrel. 
+          # That should work on forks, while not replacing 'nrel' with '***' everywhere like it does when you set CONAN_USERNAME as a repo secret...
+          # We want BPT/CPT to produces openstudio_ruby/2.7.2@<CONAN_USERNAME>/<channel>
+          CONAN_USERNAME=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "CONAN_USERNAME=$CONAN_USERNAME" >> $GITHUB_ENV
+
           matrix="{\"name\": \"${{ matrix.build_name }}\", \"compiler\": \"${{ matrix.compiler }}\", \"version\": \"${{ matrix.version}}\", \"cwd\": \"./\", \"recipe_version\": \"2.7.2\"}"
           bincrafters-package-tools prepare-env --platform gha --config "${matrix}"
       - name: Run
         env:
           CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }} # github-actions, done to be able to customize on forks
-          CONAN_USERNAME: ${{ secrets.CONAN_USERNAME }}    # nrel, so that it produces openstudio_ruby/2.7.2@<CONAN_USERNAME>/<channel>
           CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}    # Actual secret
           CONAN_UPLOAD: ${{ secrets.CONAN_UPLOAD }} # https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio, done as a secret to be able to customize on forks
           CONAN_UPLOAD_ONLY_WHEN_STABLE: 0
