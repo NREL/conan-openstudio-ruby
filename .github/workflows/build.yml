@@ -76,6 +76,8 @@ jobs:
           if [[ "${{ matrix.build_name }}" == 'Apple-Clang 10' ]]; then
             echo "MACOSX_DEPLOYMENT_TARGET=10.14" >> $GITHUB_ENV
             echo "SDKROOT=/Applications/Xcode_10.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" >> $GITHUB_ENV
+          elif [[ "${{ matrix.build_name }}" == 'MSVC-2017' ]]; then
+            echo "AS=ml64 -nologo" >> $GITHUB_ENV
           fi
 
           matrix="{\"name\": \"${{ matrix.build_name }}\", \"compiler\": \"${{ matrix.compiler }}\", \"version\": \"${{ matrix.version}}\", \"cwd\": \"./\", \"recipe_version\": \"2.7.2\"}"
