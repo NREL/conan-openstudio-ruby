@@ -198,6 +198,7 @@ add_executable(${PROJECT_NAME}
 # -Wno-register, /wd5033: ISO C++1z does not allow *register* storage class specifier
 if(MSVC)
   set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/bigobj /wd4996 /wd5033")
+  target_link_libraries(openstudio PRIVATE -IGNORE:4099,4049,4217,4286)
   set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx" PROPERTIES COMPILE_FLAGS "-DRUBY_EMBEDDED" )
 else()
   set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wno-deprecated-declarations -Wno-register")
@@ -220,18 +221,18 @@ target_link_libraries(ruby_libs PUBLIC additional_ruby_libs)
 #find_package(Threads)
 #target_link_libraries(ruby_libs PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 
-target_link_libraries(openstudio ruby_libs)
+target_link_libraries(openstudio PRIVATE ruby_libs)
 
 
 if(APPLE)
   find_library(COREFOUNDATION_LIBRARY CoreFoundation )
-  target_link_libraries(openstudio ${COREFOUNDATION_LIBRARY})
+  target_link_libraries(openstudio PRIVATE ${COREFOUNDATION_LIBRARY})
 elseif (UNIX)
   # In 2.7.2, apparently you need rt and anl for undefined reference to `timer_settime' (rt) and `gai_suspend' (anl)
   target_link_libraries(additional_ruby_libs dl crypt rt anl)
   # target_link_libraries(openstudio "icui18n" "icuuc" "gmp")
 elseif(WIN32)
-  target_link_libraries(openstudio wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi)
+  target_link_libraries(openstudio PRIVATE wsock32 ws2_32 Dbghelp Shlwapi Iphlpapi)
   set_target_properties(openstudio PROPERTIES LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRT")
 endif()
 

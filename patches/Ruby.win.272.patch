@@ -7,7 +7,7 @@ index 326bd7fa7a..1d1bc0385a 100644
  !endif
  !if !defined(LDFLAGS)
 -LDFLAGS = -incremental:no -debug -opt:ref -opt:icf
-+LDFLAGS = -incremental:no -debug -opt:ref -opt:icf -ignore:4099
++LDFLAGS = -incremental:no -debug -opt:ref -opt:icf -IGNORE:4099,4049,4217,4286
  !endif
  !if !defined(XLDFLAGS)
  XLDFLAGS = -stack:$(STACK)
