@@ -102,8 +102,7 @@ jobs:
           CONAN_ARCHS: x86_64   # No need for x86
           CONAN_VISUAL_RUNTIMES: MD,MDd   # Ignoring MT and MTd
         run: |
-          # TODO: Until we upload zlib (and bzip2) packages, and possibly update m4 packages, this will fail all builds...
-          # conan remote add --insert 0 -f nrel https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio
+          conan remote add --insert 0 -f nrel https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio
           bincrafters-package-tools --auto
 
       - name: Debug
