@@ -15,7 +15,7 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        build_name: [GCC-7, GCC-8, GCC-9, GCC-10, Apple-Clang 10, Apple-Clang 11, Apple-Clang 12, MSVC-2019, MSVC-2017]
+        build_name: [GCC-7, GCC-8, GCC-9, GCC-10, Apple-Clang 11, Apple-Clang 12, MSVC-2019, MSVC-2017]
         include:
         - build_name: GCC-7
           os: ubuntu-18.04
@@ -33,10 +33,6 @@ jobs:
           os: ubuntu-18.04
           compiler: GCC
           version: 10
-        - build_name: Apple-Clang 10
-          os: macos-10.14
-          compiler: APPLE_CLANG
-          version: 10.0
         - build_name: Apple-Clang 11
           os: macos-10.15
           compiler: APPLE_CLANG
@@ -50,7 +46,7 @@ jobs:
           compiler: VISUAL
           version: 16
         - build_name: MSVC-2017
-          os: vs2017-win2016
+          os: windows-2016
           compiler: VISUAL
           version: 15
 
@@ -73,11 +69,8 @@ jobs:
           conan config set general.revisions_enabled=True
           conan config set general.parallel_download=8
 
-          if [[ "${{ matrix.build_name }}" == 'Apple-Clang 10' ]]; then
-            echo "MACOSX_DEPLOYMENT_TARGET=10.14" >> $GITHUB_ENV
-            echo "SDKROOT=/Applications/Xcode_10.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" >> $GITHUB_ENV
-            echo "PATH=$PATH"
-          elif [[ "${{ matrix.build_name }}" == 'MSVC-2017' ]]; then
+          if [[ "${{ matrix.build_name }}" == 'MSVC-2017' ]]; then
+            # For some reason, it's picking up ml.exe (x86) and fails to assemble coroutine\Context.asm
             echo "AS=ml64 -nologo" >> $GITHUB_ENV
           fi
 
