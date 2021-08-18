@@ -226,7 +226,7 @@ if( UNIX )
     URL_HASH SHA256=6e5706d0d4ee4e1e2f883db9d768586b4d06567debea353c796ec45e8321c3d4
 
     # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)
-    PATCH_COMMAND pwd && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
+    PATCH_COMMAND pwd && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch# && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND pwd && sh -c "pwd && echo '===============  CONFIGURE ============' && echo 'Calling: ${configure_cmd}' && ${configure_cmd}"
     #    BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} Use default BUILD_COMMAND for now
@@ -292,9 +292,13 @@ else()
     URL https://codeload.github.com/ruby/ruby/tar.gz/v2_7_2
     URL_HASH SHA256=60986e07bbf1d69f547951dfb76ac4cdee6128a26f235f7501080cc308d30c9f
 
-    PATCH_COMMAND ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.CCI.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.272.patch  # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
-                  && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0001-patch-to-support-version-ranges-for-MSVC.patch
-                  && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
+    PATCH_COMMAND ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
+               && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.patch
+               && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.CCI.patch
+               && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.272.patch  # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
+               && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0001-patch-to-support-version-ranges-for-MSVC.patch
+               && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
+               && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
     CONFIGURE_COMMAND ""
     BUILD_COMMAND cmd /C "${CMAKE_BINARY_DIR}/build_ruby_$<CONFIG>.bat"
     INSTALL_COMMAND "" # ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/FFI-prefix/src/FFI-install/$<CONFIG>/lib/libffi.lib" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/lib/"

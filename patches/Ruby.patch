@@ -140,3 +140,16 @@ index 313aaed..3ce7ff7 100644
 +int rb_require_embedded(const char *t_filename) {
 +  return 0;
 +}
+
+diff --git a/win32/Makefile.sub b/win32/Makefile.sub
+index 326bd7f..e04ccb3 100644
+--- a/win32/Makefile.sub
++++ b/win32/Makefile.sub
+@@ -991,6 +991,7 @@ s,@SOEXT@,dll,;t t
+ s,@DLEXT@,so,;t t
+ s,@LIBEXT@,lib,;t t
+ s,@STRIP@,$(STRIP),;t t
++s,@ENCSTATIC@,$(ENCSTATIC),;t t
+ s,@EXTSTATIC@,$(EXTSTATIC),;t t
+ s,@setup@,Setup,;t t
+ s,@MINIRUBY@,$(MINIRUBY),;t t

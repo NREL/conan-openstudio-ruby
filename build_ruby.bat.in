@@ -74,8 +74,8 @@ call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --disable-inst
 
 nmake incs
 nmake extract-extlibs
-nmake /k
-nmake /k install-nodoc
+nmake
+nmake install-nodoc
 
 REM "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin"
 REM "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_BINARY_DIR}/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/bin"

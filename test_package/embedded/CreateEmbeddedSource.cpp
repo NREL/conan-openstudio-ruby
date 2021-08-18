@@ -1,3 +1,6 @@
+#ifdef _WIN32
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
 
 #include <string>
 #include <fstream>
@@ -53,7 +56,7 @@ int main(int argc, char *argv[])
   if( outstream.is_open() ) {
     outstream << "static const uint8_t embedded_file_" << filenum << "[] = {";
     do {
-        strm.avail_in = fread(in, 1, CHUNK, source);
+        strm.avail_in = static_cast<uInt>(fread(in, 1, CHUNK, source));
         if (ferror(source)) {
             (void)deflateEnd(&strm);
             return EXIT_FAILURE;

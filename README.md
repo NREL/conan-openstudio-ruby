@@ -4,9 +4,9 @@ A [conan](https://conan.io/) package to build ruby for [OpenStudio](https://gith
 
 ## Package Status
 
-| Bintray | Windows | Linux & macOS |
+| Artifactory | openstudio_ruby/stable | openstudio_ruby/testing |
 |:--------:|:---------:|:-----------------:|
-|[![Download](https://api.bintray.com/packages/commercialbuilding/nrel/openstudio_ruby%3Anrel/images/download.svg)](https://bintray.com/commercialbuilding/nrel/openstudio_ruby%3Anrel/_latestVersion)|[![Build status](https://ci.appveyor.com/api/projects/status/github/nrel/conan-openstudio-ruby?branch=master&svg=true)](https://ci.appveyor.com/project/ci-commercialbuildings/conan-openstudio-ruby/branch/master)|[![Build Status](https://travis-ci.org/nrel/conan-openstudio-ruby.svg?branch=master)](https://travis-ci.org/nrel/conan-openstudio-ruby)|
+|[Download](https://conan.commercialbuildings.dev/ui/repos/tree/General/openstudio%2Fnrel%2Fopenstudio_ruby)|[![openstudio_ruby/stable](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml)|[![openstudio_ruby/testing](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml)|
 
 CI is done by Travis for Linux&Mac, and AppVeyor for Windows. To ignore specific commits, please add tags in your commit message such as `[skip ci]` (skip all), `[skip travis]` or `[skip appveyor]`.
 

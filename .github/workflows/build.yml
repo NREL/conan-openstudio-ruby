@@ -1,0 +1,168 @@
+name: Conan
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build:
+
+    name: ${{ matrix.build_name }}
+
+    # Note: as of 2021-01-29, this only works for push, not for pull request
+    # if: "!(contains(github.event.head_commit.message, 'skip') && contains(github.event.head_commit.message, 'ci'))"
+    # runs-on: ubuntu-18.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
+      fail-fast: false
+      matrix:
+        build_name: [GCC-7, GCC-8, GCC-9, GCC-10, GCC-11, Apple-Clang 11, Apple-Clang 12, MSVC-2019, MSVC-2017]
+        include:
+        - build_name: GCC-7
+          os: ubuntu-18.04
+          compiler: GCC
+          version: 7
+        - build_name: GCC-8
+          os: ubuntu-18.04
+          compiler: GCC
+          version: 8
+        - build_name: GCC-9
+          os: ubuntu-18.04
+          compiler: GCC
+          version: 9
+        - build_name: GCC-10
+          os: ubuntu-18.04
+          compiler: GCC
+          version: 10
+        - build_name: GCC-11
+          os: ubuntu-18.04
+          compiler: GCC
+          version: 11
+        - build_name: Apple-Clang 11
+          os: macos-10.15
+          compiler: APPLE_CLANG
+          version: 11.0
+        - build_name: Apple-Clang 12
+          os: macos-10.15
+          compiler: APPLE_CLANG
+          version: 12.0
+        - build_name: MSVC-2019
+          os: windows-2019
+          compiler: VISUAL
+          version: 16
+        - build_name: MSVC-2017
+          os: windows-2016
+          compiler: VISUAL
+          version: 15
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.8"
+
+      - name: Install Conan
+        shell: bash
+        run: |
+          set -x
+          pip install conan conan_package_tools bincrafters_package_tools
+          conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+          conan config set hooks.conan-center
+          conan config set general.revisions_enabled=True
+          conan config set general.parallel_download=8
+
+          if [[ "${{ matrix.build_name }}" == 'MSVC-2017' ]]; then
+            # For some reason, it's picking up ml.exe (x86) and fails to assemble coroutine\Context.asm
+            echo "AS=ml64 -nologo" >> $GITHUB_ENV
+          fi
+
+          # Use lowercase based on repository owner, so that NREL -> nrel. 
+          # That should work on forks, while not replacing 'nrel' with '***' everywhere like it does when you set CONAN_USERNAME as a repo secret...
+          # We want BPT/CPT to produces openstudio_ruby/2.7.2@<CONAN_USERNAME>/<channel>
+          CONAN_USERNAME=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "CONAN_USERNAME=$CONAN_USERNAME" >> $GITHUB_ENV
+
+          matrix="{\"name\": \"${{ matrix.build_name }}\", \"compiler\": \"${{ matrix.compiler }}\", \"version\": \"${{ matrix.version}}\", \"cwd\": \"./\", \"recipe_version\": \"2.7.2\"}"
+          bincrafters-package-tools prepare-env --platform gha --config "${matrix}"
+      - name: Run
+        env:
+          CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }} # github-actions, done to be able to customize on forks
+          CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}    # Actual secret
+          CONAN_UPLOAD: ${{ secrets.CONAN_UPLOAD }} # https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio@True@nrel, done as a secret to be able to customize on forks
+          CONAN_UPLOAD_ONLY_WHEN_STABLE: 0
+          CONAN_STABLE_BRANCH_PATTERN: master
+          CONAN_CHANNEL: testing
+          CONAN_REMOTES: https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio@True@nrel,https://bincrafters.jfrog.io/artifactory/api/conan/public-conan@True@bincrafters
+          CONAN_ARCHS: x86_64   # No need for x86
+          CONAN_VISUAL_RUNTIMES: MD,MDd   # Ignoring MT and MTd
+        run: |
+          conan remote add --insert 0 -f nrel https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio
+          bincrafters-package-tools --auto
+
+      - name: Debug
+        if: ${{ failure() }}
+        shell: bash
+        run: |
+          # Debug: how to retrieve logs: remove the "-e" option above, then cat the logs you want:
+          set -x
+
+          echo "=========== MAKEFILE ================"
+          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "Makefile"|while read fname; do
+            echo "============== $fname ============"
+            cat $fname
+            echo ""
+            echo ""
+            echo ""
+          done
+
+          #if [[ "$(uname -s)" == 'Darwin' ]]; then
+          echo "=========== RUBY MKMF.LOG ================"
+          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "mkmf.log"|while read fname; do
+            echo "============== $fname ============"
+            cat $fname
+            echo ""
+            echo ""
+            echo ""
+          done
+
+          #echo "======== LISTING THE GDBM LIB FOLDERS ========"
+          #find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'lib' -type 'd'|while read dirname; do
+          #  echo $dirname
+          #  ls $dirname
+          #  echo ""
+          #  echo ""
+          #  echo ""
+          #done
+
+          #echo "======== LISTING THE GDBM INCLUDE FOLDERS ========"
+          #find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'include' -type 'd'|while read dirname; do
+          #  echo $dirname
+          #  ls $dirname
+          #  echo ""
+          #  echo ""
+          #  echo ""
+          #done
+
+          echo "=========== RUBY CONFIG.LOG ================"
+          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "config.log"|while read fname; do
+            echo "============== $fname ============"
+            cat $fname
+            echo ""
+            echo ""
+            echo ""
+          done
+
+          echo "=========== RUBY CONFIG.STATUS ================"
+          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "config.status"|while read fname; do
+            echo "============== $fname ============"
+            cat $fname
+            echo ""
+            echo ""
+            echo ""
+          done
