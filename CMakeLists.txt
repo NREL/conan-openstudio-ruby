@@ -15,30 +15,33 @@ if (INTEGRATED_CONAN)
   # Conan
 
   # Download automatically, you can also just copy the conan.cmake file
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-    message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.14/conan.cmake"
-      "${CMAKE_BINARY_DIR}/conan.cmake")
+  set(CMAKE_CONAN_EXPECTED_HASH 52a255a933397fdce3d0937f9c737e98)
+  set(CMAKE_CONAN_VERSION "0.17.0")
+
+  if(EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+    file(MD5 "${CMAKE_BINARY_DIR}/conan.cmake" CMAKE_CONAN_HASH)
+  endif()
+  if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake" OR NOT "${CMAKE_CONAN_HASH}" MATCHES "${CMAKE_CONAN_EXPECTED_HASH}")
+    # Put it in CMAKE_BINARY_DIR so we don't end up with two when building OpenStudioApplication
+    message(STATUS "openstudio: Downloading conan.cmake ${CMAKE_CONAN_VERSION} from https://github.com/conan-io/cmake-conan")
+    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/${CMAKE_CONAN_VERSION}/conan.cmake"
+       "${CMAKE_BINARY_DIR}/conan.cmake")
+  else()
+    message(STATUS "openstudio: using existing conan.cmake")
   endif()
 
   include(${CMAKE_BINARY_DIR}/conan.cmake)
+
   message("RUNNING CONAN")
 
   conan_check(VERSION 1.30.0 REQUIRED)
 
   # Add NREL remote and place it first in line, since we vendored dependencies to NREL's repo, they will be picked first
   conan_add_remote(NAME nrel INDEX 0
-    URL https://api.bintray.com/conan/commercialbuilding/nrel)
+    URL https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio)
 
   conan_add_remote(NAME bincrafters
-    URL https://api.bintray.com/conan/bincrafters/public-conan)
-
-  # TODO: Temp
-  conan_add_remote(NAME jmarrec
-    URL https://api.bintray.com/conan/jmarrec/testing)
-
-  #conan_add_remote(NAME jmarrec
-  #  URL https://api.bintray.com/conan/jmarrec/testing)
+    URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan)
 
   set(CONAN_BUILD "missing")
   if (APPLE)
@@ -71,7 +74,7 @@ if (INTEGRATED_CONAN)
 
   conan_cmake_run(REQUIRES
     openssl/${OPENSSL_VERSION}
-    ruby_installer/2.5.5@bincrafters/stable
+    ruby_installer/2.7.3@bincrafters/stable
     # cant use bison/3.5.3 from CCI as it uses m4 which won't build with x86. So use bincrafters' still but explicitly add bin dir to PATH later
     # bison_installer/3.3.2@bincrafters/stable
     bison/3.7.1
