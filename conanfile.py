@@ -84,7 +84,7 @@ class OpenstudiorubyConan(ConanFile):
         """
         Declare required dependencies
         """
-        self.requires("openssl/1.1.0l") # fails with 1.1.1h https://github.com/openssl/openssl/issues/3884`
+        self.requires("openssl/1.1.1m")  # Doesn't work with 3.x
         # Make sure you get a zlib post separation between zlib and minizip
         self.requires("zlib/1.2.11#683857dbd5377d65f26795d4023858f9")
 
@@ -99,12 +99,6 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["libffi"].fPIC = True
 
         if self.options.with_gdbm:
-            # NOTE: I have uploaded the gdbm/1.18.1 to the NREL remote
-            # with the status of this PR https://github.com/conan-io/conan-center-index/pull/2180
-            # at SHA https://github.com/conan-io/conan-center-index/pull/2180/commits/fad6b09ec294e8c0d186caea0c38bd6941dc0343
-            # So for now that'll only work if you have the NREL remote **before**
-            # the conan-center one...
-            # `conan remote update nrel https://api.bintray.com/conan/commercialbuilding/nrel --insert 0`
             self.requires("gdbm/1.19")
             # self.options["gdbm"].shared = False
             # self.options["gdbm"].fPIC = True
