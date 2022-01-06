@@ -94,7 +94,7 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["libyaml"].fPIC = True
 
         if self.options.with_libffi:
-            self.requires("libffi/3.3")
+            self.requires("libffi/3.4.2")
             # self.options["libffi"].shared = False
             # self.options["libffi"].fPIC = True
 
@@ -105,7 +105,7 @@ class OpenstudiorubyConan(ConanFile):
             # So for now that'll only work if you have the NREL remote **before**
             # the conan-center one...
             # `conan remote update nrel https://api.bintray.com/conan/commercialbuilding/nrel --insert 0`
-            self.requires("gdbm/1.18.1")
+            self.requires("gdbm/1.19")
             # self.options["gdbm"].shared = False
             # self.options["gdbm"].fPIC = True
             self.options["gdbm"].libgdbm_compat = True
@@ -120,7 +120,7 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["readline"].fPIC = True
 
         if self.options.with_gmp:
-            self.requires("gmp/6.2.0")
+            self.requires("gmp/6.2.1")
 
     def build_requirements(self):
         """
@@ -150,8 +150,7 @@ class OpenstudiorubyConan(ConanFile):
         # redefinition errors in Ruby' parser.c
         # Latest bison with m4/1.4.18
         # self.build_requires("bison/3.7.1#dcffa3dd9204cb79ac7ca09a7f19bb8b")
-        # The one on NREL (older)
-        self.build_requires("bison/3.7.1#8bba3cd5416cf47dbc99130108ecb67e")
+        self.build_requires("bison/3.7.6")
 
     def build(self):
         """

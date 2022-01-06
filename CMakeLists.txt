@@ -34,7 +34,7 @@ if (INTEGRATED_CONAN)
 
   message("RUNNING CONAN")
 
-  conan_check(VERSION 1.30.0 REQUIRED)
+  conan_check(VERSION 1.43.0 REQUIRED)
 
   # Add NREL remote and place it first in line, since we vendored dependencies to NREL's repo, they will be picked first
   conan_add_remote(NAME nrel INDEX 0
@@ -64,12 +64,12 @@ if (INTEGRATED_CONAN)
   #list(APPEND CONAN_OPTIONS "libffi:shared=False")
 
   if(NOT MSVC)
-    set(CONAN_FFI "libffi/3.3")
+    set(CONAN_FFI "libffi/3.4.2")
     set(CONAN_LIBYAML "libyaml/0.2.5")
     set(CONAN_READLINE "readline/8.0")
     list(APPEND CONAN_OPTIONS "gdbm:with_readline=True")
-    set(CONAN_GDBM "gdbm/1.18.1")
-    set(CONAN_GMP "gmp/6.2.0")
+    set(CONAN_GDBM "gdbm/1.19")
+    set(CONAN_GMP "gmp/6.2.1")
   endif()
 
   conan_cmake_run(REQUIRES
@@ -77,7 +77,7 @@ if (INTEGRATED_CONAN)
     ruby_installer/2.7.3@bincrafters/stable
     # cant use bison/3.5.3 from CCI as it uses m4 which won't build with x86. So use bincrafters' still but explicitly add bin dir to PATH later
     # bison_installer/3.3.2@bincrafters/stable
-    bison/3.7.1
+    bison/3.7.6
     zlib/1.2.11
     ${CONAN_FFI}
     ${CONAN_LIBYAML}
