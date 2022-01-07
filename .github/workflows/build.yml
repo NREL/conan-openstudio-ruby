@@ -116,8 +116,8 @@ jobs:
           CONAN_REMOTES: "https://conan.openstudio.net/artifactory/api/conan/openstudio@True@nrel,https://bincrafters.jfrog.io/artifactory/api/conan/public-conan@True@bincrafters"
           CONAN_ARCHS: x86_64   # No need for x86
           CONAN_VISUAL_RUNTIMES: MD,MDd   # Ignoring MT and MTd
+        shell: bash
         run: |
-          conan remote add --insert 0 -f nrel https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio
           bincrafters-package-tools --auto
 
       - name: Debug

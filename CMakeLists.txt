@@ -290,6 +290,7 @@ else()
   # tool dependencies
   ExternalProject_Add(Ruby
     #DEPENDS GetTools FFI
+    DEPENDS GetTools
     #    URL https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.5.tar.gz
     #    URL_HASH SHA256=28a945fdf340e6ba04fc890b98648342e3cccfd6d223a48f3810572f11b2514c
     URL https://codeload.github.com/ruby/ruby/tar.gz/v2_7_2
