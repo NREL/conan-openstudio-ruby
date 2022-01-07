@@ -58,24 +58,10 @@ endif()
 #                               S W I G                               #
 #######################################################################
 
-macro(FindValue ValueName)
-  set(LocalVar "")
-  set(LocalVar $<$<CONFIG:Debug>:${${ValueName}_DEBUG}>$<$<CONFIG:Release>:${${ValueName}_RELEASE}>$<$<CONFIG:RelWithDebInfo>:${${ValueName}_RELWITHDEBINFO}>$<$<CONFIG:MinSizeRel>:${${ValueName}_MINSIZEREL}>
-  )
-#  list(JOIN LocalVar "" LocalVar)
-  string(STRIP ${LocalVar} LocalVar)
-  set(CURRENT_${ValueName} $<IF:$<BOOL:${LocalVar}>,${LocalVar},${${ValueName}}>)
-  # For debug purposes
-  # message(STATUS "Found '${ValueName}' as '${CURRENT_${ValueName}}'")
-endmacro()
-
-# So instead, we use a generator expression to find the right value. At least it makes sense, and should be robust.
-FindValue(CONAN_SWIG_ROOT)
-
-set(SWIG_EXECUTABLE "${CURRENT_CONAN_SWIG_ROOT}/bin/swig")
-
-# The conan-provided binary has a built-in swiglib (`swig -swiglib`) that points to the build box on which it was built, which is problematic for us.
-set(SWIG_LIB "${CURRENT_CONAN_SWIG_ROOT}/bin/swiglib")
+# As of swiglib/4.0.2#452e9a58a6fb04be4267f68f4c4073f3, there is a cmake target defined in the conan package
+# As such, the swiglib points to the correct location (at 4.0 it would point to the build box) so we can use find_package just fine
+find_package(SWIG REQUIRED)
+message(STATUS "FOUND SWIG_EXECUTABLE=${SWIG_EXECUTABLE}, SWIG_DIR=${SWIG_DIR}")
 
 #######################################################################
 #                               G E M S                               #
@@ -157,16 +143,14 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_BINARY_DIR} ${PROJECT_
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
-  COMMAND ${CMAKE_COMMAND} -E env SWIG_LIB="${SWIG_LIB}"
-          "${SWIG_EXECUTABLE}"
+  COMMAND "${SWIG_EXECUTABLE}"
           "-ruby"
           -external-runtime "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
 )
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx"
-  COMMAND ${CMAKE_COMMAND} -E env SWIG_LIB="${SWIG_LIB}"
-          "${SWIG_EXECUTABLE}"
+  COMMAND "${SWIG_EXECUTABLE}"
           "-ruby"
           "-c++"
           -o "${CMAKE_CURRENT_BINARY_DIR}/embedded_scripting_wrap.cxx"
