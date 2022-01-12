@@ -128,23 +128,23 @@ jobs:
           set -x
 
           echo "=========== MAKEFILE ================"
-          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "Makefile"|while read fname; do
+          find ~/.conan/data/openstudio_ruby/2.7.2/$CONAN_USERNAME/testing/build -name "Makefile"|while read fname; do
             echo "============== $fname ============"
             cat $fname
             echo ""
             echo ""
             echo ""
-          done
+          done || true
 
           #if [[ "$(uname -s)" == 'Darwin' ]]; then
           echo "=========== RUBY MKMF.LOG ================"
-          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "mkmf.log"|while read fname; do
+          find ~/.conan/data/openstudio_ruby/2.7.2/$CONAN_USERNAME/testing/build -name "mkmf.log"|while read fname; do
             echo "============== $fname ============"
             cat $fname
             echo ""
             echo ""
             echo ""
-          done
+          done || true
 
           #echo "======== LISTING THE GDBM LIB FOLDERS ========"
           #find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'lib' -type 'd'|while read dirname; do
@@ -153,7 +153,7 @@ jobs:
           #  echo ""
           #  echo ""
           #  echo ""
-          #done
+          #done || true
 
           #echo "======== LISTING THE GDBM INCLUDE FOLDERS ========"
           #find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'include' -type 'd'|while read dirname; do
@@ -162,22 +162,22 @@ jobs:
           #  echo ""
           #  echo ""
           #  echo ""
-          #done
+          #done || true
 
           echo "=========== RUBY CONFIG.LOG ================"
-          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "config.log"|while read fname; do
+          find ~/.conan/data/openstudio_ruby/2.7.2/$CONAN_USERNAME/testing/build -name "config.log"|while read fname; do
             echo "============== $fname ============"
             cat $fname
             echo ""
             echo ""
             echo ""
-          done
+          done || true
 
           echo "=========== RUBY CONFIG.STATUS ================"
-          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "config.status"|while read fname; do
+          find ~/.conan/data/openstudio_ruby/2.7.2/$CONAN_USERNAME/testing/build -name "config.status"|while read fname; do
             echo "============== $fname ============"
             cat $fname
             echo ""
             echo ""
             echo ""
-          done
+          done || true
