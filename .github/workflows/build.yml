@@ -19,7 +19,7 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        build_name: [GCC-7, GCC-8, GCC-9, GCC-10, GCC-11, Apple-Clang 11, Apple-Clang 12, MSVC-2019, MSVC-2017]
+        build_name: [GCC-7, GCC-8, GCC-9, GCC-10, GCC-11, Apple-Clang 11, Apple-Clang 12, MSVC-2022, MSVC-2019, MSVC-2017]
         include:
         - build_name: GCC-7
           os: ubuntu-18.04
@@ -49,6 +49,10 @@ jobs:
           os: macos-10.15
           compiler: APPLE_CLANG
           version: 12.0
+        - build_name: MSVC-2022
+          os: windows-2022
+          compiler: VISUAL
+          version: 17
         - build_name: MSVC-2019
           os: windows-2019
           compiler: VISUAL
@@ -82,7 +86,7 @@ jobs:
             echo "AS=ml64 -nologo" >> $GITHUB_ENV
           fi
 
-          # Use lowercase based on repository owner, so that NREL -> nrel. 
+          # Use lowercase based on repository owner, so that NREL -> nrel.
           # That should work on forks, while not replacing 'nrel' with '***' everywhere like it does when you set CONAN_USERNAME as a repo secret...
           # We want BPT/CPT to produces openstudio_ruby/2.7.2@<CONAN_USERNAME>/<channel>
           CONAN_USERNAME=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
