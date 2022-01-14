@@ -140,7 +140,10 @@ class OpenstudiorubyConan(ConanFile):
 
         # You CANNOT use bison 3.7.1 as it's stricter and will throw
         # redefinition errors in Ruby' parser.c
-        self.build_requires("bison/3.7.1")
+        # Latest bison with m4/1.4.18
+        # self.build_requires("bison/3.7.1#dcffa3dd9204cb79ac7ca09a7f19bb8b")
+        # The one on NREL (older)
+        self.build_requires("bison/3.7.1#8bba3cd5416cf47dbc99130108ecb67e")
 
     def build(self):
         """
