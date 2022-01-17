@@ -32,15 +32,23 @@ class OpenstudiorubyConan(ConanFile):
     }
     default_options = {x: True for x in options}
 
+    @property
+    def _is_msvc(self):
+        # conan raises an exception if you compare a setting with a value
+        # which is not listed in settings.yml (`msvc` added in 1.40.0)
+        # so use `str` for now...
+        return str(self.settings.compiler) in ['Visual Studio', 'msvc']
+
     def configure(self):
-        if ((self.settings.os == "Windows") and
-           (self.settings.compiler == "Visual Studio")):
+        if (self.settings.os == "Windows"):
             self.output.warn(
-                "Readline (hence GDBM) will not work on MSVC right now")
+                "Readline (hence GDBM) will not work on Windows right now")
             self.options.with_gdbm = False
             # TODO: vcpkg supports readline, see https://github.com/ruby/ruby/blob/1b377b32c8616f85c0a97e68758c5c2db83f2169/.github/workflows/windows.yml#L28
             # But conan readline doesn't support msvc
             self.options.with_readline = False
+
+        if self._is_msvc:
             self.output.warn(
                 "Conan LIBFFI will not allow linking right now with MSVC, "
                 "so temporarilly built it from CMakeLists instead")
