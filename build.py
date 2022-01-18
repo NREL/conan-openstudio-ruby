@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import os
+import textwrap
+import tempfile
+from conans.util.files import save
 from cpt.printer import Printer
 from cpt.ci_manager import CIManager
 from bincrafters import build_template_default
@@ -58,7 +61,19 @@ if __name__ == "__main__":
     #                             "ruby_installer:build_type": "Release",
     #                         })
 
-    builder.run()
+    build_profile_text = textwrap.dedent("""
+        include(default)
+
+        [settings]
+        build_type=Release
+        """)
+
+    tmp = os.path.join(os.path.expanduser("~"), '.conan', 'profiles',
+                       'build_profile_release')
+    abs_profile_build_path = os.path.abspath(tmp)
+    save(abs_profile_build_path, build_profile_text)
+
+    builder.run(base_profile_build_name=abs_profile_build_path)
 
     # Debug
     # try:
