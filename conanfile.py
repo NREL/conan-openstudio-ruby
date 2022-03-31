@@ -84,9 +84,9 @@ class OpenstudiorubyConan(ConanFile):
         """
         Declare required dependencies
         """
-        self.requires("openssl/1.1.1m")  # Doesn't work with 3.x
+        self.requires("openssl/1.1.1n")  # Doesn't work with 3.x
         # Make sure you get a zlib post separation between zlib and minizip
-        self.requires("zlib/1.2.11#683857dbd5377d65f26795d4023858f9")
+        self.requires("zlib/1.2.11#4b38406da00104befece594b529fd155")
 
         if self.options.with_libyaml:
             self.requires("libyaml/0.2.5")
@@ -109,7 +109,7 @@ class OpenstudiorubyConan(ConanFile):
                 self.options["gdbm"].with_readline = True
 
         if self.options.with_readline:
-            self.requires("readline/8.0")
+            self.requires("readline/8.1.2")
             # self.options["readline"].shared = True
             # self.options["readline"].fPIC = True
 
