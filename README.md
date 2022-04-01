@@ -6,9 +6,10 @@ A [conan](https://conan.io/) package to build ruby for [OpenStudio](https://gith
 
 | Artifactory | openstudio_ruby/stable | openstudio_ruby/testing |
 |:--------:|:---------:|:-----------------:|
-|[Download](https://conan.commercialbuildings.dev/ui/repos/tree/General/openstudio%2Fnrel%2Fopenstudio_ruby)|[![openstudio_ruby/stable](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml)|[![openstudio_ruby/testing](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml)|
+|[Download](https://conan.openstudio.net/ui/repos/tree/General/openstudio%2Fnrel%2Fopenstudio_ruby)|[![openstudio_ruby/stable](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml)|[![openstudio_ruby/testing](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/NREL/conan-openstudio-ruby/actions/workflows/build.yml)|
 
 CI is done by Travis for Linux&Mac, and AppVeyor for Windows. To ignore specific commits, please add tags in your commit message such as `[skip ci]` (skip all), `[skip travis]` or `[skip appveyor]`.
+
 
 ## Testing
 
@@ -45,7 +46,7 @@ Steps:
 ```
 conan remote add <REMOTE> <YOUR_BINTRAY_REPO_URL>
 # eg:
-conan remote add nrel https://api.bintray.com/conan/commercialbuilding/nrel
+conan remote add nrel https://conan.openstudio.net/artifactory/api/conan/openstudio
 ```
 
 * Add your API key:

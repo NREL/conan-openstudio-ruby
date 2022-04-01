@@ -109,11 +109,11 @@ jobs:
         env:
           CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }} # github-actions, done to be able to customize on forks
           CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}    # Actual secret
-          CONAN_UPLOAD: ${{ secrets.CONAN_UPLOAD }} # https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio@True@nrel, done as a secret to be able to customize on forks
+          CONAN_UPLOAD: ${{ secrets.CONAN_UPLOAD }} # https://conan.openstudio.net/artifactory/api/conan/openstudio@True@nrel, done as a secret to be able to customize on forks
           CONAN_UPLOAD_ONLY_WHEN_STABLE: 0
           CONAN_STABLE_BRANCH_PATTERN: master
           CONAN_CHANNEL: testing
-          CONAN_REMOTES: https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio@True@nrel,https://bincrafters.jfrog.io/artifactory/api/conan/public-conan@True@bincrafters
+          CONAN_REMOTES: "https://conan.openstudio.net/artifactory/api/conan/openstudio@True@nrel,https://bincrafters.jfrog.io/artifactory/api/conan/public-conan@True@bincrafters"
           CONAN_ARCHS: x86_64   # No need for x86
           CONAN_VISUAL_RUNTIMES: MD,MDd   # Ignoring MT and MTd
         run: |
