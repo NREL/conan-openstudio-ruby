@@ -86,7 +86,7 @@ class OpenstudiorubyConan(ConanFile):
         """
         # Doesn't work with 3.x.
         # Doesn't work on gcc 7 and 8 with 1.1.1n
-        self.requires("openssl/1.1.0l")
+        self.requires("openssl/1.1.1n")
         # Make sure you get a zlib post separation between zlib and minizip
         self.requires("zlib/1.2.11#4b38406da00104befece594b529fd155")
 
