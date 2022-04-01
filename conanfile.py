@@ -32,15 +32,23 @@ class OpenstudiorubyConan(ConanFile):
     }
     default_options = {x: True for x in options}
 
+    @property
+    def _is_msvc(self):
+        # conan raises an exception if you compare a setting with a value
+        # which is not listed in settings.yml (`msvc` added in 1.40.0)
+        # so use `str` for now...
+        return str(self.settings.compiler) in ['Visual Studio', 'msvc']
+
     def configure(self):
-        if ((self.settings.os == "Windows") and
-           (self.settings.compiler == "Visual Studio")):
+        if (self.settings.os == "Windows"):
             self.output.warn(
-                "Readline (hence GDBM) will not work on MSVC right now")
+                "Readline (hence GDBM) will not work on Windows right now")
             self.options.with_gdbm = False
             # TODO: vcpkg supports readline, see https://github.com/ruby/ruby/blob/1b377b32c8616f85c0a97e68758c5c2db83f2169/.github/workflows/windows.yml#L28
             # But conan readline doesn't support msvc
             self.options.with_readline = False
+
+        if self._is_msvc:
             self.output.warn(
                 "Conan LIBFFI will not allow linking right now with MSVC, "
                 "so temporarilly built it from CMakeLists instead")
@@ -77,7 +85,8 @@ class OpenstudiorubyConan(ConanFile):
         Declare required dependencies
         """
         self.requires("openssl/1.1.0l") # fails with 1.1.1h https://github.com/openssl/openssl/issues/3884`
-        self.requires("zlib/1.2.11")
+        # Make sure you get a zlib post separation between zlib and minizip
+        self.requires("zlib/1.2.11#683857dbd5377d65f26795d4023858f9")
 
         if self.options.with_libyaml:
             self.requires("libyaml/0.2.5")
@@ -120,9 +129,7 @@ class OpenstudiorubyConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
-        # TODO: soon, see https://github.com/bincrafters/conan-ruby_installer/pull/8
-        # self.build_requires("ruby_installer/2.7.2@bincrafters/testing")
-        self.build_requires("ruby_installer/2.5.5@bincrafters/stable")
+        self.build_requires("ruby_installer/2.7.3@bincrafters/stable")
 
         # cant use bison/3.5.3 from CCI as it uses m4 which won't build
         # with x86. So use bincrafters' still but explicitly add bin dir
@@ -141,7 +148,10 @@ class OpenstudiorubyConan(ConanFile):
 
         # You CANNOT use bison 3.7.1 as it's stricter and will throw
         # redefinition errors in Ruby' parser.c
-        self.build_requires("bison/3.7.1")
+        # Latest bison with m4/1.4.18
+        # self.build_requires("bison/3.7.1#dcffa3dd9204cb79ac7ca09a7f19bb8b")
+        # The one on NREL (older)
+        self.build_requires("bison/3.7.1#8bba3cd5416cf47dbc99130108ecb67e")
 
     def build(self):
         """
