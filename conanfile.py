@@ -85,10 +85,9 @@ class OpenstudiorubyConan(ConanFile):
         Declare required dependencies
         """
         # Doesn't work with 3.x.
-        # Doesn't work on gcc 7 and 8 with 1.1.1n
+        # Doesn't work on gcc 7 and 8 with 1.1.1n: had to patch it
         self.requires("openssl/1.1.1n")
-        # Make sure you get a zlib post separation between zlib and minizip
-        self.requires("zlib/1.2.11#4b38406da00104befece594b529fd155")
+        self.requires("zlib/1.2.12")
 
         if self.options.with_libyaml:
             self.requires("libyaml/0.2.5")
