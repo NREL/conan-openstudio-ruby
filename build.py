@@ -55,12 +55,17 @@ if __name__ == "__main__":
     )
 
     # There's no reason to use Debug builds of the build_requirements at least
-    builder.update_build_if(lambda build: True,
-                            new_settings={
-                                "bison:build_type": "Release",
-                                "ruby_installer:build_type": "Release",
-                                "m4:build_type": "Release",
-                            })
+    builder.update_build_if(
+        lambda build: True,
+        new_settings={
+            "bison:build_type": "Release",
+            "ruby_installer:build_type": "Release",
+            "m4:build_type": "Release",
+        },
+        new_options={
+            "pcre:with_zlib": False,
+        },
+    )
 
     # This doesn"t work, it doesn't get passed to the docker container
     # build_profile_text = textwrap.dedent("""
