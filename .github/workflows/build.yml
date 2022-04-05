@@ -20,7 +20,7 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        build_name: [GCC-7, GCC-8, GCC-9, GCC-10, GCC-11, Apple-Clang 11, Apple-Clang 12, MSVC-2022, MSVC-2019, MSVC-2017]
+        build_name: [GCC-7, GCC-8, GCC-9, GCC-10, GCC-11, Apple-Clang 11, Apple-Clang 12, MSVC-2022, MSVC-2019]
         include:
         - build_name: GCC-7
           os: ubuntu-18.04
@@ -66,11 +66,6 @@ jobs:
           os: windows-2019
           compiler: VISUAL
           version: 16
-          allow_failure: false
-        - build_name: MSVC-2017
-          os: windows-2016
-          compiler: VISUAL
-          version: 15
           allow_failure: false
 
     steps:
