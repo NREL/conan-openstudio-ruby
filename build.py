@@ -62,9 +62,9 @@ if __name__ == "__main__":
             "ruby_installer:build_type": "Release",
             "m4:build_type": "Release",
         },
-        new_options={
-            "pcre:with_zlib": False,
-        },
+        # new_options={
+        #     "pcre:with_zlib": False,
+        # },
     )
 
     # This doesn"t work, it doesn't get passed to the docker container
