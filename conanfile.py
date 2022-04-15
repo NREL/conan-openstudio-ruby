@@ -152,7 +152,7 @@ class OpenstudiorubyConan(ConanFile):
         # Latest bison with m4/1.4.18
         # self.build_requires("bison/3.7.1#dcffa3dd9204cb79ac7ca09a7f19bb8b")
         # The one on NREL (older)
-        self.build_requires("bison/3.7.1#ad29e804e82c8b6d58765096676b5a5e")
+        self.build_requires("bison/3.7.1")
 
     def build(self):
         """
