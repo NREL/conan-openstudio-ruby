@@ -21,7 +21,7 @@ class TestPackageConan(ConanFile):
         """
         Declare required dependencies for testing
         """
-        self.requires("minizip/1.2.11")  # depends on zlib/1.2.11
+        self.requires("minizip/1.2.12")  # depends on zlib/1.2.12
 
     def build_requirements(self):
         """

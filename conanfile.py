@@ -86,7 +86,7 @@ class OpenstudiorubyConan(ConanFile):
         """
         self.requires("openssl/1.1.0l") # fails with 1.1.1h https://github.com/openssl/openssl/issues/3884`
         # Make sure you get a zlib post separation between zlib and minizip
-        self.requires("zlib/1.2.11#683857dbd5377d65f26795d4023858f9")
+        self.requires("zlib/1.2.12")
 
         if self.options.with_libyaml:
             self.requires("libyaml/0.2.5")
@@ -163,7 +163,13 @@ class OpenstudiorubyConan(ConanFile):
         # for patch in self.conan_data["patches"][self.version]:
         #     tools.patch(**patch)
 
-        cmake = CMake(self)
+        parallel = True
+        if tools.os_info.linux_distro in ["centos"]:
+            # parallel=False required or MFLAGS = -s --jobserver-fds=3,4 -j
+            # is strapped and centos' make is too old to understand
+            parallel = False
+
+        cmake = CMake(self, parallel=parallel)
         cmake.definitions["INTEGRATED_CONAN"] = False
         cmake.configure()
 
