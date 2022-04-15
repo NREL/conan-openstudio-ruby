@@ -64,12 +64,13 @@ class OpenstudiorubyConan(ConanFile):
         # I could let it slide, and hope for the best, but I'm afraid of other
         # incompatibilities, so just raise (which shouldn't happen when trying
         # to install from OpenStudio's cmake)
-        if (self.settings.compiler == 'gcc'):
-            if (self.settings.compiler.libcxx != "libstdc++11"):
-                msg = ("This isn't meant to be compiled with an old "
-                       " GCC ABI (though complation will work), "
-                       "please use settings.compiler.libcxx=libstdc++11")
-                raise ConanInvalidConfiguration(msg)
+        if tools.os_info.linux_distro not in ["centos"]:
+            if (self.settings.compiler == 'gcc'):
+                if (self.settings.compiler.libcxx != "libstdc++11"):
+                    msg = ("This isn't meant to be compiled with an old "
+                           " GCC ABI (though complation will work), "
+                           "please use settings.compiler.libcxx=libstdc++11")
+                    raise ConanInvalidConfiguration(msg)
 
         # I delete the libcxx setting now, so that the package_id isn't
         # calculated taking this into account.
