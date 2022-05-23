@@ -8,7 +8,7 @@ include(ExternalProject)
 
 option(INTEGRATED_CONAN "Use conan integrated into this CMake." ON)
 
-set(OPENSSL_VERSION "1.1.1n")
+set(OPENSSL_VERSION "1.1.1o")
 
 if (INTEGRATED_CONAN)
   ###############################################################################

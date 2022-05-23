@@ -86,7 +86,7 @@ class OpenstudiorubyConan(ConanFile):
         """
         # Doesn't work with 3.x.
         # Doesn't work on gcc 7 and 8 with 1.1.1n: had to patch it
-        self.requires("openssl/1.1.1n")
+        self.requires("openssl/1.1.1o")
         self.requires("zlib/1.2.12")
 
         if self.options.with_libyaml:
