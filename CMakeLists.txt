@@ -241,7 +241,7 @@ if( UNIX )
     )
   endif()
 
-  set(configure_cmd "./configure --with-static-linked-ext --enable-load-relative ${MAC_opts} --disable-install-doc --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install ${CONF_ARGS}")
+  set(configure_cmd "./configure --with-static-linked-ext --enable-load-relative ${MAC_opts} --disable-install-doc cflags=-fPIC --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install ${CONF_ARGS}")
   ExternalProject_Add(Ruby
     # Use official ruby source package to reduce dependencies on autoconf and friends
     URL https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.2.tar.gz
