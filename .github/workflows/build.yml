@@ -87,13 +87,6 @@ jobs:
           conan config set general.revisions_enabled=True
           conan config set general.parallel_download=8
 
-          if [[ "${{ matrix.build_name }}" == 'Apple-Clang 12' ]]; then
-            echo "CONAN_ARCHS=x86_64,armv8" >> $GITHUB_ENV
-          else
-            # No need for x86
-            echo "CONAN_ARCHS=x86_64" >> $GITHUB_ENV
-          fi
-
           # Use lowercase based on repository owner, so that NREL -> nrel.
           # That should work on forks, while not replacing 'nrel' with '***' everywhere like it does when you set CONAN_USERNAME as a repo secret...
           # We want BPT/CPT to produces openstudio_ruby/2.7.2@<CONAN_USERNAME>/<channel>
@@ -111,6 +104,7 @@ jobs:
           CONAN_STABLE_BRANCH_PATTERN: master
           CONAN_CHANNEL: testing
           CONAN_REMOTES: "https://conan.openstudio.net/artifactory/api/conan/openstudio@True@nrel,https://bincrafters.jfrog.io/artifactory/api/conan/public-conan@True@bincrafters"
+          CONAN_ARCHS: x86_64   # No need for x86
           CONAN_VISUAL_RUNTIMES: MD,MDd   # Ignoring MT and MTd
         shell: bash
         run: |
