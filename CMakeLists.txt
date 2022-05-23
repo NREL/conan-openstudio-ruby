@@ -44,10 +44,6 @@ if (INTEGRATED_CONAN)
     URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan)
 
   set(CONAN_BUILD "missing")
-  if (APPLE)
-    list(APPEND CONAN_BUILD "zlib")
-  endif()
-  list(APPEND CONAN_OPTIONS "zlib:minizip=True")
   list(APPEND CONAN_OPTIONS "gdbm:libgdbm_compat=True")
   list(APPEND CONAN_OPTIONS "gdbm:with_libiconv=False")
   list(APPEND CONAN_OPTIONS "gdbm:with_nls=False")
@@ -66,7 +62,7 @@ if (INTEGRATED_CONAN)
   if(NOT MSVC)
     set(CONAN_FFI "libffi/3.4.2")
     set(CONAN_LIBYAML "libyaml/0.2.5")
-    set(CONAN_READLINE "readline/8.0")
+    set(CONAN_READLINE "readline/8.1.2")
     list(APPEND CONAN_OPTIONS "gdbm:with_readline=True")
     set(CONAN_GDBM "gdbm/1.19")
     set(CONAN_GMP "gmp/6.2.1")
@@ -75,10 +71,8 @@ if (INTEGRATED_CONAN)
   conan_cmake_run(REQUIRES
     openssl/${OPENSSL_VERSION}
     ruby_installer/2.7.3@bincrafters/stable
-    # cant use bison/3.5.3 from CCI as it uses m4 which won't build with x86. So use bincrafters' still but explicitly add bin dir to PATH later
-    # bison_installer/3.3.2@bincrafters/stable
     bison/3.7.6
-    zlib/1.2.11
+    zlib/1.2.12
     ${CONAN_FFI}
     ${CONAN_LIBYAML}
     ${CONAN_READLINE}
