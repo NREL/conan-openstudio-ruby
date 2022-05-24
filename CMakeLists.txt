@@ -8,7 +8,7 @@ include(ExternalProject)
 
 option(INTEGRATED_CONAN "Use conan integrated into this CMake." ON)
 
-set(OPENSSL_VERSION "1.1.0l")
+set(OPENSSL_VERSION "1.1.1o")
 
 if (INTEGRATED_CONAN)
   ###############################################################################
@@ -34,7 +34,7 @@ if (INTEGRATED_CONAN)
 
   message("RUNNING CONAN")
 
-  conan_check(VERSION 1.30.0 REQUIRED)
+  conan_check(VERSION 1.43.0 REQUIRED)
 
   # Add NREL remote and place it first in line, since we vendored dependencies to NREL's repo, they will be picked first
   conan_add_remote(NAME nrel INDEX 0
@@ -44,10 +44,6 @@ if (INTEGRATED_CONAN)
     URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan)
 
   set(CONAN_BUILD "missing")
-  if (APPLE)
-    list(APPEND CONAN_BUILD "zlib")
-  endif()
-  list(APPEND CONAN_OPTIONS "zlib:minizip=True")
   list(APPEND CONAN_OPTIONS "gdbm:libgdbm_compat=True")
   list(APPEND CONAN_OPTIONS "gdbm:with_libiconv=False")
   list(APPEND CONAN_OPTIONS "gdbm:with_nls=False")
@@ -64,21 +60,19 @@ if (INTEGRATED_CONAN)
   #list(APPEND CONAN_OPTIONS "libffi:shared=False")
 
   if(NOT MSVC)
-    set(CONAN_FFI "libffi/3.3")
+    set(CONAN_FFI "libffi/3.4.2")
     set(CONAN_LIBYAML "libyaml/0.2.5")
-    set(CONAN_READLINE "readline/8.0")
+    set(CONAN_READLINE "readline/8.1.2")
     list(APPEND CONAN_OPTIONS "gdbm:with_readline=True")
-    set(CONAN_GDBM "gdbm/1.18.1")
-    set(CONAN_GMP "gmp/6.2.0")
+    set(CONAN_GDBM "gdbm/1.19")
+    set(CONAN_GMP "gmp/6.2.1")
   endif()
 
   conan_cmake_run(REQUIRES
     openssl/${OPENSSL_VERSION}
     ruby_installer/2.7.3@bincrafters/stable
-    # cant use bison/3.5.3 from CCI as it uses m4 which won't build with x86. So use bincrafters' still but explicitly add bin dir to PATH later
-    # bison_installer/3.3.2@bincrafters/stable
-    bison/3.7.1
-    zlib/1.2.11
+    bison/3.7.6
+    zlib/1.2.12
     ${CONAN_FFI}
     ${CONAN_LIBYAML}
     ${CONAN_READLINE}
@@ -222,14 +216,33 @@ if( UNIX )
   # brew install autoconf automake libtool
   # brew link autoconf automake libtool
 
+  if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+    set(patchCommand PATCH_COMMAND pwd
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0003-YYUSE.patch ${EXTRA_PATCH}
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0004-GCC7_8_fix_link_flags.patch
+    )
+  else()
+    set(patchCommand PATCH_COMMAND pwd
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0003-YYUSE.patch ${EXTRA_PATCH}
+      # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)
+      # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
+    )
+  endif()
+
   set(configure_cmd "./configure --with-static-linked-ext --enable-load-relative ${MAC_opts} --disable-install-doc cflags=-fPIC --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install ${CONF_ARGS}")
   ExternalProject_Add(Ruby
     # Use official ruby source package to reduce dependencies on autoconf and friends
     URL https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.2.tar.gz
     URL_HASH SHA256=6e5706d0d4ee4e1e2f883db9d768586b4d06567debea353c796ec45e8321c3d4
 
-    # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)
-    PATCH_COMMAND pwd && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch# && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
+    ${patchCommand}
+
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND pwd && sh -c "pwd && echo '===============  CONFIGURE ============' && echo 'Calling: ${configure_cmd}' && ${configure_cmd}"
     #    BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} Use default BUILD_COMMAND for now
@@ -290,6 +303,7 @@ else()
   # tool dependencies
   ExternalProject_Add(Ruby
     #DEPENDS GetTools FFI
+    DEPENDS GetTools
     #    URL https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.5.tar.gz
     #    URL_HASH SHA256=28a945fdf340e6ba04fc890b98648342e3cccfd6d223a48f3810572f11b2514c
     URL https://codeload.github.com/ruby/ruby/tar.gz/v2_7_2
@@ -301,6 +315,7 @@ else()
                && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.272.patch  # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
                && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0001-patch-to-support-version-ranges-for-MSVC.patch
                && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
+               && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0003-YYUSE.patch
                && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
     CONFIGURE_COMMAND ""
     BUILD_COMMAND cmd /C "${CMAKE_BINARY_DIR}/build_ruby_$<CONFIG>.bat"

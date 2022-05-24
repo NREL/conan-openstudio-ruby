@@ -84,8 +84,9 @@ class OpenstudiorubyConan(ConanFile):
         """
         Declare required dependencies
         """
-        self.requires("openssl/1.1.0l") # fails with 1.1.1h https://github.com/openssl/openssl/issues/3884`
-        # Make sure you get a zlib post separation between zlib and minizip
+        # Doesn't work with 3.x.
+        # Doesn't work on gcc 7 and 8 with 1.1.1n: had to patch it
+        self.requires("openssl/1.1.1o")
         self.requires("zlib/1.2.12")
 
         if self.options.with_libyaml:
@@ -94,18 +95,12 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["libyaml"].fPIC = True
 
         if self.options.with_libffi:
-            self.requires("libffi/3.3")
+            self.requires("libffi/3.4.2")
             # self.options["libffi"].shared = False
             # self.options["libffi"].fPIC = True
 
         if self.options.with_gdbm:
-            # NOTE: I have uploaded the gdbm/1.18.1 to the NREL remote
-            # with the status of this PR https://github.com/conan-io/conan-center-index/pull/2180
-            # at SHA https://github.com/conan-io/conan-center-index/pull/2180/commits/fad6b09ec294e8c0d186caea0c38bd6941dc0343
-            # So for now that'll only work if you have the NREL remote **before**
-            # the conan-center one...
-            # `conan remote update nrel https://api.bintray.com/conan/commercialbuilding/nrel --insert 0`
-            self.requires("gdbm/1.18.1")
+            self.requires("gdbm/1.19")
             # self.options["gdbm"].shared = False
             # self.options["gdbm"].fPIC = True
             self.options["gdbm"].libgdbm_compat = True
@@ -115,12 +110,12 @@ class OpenstudiorubyConan(ConanFile):
                 self.options["gdbm"].with_readline = True
 
         if self.options.with_readline:
-            self.requires("readline/8.0")
+            self.requires("readline/8.1.2")
             # self.options["readline"].shared = True
             # self.options["readline"].fPIC = True
 
         if self.options.with_gmp:
-            self.requires("gmp/6.2.0")
+            self.requires("gmp/6.2.1")
 
     def build_requirements(self):
         """
@@ -150,8 +145,7 @@ class OpenstudiorubyConan(ConanFile):
         # redefinition errors in Ruby' parser.c
         # Latest bison with m4/1.4.18
         # self.build_requires("bison/3.7.1#dcffa3dd9204cb79ac7ca09a7f19bb8b")
-        # The one on NREL (older)
-        self.build_requires("bison/3.7.1#8bba3cd5416cf47dbc99130108ecb67e")
+        self.build_requires("bison/3.7.6")
 
     def build(self):
         """
