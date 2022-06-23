@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 from cpt.printer import Printer
 from cpt.ci_manager import CIManager
 from bincrafters import build_template_default
 
-# Debug
-import glob as gb
 
 if __name__ == "__main__":
 
@@ -52,11 +49,14 @@ if __name__ == "__main__":
     )
 
     # There's no reason to use Debug builds of the build_requirements at least
-    # builder.update_build_if(lambda build: True,
-    #                         new_settings={
-    #                             "bison:build_type": "Release",
-    #                             "ruby_installer:build_type": "Release",
-    #                         })
+    builder.update_build_if(
+        lambda build: True,
+        new_settings={
+            "bison:build_type": "Release",
+            "ruby_installer:build_type": "Release",
+            "m4:build_type": "Release",
+        },
+    )
 
     builder.run()
 
@@ -64,6 +64,7 @@ if __name__ == "__main__":
     # try:
     #     builder.run()
     # except:
+    #     import glob as gb
     #     for p in gb.glob(os.path.join(os.path.expanduser("~"), ".conan",
     #                                   "data", "bison", "**", "config.log"),
     #                      recursive=True):
@@ -75,4 +76,3 @@ if __name__ == "__main__":
     #         print("--------------------------------------------------------")
     #         print(content)
     #         print("========================================================")
-

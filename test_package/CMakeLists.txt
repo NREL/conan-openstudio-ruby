@@ -68,6 +68,8 @@ get_filename_component(SWIG_BIN_DIR ${SWIG_EXECUTABLE} DIRECTORY)
 set(SWIG_DIR "${SWIG_BIN_DIR}/swiglib")
 message(STATUS "set SWIG_DIR=${SWIG_DIR}")
 
+message(WARNING "SWIG_EXECUTABLE=${SWIG_EXECUTABLE}, SWIG_LIB=${SWIG_LIB}")
+
 #######################################################################
 #                               G E M S                               #
 #######################################################################

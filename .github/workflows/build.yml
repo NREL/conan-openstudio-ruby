@@ -20,7 +20,7 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        build_name: [GCC-7, GCC-8, GCC-9, GCC-10, GCC-11, Apple-Clang 11, Apple-Clang 12, MSVC-2022, MSVC-2019, MSVC-2017]
+        build_name: [GCC-7, GCC-8, GCC-9, GCC-10, GCC-11, Apple-Clang 11, Apple-Clang 12, MSVC-2022, MSVC-2019]
         include:
         - build_name: GCC-7
           os: ubuntu-18.04
@@ -67,11 +67,6 @@ jobs:
           compiler: VISUAL
           version: 16
           allow_failure: false
-        - build_name: MSVC-2017
-          os: windows-2016
-          compiler: VISUAL
-          version: 15
-          allow_failure: false
 
     steps:
       - uses: actions/checkout@v2
@@ -92,11 +87,6 @@ jobs:
           conan config set general.revisions_enabled=True
           conan config set general.parallel_download=8
 
-          if [[ "${{ matrix.build_name }}" == 'MSVC-2017' ]]; then
-            # For some reason, it's picking up ml.exe (x86) and fails to assemble coroutine\Context.asm
-            echo "AS=ml64 -nologo" >> $GITHUB_ENV
-          fi
-
           # Use lowercase based on repository owner, so that NREL -> nrel.
           # That should work on forks, while not replacing 'nrel' with '***' everywhere like it does when you set CONAN_USERNAME as a repo secret...
           # We want BPT/CPT to produces openstudio_ruby/2.7.2@<CONAN_USERNAME>/<channel>
@@ -116,8 +106,8 @@ jobs:
           CONAN_REMOTES: "https://conan.openstudio.net/artifactory/api/conan/openstudio@True@nrel,https://bincrafters.jfrog.io/artifactory/api/conan/public-conan@True@bincrafters"
           CONAN_ARCHS: x86_64   # No need for x86
           CONAN_VISUAL_RUNTIMES: MD,MDd   # Ignoring MT and MTd
+        shell: bash
         run: |
-          conan remote add --insert 0 -f nrel https://conan.commercialbuildings.dev/artifactory/api/conan/openstudio
           bincrafters-package-tools --auto
 
       - name: Debug
@@ -128,23 +118,23 @@ jobs:
           set -x
 
           echo "=========== MAKEFILE ================"
-          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "Makefile"|while read fname; do
+          find ~/.conan/data/openstudio_ruby/2.7.2/$CONAN_USERNAME/testing/build -name "Makefile"|while read fname; do
             echo "============== $fname ============"
             cat $fname
             echo ""
             echo ""
             echo ""
-          done
+          done || true
 
           #if [[ "$(uname -s)" == 'Darwin' ]]; then
           echo "=========== RUBY MKMF.LOG ================"
-          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "mkmf.log"|while read fname; do
+          find ~/.conan/data/openstudio_ruby/2.7.2/$CONAN_USERNAME/testing/build -name "mkmf.log"|while read fname; do
             echo "============== $fname ============"
             cat $fname
             echo ""
             echo ""
             echo ""
-          done
+          done || true
 
           #echo "======== LISTING THE GDBM LIB FOLDERS ========"
           #find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'lib' -type 'd'|while read dirname; do
@@ -153,7 +143,7 @@ jobs:
           #  echo ""
           #  echo ""
           #  echo ""
-          #done
+          #done || true
 
           #echo "======== LISTING THE GDBM INCLUDE FOLDERS ========"
           #find ~/.conan/data/gdbm/1.18.1/_/_/package/ -name 'include' -type 'd'|while read dirname; do
@@ -162,22 +152,22 @@ jobs:
           #  echo ""
           #  echo ""
           #  echo ""
-          #done
+          #done || true
 
           echo "=========== RUBY CONFIG.LOG ================"
-          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "config.log"|while read fname; do
+          find ~/.conan/data/openstudio_ruby/2.7.2/$CONAN_USERNAME/testing/build -name "config.log"|while read fname; do
             echo "============== $fname ============"
             cat $fname
             echo ""
             echo ""
             echo ""
-          done
+          done || true
 
           echo "=========== RUBY CONFIG.STATUS ================"
-          find ~/.conan/data/openstudio_ruby/2.7.2/nrel/testing/build -name "config.status"|while read fname; do
+          find ~/.conan/data/openstudio_ruby/2.7.2/$CONAN_USERNAME/testing/build -name "config.status"|while read fname; do
             echo "============== $fname ============"
             cat $fname
             echo ""
             echo ""
             echo ""
-          done
+          done || true
