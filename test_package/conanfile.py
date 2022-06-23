@@ -64,7 +64,7 @@ class TestPackageConan(ConanFile):
 
             rel_path = os.path.relpath(test_file, start=self.build_folder)
 
-            with open(test_file, 'r') as f:
+            with open(test_file, 'r', encoding='utf-8') as f:
                 content = f.read()
             single_tests = re_test.findall(content)
             if not single_tests:
