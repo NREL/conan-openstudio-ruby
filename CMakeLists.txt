@@ -3,92 +3,12 @@ cmake_policy(SET CMP0048 NEW)
 
 project(openstudio_ruby)
 
-
 include(ExternalProject)
 
-option(INTEGRATED_CONAN "Use conan integrated into this CMake." ON)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 
-set(OPENSSL_VERSION "1.1.1o")
-
-if (INTEGRATED_CONAN)
-  ###############################################################################
-  # Conan
-
-  # Download automatically, you can also just copy the conan.cmake file
-  set(CMAKE_CONAN_EXPECTED_HASH 52a255a933397fdce3d0937f9c737e98)
-  set(CMAKE_CONAN_VERSION "0.17.0")
-
-  if(EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-    file(MD5 "${CMAKE_BINARY_DIR}/conan.cmake" CMAKE_CONAN_HASH)
-  endif()
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake" OR NOT "${CMAKE_CONAN_HASH}" MATCHES "${CMAKE_CONAN_EXPECTED_HASH}")
-    # Put it in CMAKE_BINARY_DIR so we don't end up with two when building OpenStudioApplication
-    message(STATUS "openstudio: Downloading conan.cmake ${CMAKE_CONAN_VERSION} from https://github.com/conan-io/cmake-conan")
-    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/${CMAKE_CONAN_VERSION}/conan.cmake"
-       "${CMAKE_BINARY_DIR}/conan.cmake")
-  else()
-    message(STATUS "openstudio: using existing conan.cmake")
-  endif()
-
-  include(${CMAKE_BINARY_DIR}/conan.cmake)
-
-  message("RUNNING CONAN")
-
-  conan_check(VERSION 1.43.0 REQUIRED)
-
-  # Add NREL remote and place it first in line, since we vendored dependencies to NREL's repo, they will be picked first
-  conan_add_remote(NAME nrel INDEX 0
-    URL https://conan.openstudio.net/artifactory/api/conan/openstudio)
-
-  conan_add_remote(NAME bincrafters
-    URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan)
-
-  set(CONAN_BUILD "missing")
-  list(APPEND CONAN_OPTIONS "gdbm:libgdbm_compat=True")
-  list(APPEND CONAN_OPTIONS "gdbm:with_libiconv=False")
-  list(APPEND CONAN_OPTIONS "gdbm:with_nls=False")
-
-  # Passing shared=False is fine (but also already the default)
-  # Passing fPIC=True is already the default on Unix, and doesn't exist on Windows (options is deleted in most recipes)
-  #list(APPEND CONAN_OPTIONS "libyaml:fPIC=True")
-  #list(APPEND CONAN_OPTIONS "libyaml:shared=False")
-  #list(APPEND CONAN_OPTIONS "gdbm:fPIC=True")
-  #list(APPEND CONAN_OPTIONS "gdbm:shared=False")
-  #list(APPEND CONAN_OPTIONS "readline:fPIC=True")
-  #list(APPEND CONAN_OPTIONS "readline:shared=False")
-  #list(APPEND CONAN_OPTIONS "fPIC=True")
-  #list(APPEND CONAN_OPTIONS "libffi:shared=False")
-
-  if(NOT MSVC)
-    set(CONAN_FFI "libffi/3.4.2")
-    set(CONAN_LIBYAML "libyaml/0.2.5")
-    set(CONAN_READLINE "readline/8.1.2")
-    list(APPEND CONAN_OPTIONS "gdbm:with_readline=True")
-    set(CONAN_GDBM "gdbm/1.19")
-    set(CONAN_GMP "gmp/6.2.1")
-  endif()
-
-  conan_cmake_run(REQUIRES
-    openssl/${OPENSSL_VERSION}
-    ruby_installer/2.7.3@bincrafters/stable
-    bison/3.7.6
-    zlib/1.2.12
-    ${CONAN_FFI}
-    ${CONAN_LIBYAML}
-    ${CONAN_READLINE}
-    ${CONAN_GDBM}
-    ${CONAN_GMP}
-
-    BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
-    GENERATORS cmake_find_package
-    BUILD ${CONAN_BUILD}
-    OPTIONS ${CONAN_OPTIONS}
-  )
-else()
-  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-endif()
-
-
+# OPENSSL_VERSION is now set via conanfile.py
+message(AUTHOR_WARNING "OPENSSL_VERSION=${OPENSSL_VERSION}")
 
 find_package(Git)
 if(NOT GIT_FOUND)
