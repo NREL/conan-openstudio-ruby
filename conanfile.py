@@ -64,12 +64,13 @@ class OpenstudiorubyConan(ConanFile):
         # I could let it slide, and hope for the best, but I'm afraid of other
         # incompatibilities, so just raise (which shouldn't happen when trying
         # to install from OpenStudio's cmake)
-        if (self.settings.compiler == 'gcc'):
-            if (self.settings.compiler.libcxx != "libstdc++11"):
-                msg = ("This isn't meant to be compiled with an old "
-                       " GCC ABI (though complation will work), "
-                       "please use settings.compiler.libcxx=libstdc++11")
-                raise ConanInvalidConfiguration(msg)
+        if tools.os_info.linux_distro not in ["centos"]:
+            if (self.settings.compiler == 'gcc'):
+                if (self.settings.compiler.libcxx != "libstdc++11"):
+                    msg = ("This isn't meant to be compiled with an old "
+                           " GCC ABI (though complation will work), "
+                           "please use settings.compiler.libcxx=libstdc++11")
+                    raise ConanInvalidConfiguration(msg)
 
         # I delete the libcxx setting now, so that the package_id isn't
         # calculated taking this into account.
@@ -124,7 +125,7 @@ class OpenstudiorubyConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
-        self.build_requires("ruby_installer/2.7.3@bincrafters/stable")
+        self.build_requires("ruby_installer/2.7.3@nrel/stable")
 
         # cant use bison/3.5.3 from CCI as it uses m4 which won't build
         # with x86. So use bincrafters' still but explicitly add bin dir
@@ -157,7 +158,13 @@ class OpenstudiorubyConan(ConanFile):
         # for patch in self.conan_data["patches"][self.version]:
         #     tools.patch(**patch)
 
-        cmake = CMake(self)
+        parallel = True
+        if tools.os_info.linux_distro in ["centos"]:
+            # parallel=False required or MFLAGS = -s --jobserver-fds=3,4 -j
+            # is strapped and centos' make is too old to understand
+            parallel = False
+
+        cmake = CMake(self, parallel=parallel)
         cmake.definitions["INTEGRATED_CONAN"] = False
         cmake.configure()
 
