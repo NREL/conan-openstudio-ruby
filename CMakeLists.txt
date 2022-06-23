@@ -136,7 +136,7 @@ if( UNIX )
   # brew install autoconf automake libtool
   # brew link autoconf automake libtool
 
-  if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+  if(CMAKE_COMPILER_IS_GNUCXX)
     set(patchCommand PATCH_COMMAND pwd
       && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
       && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
