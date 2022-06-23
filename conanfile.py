@@ -165,7 +165,7 @@ class OpenstudiorubyConan(ConanFile):
             parallel = False
 
         cmake = CMake(self, parallel=parallel)
-        cmake.definitions["INTEGRATED_CONAN"] = False
+        cmake.definitions["OPENSSL_VERSION"] = self.deps_cpp_info["openssl"].version
         cmake.configure()
 
         # On Windows the build never succeeds on the first try. Much effort
