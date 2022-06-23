@@ -64,12 +64,13 @@ class OpenstudiorubyConan(ConanFile):
         # I could let it slide, and hope for the best, but I'm afraid of other
         # incompatibilities, so just raise (which shouldn't happen when trying
         # to install from OpenStudio's cmake)
-        if (self.settings.compiler == 'gcc'):
-            if (self.settings.compiler.libcxx != "libstdc++11"):
-                msg = ("This isn't meant to be compiled with an old "
-                       " GCC ABI (though complation will work), "
-                       "please use settings.compiler.libcxx=libstdc++11")
-                raise ConanInvalidConfiguration(msg)
+        if tools.os_info.linux_distro not in ["centos"]:
+            if (self.settings.compiler == 'gcc'):
+                if (self.settings.compiler.libcxx != "libstdc++11"):
+                    msg = ("This isn't meant to be compiled with an old "
+                           " GCC ABI (though complation will work), "
+                           "please use settings.compiler.libcxx=libstdc++11")
+                    raise ConanInvalidConfiguration(msg)
 
         # I delete the libcxx setting now, so that the package_id isn't
         # calculated taking this into account.
@@ -84,9 +85,10 @@ class OpenstudiorubyConan(ConanFile):
         """
         Declare required dependencies
         """
-        self.requires("openssl/1.1.0l") # fails with 1.1.1h https://github.com/openssl/openssl/issues/3884`
-        # Make sure you get a zlib post separation between zlib and minizip
-        self.requires("zlib/1.2.11#683857dbd5377d65f26795d4023858f9")
+        # Doesn't work with 3.x.
+        # Doesn't work on gcc 7 and 8 with 1.1.1n: had to patch it
+        self.requires("openssl/1.1.1o")
+        self.requires("zlib/1.2.12")
 
         if self.options.with_libyaml:
             self.requires("libyaml/0.2.5")
@@ -94,18 +96,12 @@ class OpenstudiorubyConan(ConanFile):
             # self.options["libyaml"].fPIC = True
 
         if self.options.with_libffi:
-            self.requires("libffi/3.3")
+            self.requires("libffi/3.4.2")
             # self.options["libffi"].shared = False
             # self.options["libffi"].fPIC = True
 
         if self.options.with_gdbm:
-            # NOTE: I have uploaded the gdbm/1.18.1 to the NREL remote
-            # with the status of this PR https://github.com/conan-io/conan-center-index/pull/2180
-            # at SHA https://github.com/conan-io/conan-center-index/pull/2180/commits/fad6b09ec294e8c0d186caea0c38bd6941dc0343
-            # So for now that'll only work if you have the NREL remote **before**
-            # the conan-center one...
-            # `conan remote update nrel https://api.bintray.com/conan/commercialbuilding/nrel --insert 0`
-            self.requires("gdbm/1.18.1")
+            self.requires("gdbm/1.19")
             # self.options["gdbm"].shared = False
             # self.options["gdbm"].fPIC = True
             self.options["gdbm"].libgdbm_compat = True
@@ -115,12 +111,12 @@ class OpenstudiorubyConan(ConanFile):
                 self.options["gdbm"].with_readline = True
 
         if self.options.with_readline:
-            self.requires("readline/8.0")
+            self.requires("readline/8.1.2")
             # self.options["readline"].shared = True
             # self.options["readline"].fPIC = True
 
         if self.options.with_gmp:
-            self.requires("gmp/6.2.0")
+            self.requires("gmp/6.2.1")
 
     def build_requirements(self):
         """
@@ -129,7 +125,7 @@ class OpenstudiorubyConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
-        self.build_requires("ruby_installer/2.7.3@bincrafters/stable")
+        self.build_requires("ruby_installer/2.7.3@nrel/stable")
 
         # cant use bison/3.5.3 from CCI as it uses m4 which won't build
         # with x86. So use bincrafters' still but explicitly add bin dir
@@ -150,8 +146,7 @@ class OpenstudiorubyConan(ConanFile):
         # redefinition errors in Ruby' parser.c
         # Latest bison with m4/1.4.18
         # self.build_requires("bison/3.7.1#dcffa3dd9204cb79ac7ca09a7f19bb8b")
-        # The one on NREL (older)
-        self.build_requires("bison/3.7.1#8bba3cd5416cf47dbc99130108ecb67e")
+        self.build_requires("bison/3.7.6")
 
     def build(self):
         """
@@ -163,8 +158,14 @@ class OpenstudiorubyConan(ConanFile):
         # for patch in self.conan_data["patches"][self.version]:
         #     tools.patch(**patch)
 
-        cmake = CMake(self)
-        cmake.definitions["INTEGRATED_CONAN"] = False
+        parallel = True
+        if tools.os_info.linux_distro in ["centos"]:
+            # parallel=False required or MFLAGS = -s --jobserver-fds=3,4 -j
+            # is strapped and centos' make is too old to understand
+            parallel = False
+
+        cmake = CMake(self, parallel=parallel)
+        cmake.definitions["OPENSSL_VERSION"] = self.deps_cpp_info["openssl"].version
         cmake.configure()
 
         # On Windows the build never succeeds on the first try. Much effort

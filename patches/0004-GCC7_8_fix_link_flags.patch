@@ -1,0 +1,28 @@
+diff --git a/template/Makefile.in b/template/Makefile.in
+index 3845f02..5822e80 100644
+--- a/template/Makefile.in
++++ b/template/Makefile.in
+@@ -271,7 +271,22 @@ miniruby$(EXEEXT):
+ $(PROGRAM):
+ 		@$(RM) $@
+ 		$(ECHO) linking $@
+-		$(Q) $(PURIFY) $(CC) $(LDFLAGS) $(XLDFLAGS) $(MAINOBJ) $(EXTOBJS) $(LIBRUBYARG) $(MAINLIBS) $(LIBS) $(EXTLIBS) $(OUTFLAG)$@
++		$(ECHO) Q = $(Q)
++		$(ECHO) PURIFY = $(PURIFY)
++		$(ECHO) CC = $(CC)
++		$(ECHO) LDFLAGS = $(LDFLAGS)
++		$(ECHO) XLDFLAGS = $(XLDFLAGS)
++		$(ECHO) MAINOBJ = $(MAINOBJ)
++		$(ECHO) EXTOBJS = $(EXTOBJS)
++		$(ECHO) LIBRUBYARG = $(LIBRUBYARG)
++		$(ECHO) MAINLIBS = $(MAINLIBS)
++		$(ECHO) LIBS = $(LIBS)
++		$(ECHO) EXTLIBS = $(EXTLIBS)
++		$(ECHO) OUTFLAG = $(OUTFLAG)
++		$(ECHO) POSTLINK = $(POSTLINK)
++		$(ECHO) ORIGINAL LINK FLAGS =  $(LIBRUBYARG) $(MAINLIBS) $(LIBS) $(EXTLIBS)
++		$(ECHO) NEW LINK FLAGS = -Wl,-rpath,$(libdir) -lruby-static -lz -lrt -lgmp -ldl -lcrypt -lm -lanl -lssl -lcrypto -lreadline -lncurses -lgdbm_compat -lgdbm -lffi -lutil -lyaml -pthread
++		$(Q) $(PURIFY) $(CC) $(LDFLAGS) $(XLDFLAGS) $(MAINOBJ) $(EXTOBJS) -Wl,-rpath,$(libdir) -lruby-static -lz -lrt -lgmp -ldl -lcrypt -lm -lanl -lssl -lcrypto -lreadline -lncurses -lgdbm_compat -lgdbm -lffi -lutil -lyaml -pthread $(OUTFLAG)$@
+ 		$(Q) $(POSTLINK)
+ 
+ PRE_LIBRUBY_UPDATE = [ -n "$(LIBRUBY_SO_UPDATE)" ] || $(gnumake:yes=exec) $(RM) $(LIBRUBY_EXTS)

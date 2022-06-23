@@ -3,98 +3,12 @@ cmake_policy(SET CMP0048 NEW)
 
 project(openstudio_ruby)
 
-
 include(ExternalProject)
 
-option(INTEGRATED_CONAN "Use conan integrated into this CMake." ON)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 
-set(OPENSSL_VERSION "1.1.0l")
-
-if (INTEGRATED_CONAN)
-  ###############################################################################
-  # Conan
-
-  # Download automatically, you can also just copy the conan.cmake file
-  set(CMAKE_CONAN_EXPECTED_HASH 52a255a933397fdce3d0937f9c737e98)
-  set(CMAKE_CONAN_VERSION "0.17.0")
-
-  if(EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-    file(MD5 "${CMAKE_BINARY_DIR}/conan.cmake" CMAKE_CONAN_HASH)
-  endif()
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake" OR NOT "${CMAKE_CONAN_HASH}" MATCHES "${CMAKE_CONAN_EXPECTED_HASH}")
-    # Put it in CMAKE_BINARY_DIR so we don't end up with two when building OpenStudioApplication
-    message(STATUS "openstudio: Downloading conan.cmake ${CMAKE_CONAN_VERSION} from https://github.com/conan-io/cmake-conan")
-    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/${CMAKE_CONAN_VERSION}/conan.cmake"
-       "${CMAKE_BINARY_DIR}/conan.cmake")
-  else()
-    message(STATUS "openstudio: using existing conan.cmake")
-  endif()
-
-  include(${CMAKE_BINARY_DIR}/conan.cmake)
-
-  message("RUNNING CONAN")
-
-  conan_check(VERSION 1.30.0 REQUIRED)
-
-  # Add NREL remote and place it first in line, since we vendored dependencies to NREL's repo, they will be picked first
-  conan_add_remote(NAME nrel INDEX 0
-    URL https://conan.openstudio.net/artifactory/api/conan/openstudio)
-
-  conan_add_remote(NAME bincrafters
-    URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan)
-
-  set(CONAN_BUILD "missing")
-  if (APPLE)
-    list(APPEND CONAN_BUILD "zlib")
-  endif()
-  list(APPEND CONAN_OPTIONS "zlib:minizip=True")
-  list(APPEND CONAN_OPTIONS "gdbm:libgdbm_compat=True")
-  list(APPEND CONAN_OPTIONS "gdbm:with_libiconv=False")
-  list(APPEND CONAN_OPTIONS "gdbm:with_nls=False")
-
-  # Passing shared=False is fine (but also already the default)
-  # Passing fPIC=True is already the default on Unix, and doesn't exist on Windows (options is deleted in most recipes)
-  #list(APPEND CONAN_OPTIONS "libyaml:fPIC=True")
-  #list(APPEND CONAN_OPTIONS "libyaml:shared=False")
-  #list(APPEND CONAN_OPTIONS "gdbm:fPIC=True")
-  #list(APPEND CONAN_OPTIONS "gdbm:shared=False")
-  #list(APPEND CONAN_OPTIONS "readline:fPIC=True")
-  #list(APPEND CONAN_OPTIONS "readline:shared=False")
-  #list(APPEND CONAN_OPTIONS "fPIC=True")
-  #list(APPEND CONAN_OPTIONS "libffi:shared=False")
-
-  if(NOT MSVC)
-    set(CONAN_FFI "libffi/3.3")
-    set(CONAN_LIBYAML "libyaml/0.2.5")
-    set(CONAN_READLINE "readline/8.0")
-    list(APPEND CONAN_OPTIONS "gdbm:with_readline=True")
-    set(CONAN_GDBM "gdbm/1.18.1")
-    set(CONAN_GMP "gmp/6.2.0")
-  endif()
-
-  conan_cmake_run(REQUIRES
-    openssl/${OPENSSL_VERSION}
-    ruby_installer/2.7.3@bincrafters/stable
-    # cant use bison/3.5.3 from CCI as it uses m4 which won't build with x86. So use bincrafters' still but explicitly add bin dir to PATH later
-    # bison_installer/3.3.2@bincrafters/stable
-    bison/3.7.1
-    zlib/1.2.11
-    ${CONAN_FFI}
-    ${CONAN_LIBYAML}
-    ${CONAN_READLINE}
-    ${CONAN_GDBM}
-    ${CONAN_GMP}
-
-    BASIC_SETUP CMAKE_TARGETS NO_OUTPUT_DIRS
-    GENERATORS cmake_find_package
-    BUILD ${CONAN_BUILD}
-    OPTIONS ${CONAN_OPTIONS}
-  )
-else()
-  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-endif()
-
-
+# OPENSSL_VERSION is now set via conanfile.py
+message(AUTHOR_WARNING "OPENSSL_VERSION=${OPENSSL_VERSION}")
 
 find_package(Git)
 if(NOT GIT_FOUND)
@@ -222,14 +136,33 @@ if( UNIX )
   # brew install autoconf automake libtool
   # brew link autoconf automake libtool
 
-  set(configure_cmd "./configure --with-static-linked-ext --enable-load-relative ${MAC_opts} --disable-install-doc --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install ${CONF_ARGS}")
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    set(patchCommand PATCH_COMMAND pwd
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0003-YYUSE.patch ${EXTRA_PATCH}
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0004-GCC7_8_fix_link_flags.patch
+    )
+  else()
+    set(patchCommand PATCH_COMMAND pwd
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0003-YYUSE.patch ${EXTRA_PATCH}
+      # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)
+      # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
+    )
+  endif()
+
+  set(configure_cmd "./configure --with-static-linked-ext --enable-load-relative ${MAC_opts} --disable-install-doc cflags=-fPIC --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install ${CONF_ARGS}")
   ExternalProject_Add(Ruby
     # Use official ruby source package to reduce dependencies on autoconf and friends
     URL https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.2.tar.gz
     URL_HASH SHA256=6e5706d0d4ee4e1e2f883db9d768586b4d06567debea353c796ec45e8321c3d4
 
-    # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)
-    PATCH_COMMAND pwd && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch# && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
+    ${patchCommand}
+
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND pwd && sh -c "pwd && echo '===============  CONFIGURE ============' && echo 'Calling: ${configure_cmd}' && ${configure_cmd}"
     #    BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} Use default BUILD_COMMAND for now
@@ -260,10 +193,10 @@ else()
   #file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/bison/2.4.1/bison-2.4.1-bin.zip ${CMAKE_BINARY_DIR}/tools/bison-2.4.1-bin.zip)
   #file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/bison/2.4.1/bison-2.4.1-dep.zip ${CMAKE_BINARY_DIR}/tools/bison-2.4.1-dep.zip)
   if(NOT EXISTS ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-dep.zip)
-    file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-dep.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-dep.zip)
+    file(DOWNLOAD https://sourceforge.net/projects/gnuwin32/files/sed/4.2.1/sed-4.2.1-dep.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-dep.zip)
   endif()
   if(NOT EXISTS ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-bin.zip)
-    file(DOWNLOAD https://iweb.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-bin.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-bin.zip)
+    file(DOWNLOAD https://sourceforge.net/projects/gnuwin32/files/sed/4.2.1/sed-4.2.1-bin.zip ${CMAKE_BINARY_DIR}/tools/sed-4.2.1-bin.zip)
   endif()
 
   #add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/tools/bin/bison.exe ${CMAKE_BINARY_DIR}/tools/bin/sed.exe
@@ -290,6 +223,7 @@ else()
   # tool dependencies
   ExternalProject_Add(Ruby
     #DEPENDS GetTools FFI
+    DEPENDS GetTools
     #    URL https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.5.tar.gz
     #    URL_HASH SHA256=28a945fdf340e6ba04fc890b98648342e3cccfd6d223a48f3810572f11b2514c
     URL https://codeload.github.com/ruby/ruby/tar.gz/v2_7_2
@@ -301,6 +235,7 @@ else()
                && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.win.272.patch  # && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.nodynamic.patch
                && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0001-patch-to-support-version-ranges-for-MSVC.patch
                && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
+               && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0003-YYUSE.patch
                && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
     CONFIGURE_COMMAND ""
     BUILD_COMMAND cmd /C "${CMAKE_BINARY_DIR}/build_ruby_$<CONFIG>.bat"
