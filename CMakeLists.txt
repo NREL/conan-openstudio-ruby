@@ -85,16 +85,16 @@ endif()
 # Notice that we pass --with-dbm-dir poiting to conan gdbm: that's because we build with gdbm_compat which should provide dbm too
 # We also pass `--with-dbm-type=gdbm_compat` since we use GDBM > 1.8.1 (found this arg in `Ruby/ext/extconf.rb`)
 # Note: probably would be a good idea to escape the path by wrapping into double quotes (for build_ruby.bat at least...)
-set(CONF_ARGS
-"$<IF:$<BOOL:${CURRENT_CONAN_ZLIB_ROOT}>,--with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_OPENSSL_ROOT}>,--with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_LIBFFI_ROOT}>,--with-libffi-dir=${CURRENT_CONAN_LIBFFI_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_LIBYAML_ROOT}>,--with-libyaml-dir=${CURRENT_CONAN_LIBYAML_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-gdbm-dir=${CURRENT_CONAN_GDBM_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-dbm-dir=${CURRENT_CONAN_GDBM_ROOT} --with-dbm-type=gdbm_compat ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_READLINE_ROOT}>,--with-readline-dir=${CURRENT_CONAN_READLINE_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_GMP_ROOT}>,--with-gmp-dir=${CURRENT_CONAN_GMP_ROOT} ,>"
-)
+# set(CONF_ARGS
+# "$<IF:$<BOOL:${CURRENT_CONAN_ZLIB_ROOT}>,--with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} ,>\
+# $<IF:$<BOOL:${CURRENT_CONAN_OPENSSL_ROOT}>,--with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT} ,>\
+# $<IF:$<BOOL:${CURRENT_CONAN_LIBFFI_ROOT}>,--with-libffi-dir=${CURRENT_CONAN_LIBFFI_ROOT} ,>\
+# $<IF:$<BOOL:${CURRENT_CONAN_LIBYAML_ROOT}>,--with-libyaml-dir=${CURRENT_CONAN_LIBYAML_ROOT} ,>\
+# $<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-gdbm-dir=${CURRENT_CONAN_GDBM_ROOT} ,>\
+# $<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-dbm-dir=${CURRENT_CONAN_GDBM_ROOT} --with-dbm-type=gdbm_compat ,>\
+# $<IF:$<BOOL:${CURRENT_CONAN_READLINE_ROOT}>,--with-readline-dir=${CURRENT_CONAN_READLINE_ROOT} ,>\
+# $<IF:$<BOOL:${CURRENT_CONAN_GMP_ROOT}>,--with-gmp-dir=${CURRENT_CONAN_GMP_ROOT} ,>"
+# )
 
 # openssl (> 1.1.0) from conan center index now renames debug libraries to libssld and libcryptod
 FindValue(CONAN_LIBS_OPENSSL)
@@ -155,7 +155,7 @@ if( UNIX )
     )
   endif()
 
-  set(configure_cmd "./configure --with-static-linked-ext --enable-load-relative ${MAC_opts} --disable-install-doc cflags=-fPIC --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install ${CONF_ARGS}")
+  set(configure_cmd "./configure --with-static-linked-ext --enable-load-relative ${MAC_opts} --disable-install-doc cflags=-fPIC --prefix=${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install ${OPT_DIRS} ${CONF_ARGS}")
   ExternalProject_Add(Ruby
     # Use official ruby source package to reduce dependencies on autoconf and friends
     URL https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.2.tar.gz

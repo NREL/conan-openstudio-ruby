@@ -166,6 +166,33 @@ class OpenstudiorubyConan(ConanFile):
 
         cmake = CMake(self, parallel=parallel)
         cmake.definitions["OPENSSL_VERSION"] = self.deps_cpp_info["openssl"].version
+
+        legacy_conf_args = []
+        opt_dirs = []
+        conf_args = []
+        for name, dep_cpp_info in self.deps_cpp_info.dependencies:
+            if name in ['zlib', 'openssl', 'libffi', 'libyaml', 'readline', 'gmp', 'gdbm']:
+                root_path = tools.unix_path(dep_cpp_info.rootpath)
+                legacy_conf_args.append(f"--with-{name}-dir={root_path}")
+                opt_dirs.append(root_path)
+                if name == 'gdbm':
+                    legacy_conf_args.append(f"--with-dbm-dir=={root_path} --with-dbm-type=gdbm_compat")
+                    conf_args.append(f"--with-dbm-dir=={root_path} --with-dbm-type=gdbm_compat")
+
+        if opt_dirs:
+            sep = ':'
+            if (self.settings.os == "Windows"):
+                sep = ';'
+
+            opt_dirs_str = f"--with-opt-dir={sep.join(opt_dirs)}"
+            conf_args_str = " ".join(conf_args)
+            legacy_conf_args_str = " ".join(legacy_conf_args)
+            print(f"OPT_DIRS={opt_dirs_str}")
+            print(f"CONF_ARGS={conf_args_str}")
+            print(f"legacy_conf_args={legacy_conf_args_str}")
+            cmake.definitions["CONF_ARGS"] = conf_args_str
+            cmake.definitions["OPT_DIRS"] = opt_dirs_str
+
         cmake.configure()
 
         # On Windows the build never succeeds on the first try. Much effort
