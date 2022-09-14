@@ -27,26 +27,31 @@ jobs:
           compiler: GCC
           version: 7
           allow_failure: false
+          CONAN_DOCKER_IMAGE: conanio/gcc7:1.46.2
         - build_name: GCC-8
           os: ubuntu-18.04
           compiler: GCC
           version: 8
           allow_failure: false
+          CONAN_DOCKER_IMAGE: conanio/gcc8:1.46.2
         - build_name: GCC-9
           os: ubuntu-18.04
           compiler: GCC
           version: 9
           allow_failure: false
+          CONAN_DOCKER_IMAGE: conanio/gcc9:1.46.2
         - build_name: GCC-10
           os: ubuntu-18.04
           compiler: GCC
           version: 10
           allow_failure: false
+          CONAN_DOCKER_IMAGE: conanio/gcc10:1.46.2
         - build_name: GCC-11
           os: ubuntu-18.04
           compiler: GCC
           version: 11
           allow_failure: false
+          CONAN_DOCKER_IMAGE: conanio/gcc11:1.46.2
         - build_name: Apple-Clang 11
           os: macos-10.15
           compiler: APPLE_CLANG
@@ -93,7 +98,7 @@ jobs:
           CONAN_USERNAME=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           echo "CONAN_USERNAME=$CONAN_USERNAME" >> $GITHUB_ENV
 
-          matrix="{\"name\": \"${{ matrix.build_name }}\", \"compiler\": \"${{ matrix.compiler }}\", \"version\": \"${{ matrix.version}}\", \"cwd\": \"./\", \"recipe_version\": \"2.7.2\"}"
+          matrix="{\"name\": \"${{ matrix.build_name }}\", \"compiler\": \"${{ matrix.compiler }}\", \"version\": \"${{ matrix.version}}\", \"dockerImage\": \"${{ matrix.CONAN_DOCKER_IMAGE }}\", \"cwd\": \"./\", \"recipe_version\": \"2.7.2\"}"
           bincrafters-package-tools prepare-env --platform gha --config "${matrix}"
       - name: Run
         env:
