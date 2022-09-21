@@ -87,7 +87,12 @@ class OpenstudiorubyConan(ConanFile):
         """
         # Doesn't work with 3.x.
         # Doesn't work on gcc 7 and 8 with 1.1.1n: had to patch it
-        self.requires("openssl/1.1.1o")
+        # 1.1.1o doesn't build on centos with gcc10/9 
+        if tools.os_info.linux_distro == "centos":
+            self.requires("openssl/1.1.0l")
+        else:
+            self.requires("openssl/1.1.1o")
+               
         self.requires("zlib/1.2.12")
 
         if self.options.with_libyaml:
@@ -125,7 +130,12 @@ class OpenstudiorubyConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
-        self.build_requires("ruby_installer/2.7.3@nrel/stable")
+
+        # ruby_installer has openssl 1.1.1o dep so need to have 1.1.0l for centos builds
+        if tools.os_info.linux_distro == "centos":
+            self.build_requires("ruby_installer/2.7.3@nrel/centos")
+        else: 
+            self.build_requires("ruby_installer/2.7.3@nrel/stable")
 
         # cant use bison/3.5.3 from CCI as it uses m4 which won't build
         # with x86. So use bincrafters' still but explicitly add bin dir
