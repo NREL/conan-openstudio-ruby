@@ -125,7 +125,9 @@ class OpenstudiorubyConan(ConanFile):
         pre-compiled binary, then the build requirements for this package will
         not be retrieved.
         """
-        self.build_requires("ruby_installer/2.7.3@nrel/stable")
+        if (self.settings.os == "Linux"):
+            # Mac has it. Windows too. the conanio/gcc images do not
+            self.build_requires("ruby_installer/2.7.3@nrel/stable")
 
         # cant use bison/3.5.3 from CCI as it uses m4 which won't build
         # with x86. So use bincrafters' still but explicitly add bin dir

@@ -15,7 +15,7 @@ ECHO "CONF_ARGS='%CONF_ARGS%'"
 set CL=/MP
 set CFLAGS=${CURRENT_CMAKE_C_FLAGS} -wd4996 -we4028 -we4142 -Zm600 -Zi
 
-set BASE_RUBY=${CURRENT_CONAN_BIN_DIRS_RUBY_INSTALLER}/ruby.exe
+REM set BASE_RUBY=${CURRENT_CONAN_BIN_DIRS_RUBY_INSTALLER}/ruby.exe
 set OPENSSL_DIR=${CURRENT_CONAN_OPENSSL_ROOT}
 set OPENSSL_LIBS=${CURRENT_CONAN_LIB_DIRS_OPENSSL}/${OPENSSL_LIBCRYPTO_NAME}.lib ${CURRENT_CONAN_LIB_DIRS_OPENSSL}/${OPENSSL_LIBSSL_NAME}.lib
 set ZLIB_DIR=${CURRENT_CONAN_ZLIB_ROOT}
@@ -69,7 +69,8 @@ echo "CONF_ARGS='%CONF_ARGS%'"
 
 @ECHO ON
 
-call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --disable-install-doc --enable-load-relative  --with-static-linked-ext --without-ext=+,dbm,gdbm --enable-bundled-libffi %CONF_ARGS% --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" --with-baseruby="%BASE_RUBY%" 
+call ${CMAKE_BINARY_DIR}\Ruby-prefix\src\Ruby\win32\configure.bat --disable-install-doc --enable-load-relative  --with-static-linked-ext --without-ext=+,dbm,gdbm --enable-bundled-libffi %CONF_ARGS% --prefix="${CMAKE_BINARY_DIR}/Ruby-prefix/src/Ruby-install/" 
+REM --with-baseruby="%BASE_RUBY%" 
 
 
 nmake incs
