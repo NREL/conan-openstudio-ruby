@@ -1,25 +1,26 @@
 diff --git a/ext/zlib/extconf.rb b/ext/zlib/extconf.rb
-index fd2f168..8e77caa 100644
+index d674544..afbb55a 100644
 --- a/ext/zlib/extconf.rb
 +++ b/ext/zlib/extconf.rb
 @@ -11,7 +11,7 @@ require 'rbconfig'
  dir_config 'zlib'
  
- 
+ libs = $libs
 -if %w'z libz zlib1 zlib zdll zlibwapi'.find {|z| have_library(z, 'deflateReset')} and
 +if %w'z zlibstatic zlibstaticd zlib zlibd'.find {|z| have_library(z, 'deflateReset', 'zlib.h')} and
      have_header('zlib.h') then
    have_zlib = true
  else
 diff --git a/lib/mkmf.rb b/lib/mkmf.rb
-index eabccd4..ef1805e 100644
+index 2305641..f545a90 100644
 --- a/lib/mkmf.rb
 +++ b/lib/mkmf.rb
-@@ -2747,7 +2747,21 @@ MESSAGE
+@@ -2795,7 +2795,25 @@ MESSAGE
    ##
    # A C main function which does no work
  
 -  MAIN_DOES_NOTHING = config_string('MAIN_DOES_NOTHING') || "int main(int argc, char **argv)\n{\n  return !!argv[argc];\n}"
++  
 +  MAIN_DOES_NOTHING = config_string('MAIN_DOES_NOTHING') || <<-SRC
 +int main(int argc, char **argv)
 +{
@@ -34,36 +35,38 @@ index eabccd4..ef1805e 100644
 +  return 0;
 +}
 +SRC
-+
++  
++  
++  
++  
    UNIVERSAL_INTS = config_string('UNIVERSAL_INTS') {|s| Shellwords.shellwords(s)} ||
      %w[int short long long\ long]
  
 diff --git a/lib/rubygems.rb b/lib/rubygems.rb
-index 94242a1..2b6c4c0 100644
+index bad8e80..43a8360 100644
 --- a/lib/rubygems.rb
 +++ b/lib/rubygems.rb
-@@ -1392,24 +1392,24 @@ An Array (#{env.inspect}) was passed in from #{caller[3]}
+@@ -1293,23 +1293,24 @@ An Array (#{env.inspect}) was passed in from #{caller[3]}
  
    MARSHAL_SPEC_DIR = "quick/Marshal.#{Gem.marshal_version}/".freeze
  
--  autoload :BundlerVersionFinder, File.expand_path('rubygems/bundler_version_finder', __dir__)
--  autoload :ConfigFile,         File.expand_path('rubygems/config_file', __dir__)
--  autoload :Dependency,         File.expand_path('rubygems/dependency', __dir__)
--  autoload :DependencyList,     File.expand_path('rubygems/dependency_list', __dir__)
--  autoload :Installer,          File.expand_path('rubygems/installer', __dir__)
--  autoload :Licenses,           File.expand_path('rubygems/util/licenses', __dir__)
--  autoload :NameTuple,          File.expand_path('rubygems/name_tuple', __dir__)
--  autoload :PathSupport,        File.expand_path('rubygems/path_support', __dir__)
--  autoload :Platform,           File.expand_path('rubygems/platform', __dir__)
--  autoload :RequestSet,         File.expand_path('rubygems/request_set', __dir__)
--  autoload :Requirement,        File.expand_path('rubygems/requirement', __dir__)
--  autoload :Resolver,           File.expand_path('rubygems/resolver', __dir__)
--  autoload :Source,             File.expand_path('rubygems/source', __dir__)
--  autoload :SourceList,         File.expand_path('rubygems/source_list', __dir__)
--  autoload :SpecFetcher,        File.expand_path('rubygems/spec_fetcher', __dir__)
--  autoload :Specification,      File.expand_path('rubygems/specification', __dir__)
--  autoload :Util,               File.expand_path('rubygems/util', __dir__)
--  autoload :Version,            File.expand_path('rubygems/version', __dir__)
+-  autoload :BundlerVersionFinder, File.expand_path("rubygems/bundler_version_finder", __dir__)
+-  autoload :ConfigFile,         File.expand_path("rubygems/config_file", __dir__)
+-  autoload :Dependency,         File.expand_path("rubygems/dependency", __dir__)
+-  autoload :DependencyList,     File.expand_path("rubygems/dependency_list", __dir__)
+-  autoload :Installer,          File.expand_path("rubygems/installer", __dir__)
+-  autoload :Licenses,           File.expand_path("rubygems/util/licenses", __dir__)
+-  autoload :NameTuple,          File.expand_path("rubygems/name_tuple", __dir__)
+-  autoload :PathSupport,        File.expand_path("rubygems/path_support", __dir__)
+-  autoload :RequestSet,         File.expand_path("rubygems/request_set", __dir__)
+-  autoload :Requirement,        File.expand_path("rubygems/requirement", __dir__)
+-  autoload :Resolver,           File.expand_path("rubygems/resolver", __dir__)
+-  autoload :Source,             File.expand_path("rubygems/source", __dir__)
+-  autoload :SourceList,         File.expand_path("rubygems/source_list", __dir__)
+-  autoload :SpecFetcher,        File.expand_path("rubygems/spec_fetcher", __dir__)
+-  autoload :SpecificationPolicy, File.expand_path("rubygems/specification_policy", __dir__)
+-  autoload :Util,               File.expand_path("rubygems/util", __dir__)
+-  autoload :Version,            File.expand_path("rubygems/version", __dir__)
 +  require 'rubygems/bundler_version_finder'
 +  require 'rubygems/config_file'
 +  require 'rubygems/dependency'
@@ -82,74 +85,73 @@ index 94242a1..2b6c4c0 100644
 +  require 'rubygems/specification'
 +  require 'rubygems/util'
 +  require 'rubygems/version'
- 
-   require "rubygems/specification"
  end
-diff --git a/lib/rubygems/version.rb b/lib/rubygems/version.rb
-index b1faedc..6e7557a 100644
---- a/lib/rubygems/version.rb
-+++ b/lib/rubygems/version.rb
-@@ -151,7 +151,7 @@
  
- class Gem::Version
+ require_relative "rubygems/exceptions"
+diff --git a/lib/rubygems/util.rb b/lib/rubygems/util.rb
+index 356c46a..64a0b04 100644
+--- a/lib/rubygems/util.rb
++++ b/lib/rubygems/util.rb
+@@ -98,7 +98,9 @@ module Gem::Util
  
--  autoload :Requirement, File.expand_path('requirement', __dir__)
-+  require 'rubygems/requirement'
- 
-   include Comparable
- 
+   def self.glob_files_in_dir(glob, base_path)
+     if RUBY_VERSION >= "2.5"
+-      Dir.glob(glob, base: base_path).map! {|f| File.expand_path(f, base_path) }
++      Dir.glob(File.expand_path(glob, base_path))
++      #Below fails on windows. Throws invalid argument" 
++      #Dir.glob(glob, base: base_path).map! {|f| File.expand_path(f, base_path) }
+     else
+       Dir.glob(File.expand_path(glob, base_path))
+     end
 diff --git a/load.c b/load.c
-index 07acc9a..52014b9 100644
+index bc05711..12afa08 100644
 --- a/load.c
 +++ b/load.c
-@@ -10,6 +10,9 @@
- #include "probes.h"
- #include "iseq.h"
+@@ -17,6 +17,9 @@
+ #include "ruby/encoding.h"
+ #include "ruby/util.h"
  
 +int rb_hasFile(const char *t_filename);
 +int rb_require_embedded(const char *t_filename);
-+
++ 
  static VALUE ruby_dln_librefs;
  
  #define IS_RBEXT(e) (strcmp((e), ".rb") == 0)
-@@ -1116,7 +1119,11 @@ rb_require_string(VALUE fname)
- VALUE
- rb_require(const char *fname)
- {
-+  if ( rb_hasFile(fname) ) {
-+    return rb_require_embedded(fname);
-+  } else {
-     return rb_require_string(rb_str_new_cstr(fname));
-+  }
+@@ -1236,11 +1239,15 @@ rb_require_string(VALUE fname)
+     return RBOOL(result);
  }
  
+-VALUE
+-rb_require(const char *fname)
+-{
+-    return rb_require_string(rb_str_new_cstr(fname));
+-}
++ VALUE
++ rb_require(const char *fname)
++ {
++   if ( rb_hasFile(fname) ) {
++     return rb_require_embedded(fname);
++   } else {
++     return rb_require_string(rb_str_new_cstr(fname));
++   }
++ }
+ 
  static int
+ register_init_ext(st_data_t *key, st_data_t *value, st_data_t init, int existing)
 diff --git a/main.c b/main.c
-index 313aaed..3ce7ff7 100644
+index d81cfce..1f3d169 100644
 --- a/main.c
 +++ b/main.c
-@@ -50,3 +50,11 @@ main(int argc, char **argv)
+@@ -47,3 +47,11 @@ main(int argc, char **argv)
  	return ruby_run_node(ruby_options(argc, argv));
      }
  }
 +
-+int rb_hasFile(const char *t_filename) {
-+  return 0;
-+}
-+
-+int rb_require_embedded(const char *t_filename) {
-+  return 0;
-+}
-
-diff --git a/win32/Makefile.sub b/win32/Makefile.sub
-index 326bd7f..e04ccb3 100644
---- a/win32/Makefile.sub
-+++ b/win32/Makefile.sub
-@@ -991,6 +991,7 @@ s,@SOEXT@,dll,;t t
- s,@DLEXT@,so,;t t
- s,@LIBEXT@,lib,;t t
- s,@STRIP@,$(STRIP),;t t
-+s,@ENCSTATIC@,$(ENCSTATIC),;t t
- s,@EXTSTATIC@,$(EXTSTATIC),;t t
- s,@setup@,Setup,;t t
- s,@MINIRUBY@,$(MINIRUBY),;t t
++ int rb_hasFile(const char *t_filename) {
++   return 0;
++ }
++ 
++ int rb_require_embedded(const char *t_filename) {
++   return 0;
++ }
+\ No newline at end of file

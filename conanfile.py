@@ -8,7 +8,7 @@ from conans.errors import ConanException, ConanInvalidConfiguration
 
 class OpenstudiorubyConan(ConanFile):
     name = "openstudio_ruby"
-    version = "2.7.2"
+    version = "3.1.3"
     license = "<Put the package license here>"  # TODO
     author = "NREL <openstudio@nrel.gov>"
     url = "https://github.com/NREL/conan-openstudio-ruby"
@@ -87,7 +87,7 @@ class OpenstudiorubyConan(ConanFile):
         """
         # Doesn't work with 3.x.
         # Doesn't work on gcc 7 and 8 with 1.1.1n: had to patch it
-        self.requires("openssl/1.1.1o")
+        self.requires("openssl/1.1.1s")
         self.requires("zlib/1.2.12")
 
         if self.options.with_libyaml:
@@ -196,10 +196,10 @@ class OpenstudiorubyConan(ConanFile):
         on the platform
 
         eg:
-            include/ruby-2.7.0/x64-mswin64_140
-            include/ruby-2.7.0/i386-mswin32_140
-            include/ruby-2.7.0/x86_64-linux
-            include/ruby-2.7.0/x86_64-darwin17
+            include/ruby-3.1.0/x64-mswin64_140
+            include/ruby-3.1.0/i386-mswin32_140
+            include/ruby-3.1.0/x86_64-linux
+            include/ruby-3.1.0/x86_64-darwin17
         """
         found = []
 
