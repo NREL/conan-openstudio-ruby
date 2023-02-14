@@ -86,13 +86,13 @@ endif()
 # We also pass `--with-dbm-type=gdbm_compat` since we use GDBM > 1.8.1 (found this arg in `Ruby/ext/extconf.rb`)
 # Note: probably would be a good idea to escape the path by wrapping into double quotes (for build_ruby.bat at least...)
 set(CONF_ARGS
-"$<IF:$<BOOL:${CURRENT_CONAN_ZLIB_ROOT}>,--with-opt-dir=${CURRENT_CONAN_ZLIB_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_OPENSSL_ROOT}>,--with-opt-dir=${CURRENT_CONAN_OPENSSL_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_LIBFFI_ROOT}>,--with-opt-dir=${CURRENT_CONAN_LIBFFI_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_LIBYAML_ROOT}>,--with-opt-dir=${CURRENT_CONAN_LIBYAML_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-opt-dir=${CURRENT_CONAN_GDBM_ROOT} ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-opt-dir=${CURRENT_CONAN_GDBM_ROOT} --with-dbm-type=gdbm_compat ,>\
-$<IF:$<BOOL:${CURRENT_CONAN_READLINE_ROOT}>,--with-opt-dir=${CURRENT_CONAN_READLINE_ROOT} ,>\
+"$<IF:$<BOOL:${CURRENT_CONAN_ZLIB_ROOT}>,--with-zlib-dir=${CURRENT_CONAN_ZLIB_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_OPENSSL_ROOT}>,--with-openssl-dir=${CURRENT_CONAN_OPENSSL_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIBFFI_ROOT}>,--with-libffi-dir=${CURRENT_CONAN_LIBFFI_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_LIBYAML_ROOT}>,--with-libyaml-dir=${CURRENT_CONAN_LIBYAML_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-gdbm-dir=${CURRENT_CONAN_GDBM_ROOT} ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_GDBM_ROOT}>,--with-dbm-dir=${CURRENT_CONAN_GDBM_ROOT} --with-dbm-type=gdbm_compat ,>\
+$<IF:$<BOOL:${CURRENT_CONAN_READLINE_ROOT}>,--with-readline-dir=${CURRENT_CONAN_READLINE_ROOT} ,>\
 $<IF:$<BOOL:${CURRENT_CONAN_GMP_ROOT}>,--with-gmp-dir=${CURRENT_CONAN_GMP_ROOT} ,>"
 )
 
@@ -139,7 +139,7 @@ if( UNIX )
   if(CMAKE_COMPILER_IS_GNUCXX)
     set(patchCommand PATCH_COMMAND pwd
       && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
-      #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.ld.patch
       #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
       #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0003-YYUSE.patch ${EXTRA_PATCH}
       #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0004-GCC7_8_fix_link_flags.patch
@@ -147,7 +147,7 @@ if( UNIX )
   else()
     set(patchCommand PATCH_COMMAND pwd
       && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
-      #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.util.patch
+      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.ld.patch
       #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
       #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0003-YYUSE.patch ${EXTRA_PATCH}
       # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)

@@ -1,0 +1,13 @@
+diff --git a/lib/mkmf.rb b/lib/mkmf.rb
+index f545a90..1c45e17 100644
+--- a/lib/mkmf.rb
++++ b/lib/mkmf.rb
+@@ -512,7 +512,7 @@ MSG
+                                   'ARCH_FLAG' => "#$ARCH_FLAG",
+                                   'LDFLAGS' => "#$LDFLAGS #{ldflags}",
+                                   'LOCAL_LIBS' => "#$LOCAL_LIBS #$libs",
+-                                  'LIBS' => "#{librubyarg} #{opt} #$LIBS")
++                                  'LIBS' => "#{opt} #{librubyarg} #$LIBS")
+     conf['LIBPATH'] = libpathflag(libpath.map {|s| RbConfig::expand(s.dup, conf)})
+     conf
+   end
