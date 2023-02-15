@@ -139,7 +139,6 @@ if( UNIX )
   if(CMAKE_COMPILER_IS_GNUCXX)
     set(patchCommand PATCH_COMMAND pwd
       && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
-      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.ld.patch
       #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
       #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0003-YYUSE.patch ${EXTRA_PATCH}
       #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0004-GCC7_8_fix_link_flags.patch
@@ -147,7 +146,6 @@ if( UNIX )
   else()
     set(patchCommand PATCH_COMMAND pwd
       && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
-      && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.ld.patch
       #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0002-patch-encoding-CP720.patch
       #&& ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/0003-YYUSE.patch ${EXTRA_PATCH}
       # The 'nodynamic' modules patch fails to build in any way on Unix, with 2.5.x, so we aren't using it (at the moment anyhow)
