@@ -2,7 +2,7 @@ name: Conan
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master, develop, ruby_3_1_3 ]
   pull_request:
     branches: [ master, develop ]
 
