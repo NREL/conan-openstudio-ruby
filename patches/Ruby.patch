@@ -12,9 +12,18 @@ index d674544..afbb55a 100644
    have_zlib = true
  else
 diff --git a/lib/mkmf.rb b/lib/mkmf.rb
-index 2305641..f545a90 100644
+index 2305641..1c45e17 100644
 --- a/lib/mkmf.rb
 +++ b/lib/mkmf.rb
+@@ -512,7 +512,7 @@ MSG
+                                   'ARCH_FLAG' => "#$ARCH_FLAG",
+                                   'LDFLAGS' => "#$LDFLAGS #{ldflags}",
+                                   'LOCAL_LIBS' => "#$LOCAL_LIBS #$libs",
+-                                  'LIBS' => "#{librubyarg} #{opt} #$LIBS")
++                                  'LIBS' => "#{opt} #{librubyarg} #$LIBS")
+     conf['LIBPATH'] = libpathflag(libpath.map {|s| RbConfig::expand(s.dup, conf)})
+     conf
+   end
 @@ -2795,7 +2795,25 @@ MESSAGE
    ##
    # A C main function which does no work
@@ -43,7 +52,7 @@ index 2305641..f545a90 100644
      %w[int short long long\ long]
  
 diff --git a/lib/rubygems.rb b/lib/rubygems.rb
-index bad8e80..43a8360 100644
+index bad8e80..b61f5ff 100644
 --- a/lib/rubygems.rb
 +++ b/lib/rubygems.rb
 @@ -1293,23 +1293,24 @@ An Array (#{env.inspect}) was passed in from #{caller[3]}
@@ -67,22 +76,22 @@ index bad8e80..43a8360 100644
 -  autoload :SpecificationPolicy, File.expand_path("rubygems/specification_policy", __dir__)
 -  autoload :Util,               File.expand_path("rubygems/util", __dir__)
 -  autoload :Version,            File.expand_path("rubygems/version", __dir__)
++  require 'rubygems/platform'
++  require 'rubygems/requirement'
 +  require 'rubygems/bundler_version_finder'
 +  require 'rubygems/config_file'
 +  require 'rubygems/dependency'
 +  require 'rubygems/dependency_list'
-+  require 'rubygems/resolver'
 +  require 'rubygems/installer'
 +  require 'rubygems/util/licenses'
++  require 'rubygems/name_tuple'
 +  require 'rubygems/path_support'
-+  require 'rubygems/platform'
 +  require 'rubygems/request_set'
-+  require 'rubygems/requirement'
 +  require 'rubygems/resolver'
 +  require 'rubygems/source'
 +  require 'rubygems/source_list'
 +  require 'rubygems/spec_fetcher'
-+  require 'rubygems/specification'
++  require 'rubygems/specification_policy'
 +  require 'rubygems/util'
 +  require 'rubygems/version'
  end
