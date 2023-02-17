@@ -3,8 +3,7 @@
 
 from cpt.printer import Printer
 from cpt.ci_manager import CIManager
-from bincrafters import build_template_default
-
+from bincrafters import build_autodetect
 
 if __name__ == "__main__":
 
@@ -38,7 +37,7 @@ if __name__ == "__main__":
     # cf: https://docs.conan.io/en/latest/howtos/manage_gcc_abi.html
     pure_c = False
 
-    builder = build_template_default.get_builder(
+    builder = build_autodetect._get_default_builder(
         build_policy="outdated",
         upload_only_when_stable=upload_only_when_stable,
         pure_c=pure_c
