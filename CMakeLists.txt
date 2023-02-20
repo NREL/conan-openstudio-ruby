@@ -225,7 +225,7 @@ else()
     DEPENDS GetTools
     #    URL https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.5.tar.gz
     #    URL_HASH SHA256=28a945fdf340e6ba04fc890b98648342e3cccfd6d223a48f3810572f11b2514c
-    URL https://codeload.github.com/ruby/ruby/tar.gz/v3_1_3
+    URL https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.3.tar.gz
     URL_HASH SHA256=5ea498a35f4cd15875200a52dde42b6eb179e1264e17d78732c3a57cd1c6ab9e
 
     PATCH_COMMAND ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/patches/Ruby.patch
