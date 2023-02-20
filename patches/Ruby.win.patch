@@ -1,25 +1,48 @@
 diff --git a/ext/fiddle/extconf.rb b/ext/fiddle/extconf.rb
-index f8a94d4..05340ca 100644
+index 053456d..2ccd5ff 100644
 --- a/ext/fiddle/extconf.rb
 +++ b/ext/fiddle/extconf.rb
-@@ -10,6 +10,12 @@ if ! bundle
-   pkg_config("libffi") and
-     ver = pkg_config("libffi", "modversion")
- 
-+  if $mswin
-+    $defs << "-DFFI_BUILDING"
+@@ -114,6 +114,8 @@ unless have_libffi
+       raise "missing #{as} command."
+     end
+     $defs << "-DFFI_BUILDING"
 +    CONFIG['CFLAGS'] << " -DFFI_BUILDING"
 +    $CFLAGS << " -DFFI_BUILDING"
-+  end
-+
-   if have_header(ffi_header = 'ffi.h')
-     true
-   elsif have_header(ffi_header = 'ffi/ffi.h')
+     libffi_config = "#{relative_from($srcdir, '..')}/win32/libffi-config.rb"
+     config = CONFIG.merge("top_srcdir" => $top_srcdir)
+     args = $ruby.gsub(/:\/=\\/, '')
+diff --git a/ext/openssl/extconf.rb b/ext/openssl/extconf.rb
+index d2d7893..22901e8 100644
+--- a/ext/openssl/extconf.rb
++++ b/ext/openssl/extconf.rb
+@@ -56,9 +56,13 @@ def find_openssl_library
+ 
+   if $mswin
+     # OpenSSL >= 1.1.0: libcrypto.lib and libssl.lib.
++    # Potentially with 'd' appended (conan center index)
+     if have_library("libcrypto", "CRYPTO_malloc") &&
+         have_library("libssl", "SSL_new")
+       return true
++    elsif have_library("libcryptod", "CRYPTO_malloc") &&
++        have_library("libssld", "SSL_new")
++      return true
+     end
+ 
+     # OpenSSL <= 1.0.2: libeay32.lib and ssleay32.lib.
 diff --git a/win32/Makefile.sub b/win32/Makefile.sub
-index 326bd7f..c080e53 100644
+index b5d1179..f32ce62 100644
 --- a/win32/Makefile.sub
 +++ b/win32/Makefile.sub
-@@ -380,7 +380,7 @@ MINIRUBY = $(RUBY) -I$(MAKEDIR) -r$(arch)-fake
+@@ -258,7 +258,7 @@ CFLAGS = $(CFLAGS_NO_ARCH) $(ARCH_FLAG)
+ CXXFLAGS = $(CFLAGS)
+ !endif
+ !if !defined(LDFLAGS)
+-LDFLAGS = -incremental:no -debug -opt:ref -opt:icf
++LDFLAGS = -incremental:no -debug -opt:ref -opt:icf -IGNORE:4099,4049,4217,4286
+ !endif
+ !if !defined(XLDFLAGS)
+ XLDFLAGS = -stack:$(STACK)
+@@ -374,7 +374,7 @@ MINIRUBY = $(RUBY) -I$(MAKEDIR) -r$(arch)-fake
  RUNRUBY = $(MINIRUBY)
  !else
  MINIRUBY = .\miniruby$(EXEEXT) -I$(srcdir)/lib -I.
@@ -27,4 +50,13 @@ index 326bd7f..c080e53 100644
 +RUNRUBY = .\$(PROGRAM) --disable-gems -I$(srcdir)/lib -I"$(EXTOUT)/$(arch)" -I.
  !endif
  MINIRUBY = $(MINIRUBY) $(MINIRUBYOPT)
- RUNRUBY = $(RUNRUBY) "$(srcdir)/tool/runruby.rb" --extout="$(EXTOUT)" $(RUNRUBYOPT) -- $(RUN_OPTS)
+ RUNRUBY = $(RUNRUBY) "$(tooldir)/runruby.rb" --extout="$(EXTOUT)" $(RUNRUBYOPT) -- $(RUN_OPTS)
+@@ -1166,7 +1166,7 @@ $(LIBRUBY_SO):	$(LIBRUBY_A) $(DLDOBJS) $(RUBYDEF) $(RUBY_SO_NAME).res
+ 		@-$(PRE_LIBRUBY_UPDATE)
+ !endif
+ 		$(ECHO) linking shared-library $(@:\=/)
+-		$(Q) $(LDSHARED) $(DLDOBJS) $(LIBRUBY_A) \
++		$(Q) $(LDSHARED) $(MAINOBJ) $(DLDOBJS) $(LIBRUBY_A) \
+ 			$(RUBY_SO_NAME).res $(SOLIBS) $(EXTSOLIBS) $(LIBS) -Fe$@ -link $(LDFLAGS) \
+ 			$(LIBRUBY_DLDFLAGS)
+ 		@$(RM) dummy.lib dummy.exp
