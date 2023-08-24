@@ -2,7 +2,7 @@ name: Conan
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master, develop, ci ]
   pull_request:
     branches: [ master, develop ]
 
@@ -20,20 +20,8 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        build_name: [GCC-7, GCC-8, GCC-9, GCC-10, GCC-11, Apple-Clang 11, Apple-Clang 12, MSVC-2022, MSVC-2019]
+        build_name: [GCC-9, GCC-10, GCC-11, Apple-Clang 11, Apple-Clang 12, MSVC-2022, MSVC-2019]
         include:
-        - build_name: GCC-7
-          os: ubuntu-18.04
-          compiler: GCC
-          version: 7
-          allow_failure: false
-          CONAN_DOCKER_IMAGE: conanio/gcc7:1.46.2
-        - build_name: GCC-8
-          os: ubuntu-18.04
-          compiler: GCC
-          version: 8
-          allow_failure: false
-          CONAN_DOCKER_IMAGE: conanio/gcc8:1.46.2
         - build_name: GCC-9
           os: ubuntu-18.04
           compiler: GCC
